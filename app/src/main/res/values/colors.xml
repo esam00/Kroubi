@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="colorPrimary">#075E54</color>
+    <color name="colorPrimaryDark">#043C34</color>
+    <color name="colorAccent">#25D366</color>
+
+    <color name="colorMain">#075E54</color>
+    <color name="colorMainLight">#128C7E</color>
+
+    <color name="chat_background">#ECE5DD</color>
+    <color name="outgoing_chat_bubble">#DCF8C6</color>
+
+    <color name="disabledColor">#8A9B91</color>
+    <color name="white">#fff</color>
+    <color name="light_gray">#A79A9A</color>
+
+    <color name="dark_gray">#5E5757</color>
+
+
+</resources>

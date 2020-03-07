@@ -1,0 +1,9 @@
+<resources>
+    <string name="app_name">Chat App</string>
+    <string name="home_activity_title">WhatsApp</string>
+    <string name="title_activity_image_presenter">ImagePresenter</string>
+    <string name="please_wait">please wait ..</string>
+    <string name="ok">OK</string>
+    <string name="cancel">Cancel</string>
+
+</resources>
