@@ -81,7 +81,7 @@ public class ContactsActivity extends AppCompatActivity implements ContactsAdapt
                 phone = phone.replace(")", "");
 
                 if (!String.valueOf(phone.charAt(0)).equals("+")) {
-                    phone = isoPrefix + phone.replaceFirst("0","");
+                    phone = isoPrefix + phone;
                 }
 
                 Contact contact = new Contact("", name, phone);

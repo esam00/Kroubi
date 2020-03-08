@@ -164,7 +164,9 @@ public class ChatsFragment extends Fragment implements HomeChatAdapter.ListItemC
             requestPermissions(new String[]{ Manifest.permission.READ_CONTACTS,
                     Manifest.permission.WRITE_CONTACTS,
                     Manifest.permission.READ_EXTERNAL_STORAGE,
-                    Manifest.permission.WRITE_EXTERNAL_STORAGE},1);
+                    Manifest.permission.WRITE_EXTERNAL_STORAGE,
+                    Manifest.permission.CAMERA,
+            },1);
         }
     }
 

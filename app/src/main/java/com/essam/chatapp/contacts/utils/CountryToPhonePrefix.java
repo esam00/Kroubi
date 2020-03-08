@@ -63,7 +63,7 @@ public class CountryToPhonePrefix {
         countryToPhonePrefix.put("DM", "+1-767");
         countryToPhonePrefix.put("DO", "+1-809and1-829");
         countryToPhonePrefix.put("EC", "+593");
-        countryToPhonePrefix.put("EG", "+20");
+        countryToPhonePrefix.put("EG", "+2");
         countryToPhonePrefix.put("SV", "+503");
         countryToPhonePrefix.put("GQ", "+240");
         countryToPhonePrefix.put("ER", "+291");

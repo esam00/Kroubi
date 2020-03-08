@@ -4,6 +4,7 @@ package com.essam.chatapp.home.activity;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 
 import androidx.appcompat.app.AppCompatActivity;
@@ -13,8 +14,10 @@ import androidx.viewpager.widget.ViewPager;
 import com.essam.chatapp.R;
 import com.essam.chatapp.contacts.activity.ContactsActivity;
 import com.essam.chatapp.home.adapter.ViewPagerAdapter;
+import com.essam.chatapp.login.LoginActivity;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.android.material.tabs.TabLayout;
+import com.google.firebase.auth.FirebaseAuth;
 
 public class HomeActivity extends AppCompatActivity {
 
@@ -111,6 +114,19 @@ public class HomeActivity extends AppCompatActivity {
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.menu,menu);
         return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()){
+            case R.id.sign_out:
+                FirebaseAuth.getInstance().signOut();
+                Intent intent = new Intent(this,LoginActivity.class);
+                intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+                intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK);
+                startActivity(intent);
+        }
+        return super.onOptionsItemSelected(item);
     }
 
     @Override
