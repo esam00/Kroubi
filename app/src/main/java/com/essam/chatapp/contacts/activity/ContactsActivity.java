@@ -10,7 +10,9 @@ import android.database.Cursor;
 import android.os.Bundle;
 import android.provider.ContactsContract;
 import android.telephony.TelephonyManager;
+import android.util.Log;
 import android.view.View;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -28,65 +30,82 @@ import com.google.firebase.database.Query;
 import com.google.firebase.database.ValueEventListener;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 public class ContactsActivity extends AppCompatActivity implements ContactsAdapter.ListItemClickListener {
     private RecyclerView contactsRv;
     private TextView emptyTextView;
+    private ProgressBar progressBar;
     private ContactsAdapter contactsAdapter;
-    private List<Contact> contacts;
+    private List<Contact> contacts,users;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_contacts);
 
-        initializeRecyclerView();
+        initViews();
         getContactsList();
     }
 
-    private void initializeRecyclerView() {
+    private void initViews() {
         contacts = new ArrayList<>();
+        users = new ArrayList<>();
         contactsRv = findViewById(R.id.rv_contacts);
-        contactsAdapter = new ContactsAdapter(this, contacts);
         emptyTextView = findViewById(R.id.tv_empty);
+        progressBar = findViewById(R.id.progress_bar);
 
         LinearLayoutManager linearLayoutManager = new LinearLayoutManager(this);
+        contactsAdapter = new ContactsAdapter(this, users);
         contactsRv.setLayoutManager(linearLayoutManager);
         contactsRv.setAdapter(contactsAdapter);
     }
 
     private void getContactsList() {
         String isoPrefix = getCountryIso();
+        Log.e("Tag", "isoPrefix: " + isoPrefix );
 
         Cursor cursor = getContentResolver().query(ContactsContract.CommonDataKinds.Phone.CONTENT_URI,
                 null,
                 null,
                 null,
                 null);
-        while (cursor.moveToNext()) {
-            String name = cursor.getString(cursor.getColumnIndex(ContactsContract.CommonDataKinds.Phone.DISPLAY_NAME));
-            String phone = cursor.getString(cursor.getColumnIndex(ContactsContract.CommonDataKinds.Phone.NUMBER));
+        if(cursor != null && cursor.getCount()>0){
+            while (cursor.moveToNext()) {
+                String name = cursor.getString(cursor.getColumnIndex(ContactsContract.CommonDataKinds.Phone.DISPLAY_NAME));
+                String phone = cursor.getString(cursor.getColumnIndex(ContactsContract.CommonDataKinds.Phone.NUMBER));
 
-            phone = phone.replace(" ", "");
-            phone = phone.replace("-", "");
-            phone = phone.replace("(", "");
-            phone = phone.replace(")", "");
+                phone = phone.replace(" ", "");
+                phone = phone.replace("-", "");
+                phone = phone.replace("(", "");
+                phone = phone.replace(")", "");
 
-            if (!String.valueOf(phone.charAt(0)).equals("+")) {
-                phone = isoPrefix + phone;
+                if (!String.valueOf(phone.charAt(0)).equals("+")) {
+                    phone = isoPrefix + phone.replaceFirst("0","");
+                }
 
+                Contact contact = new Contact("", name, phone);
+                if (!isRedundant(phone)){
+                    contacts.add(contact);
+                    Log.e("Tag", "getContactsList: " + phone );
+                    checkIfThisContactIsUser(contact);
+                }
             }
-
-            Contact contact = new Contact("", name, phone);
-            getOnlyUsersFromContacts(contact);
-
+            cursor.close();
         }
+        progressBar.setVisibility(View.GONE);
     }
 
-    private void getOnlyUsersFromContacts(final Contact mContact) {
+    private boolean isRedundant(String phone){
+        for(Contact contact : contacts){
+            if(contact.getPhone().equals(phone)){
+                return true;
+            }
+        }
+        return false;
+    }
+
+    private void checkIfThisContactIsUser(final Contact mContact) {
         DatabaseReference mUserDb = FirebaseDatabase.getInstance().getReference().child("user");
         Query query = mUserDb.orderByChild("phone").equalTo(mContact.getPhone());
 
@@ -111,12 +130,12 @@ public class ContactsActivity extends AppCompatActivity implements ContactsAdapt
                             mUser.setName(mContact.getName());
                         }
 
-                        contacts.add(mUser);
+                        users.add(mUser);
                         contactsAdapter.notifyDataSetChanged();
                     }
                 }
 
-                if (contacts.size() == 0) {
+                if (users.size() == 0) {
                     emptyTextView.setVisibility(View.VISIBLE);
                     contactsRv.setVisibility(View.GONE);
                 } else {
@@ -148,10 +167,8 @@ public class ContactsActivity extends AppCompatActivity implements ContactsAdapt
 
     @Override
     public void onClick(final int index) {
-
-
         final String myUid = FirebaseAuth.getInstance().getUid();
-        final String otherUid = contacts.get(index).getUid();
+        final String otherUid = users.get(index).getUid();
         DatabaseReference userChatDb = FirebaseDatabase.getInstance().getReference().child("user").child(myUid).child("chat");
 
         userChatDb.addListenerForSingleValueEvent(new ValueEventListener() {
@@ -190,27 +207,5 @@ public class ContactsActivity extends AppCompatActivity implements ContactsAdapt
         });
 
 
-    }
-
-    private void pushNewChat(String myUid, String otherUid) {
-        String key = FirebaseDatabase.getInstance().getReference().child("chat").push().getKey();
-        DatabaseReference mySideDb = FirebaseDatabase.getInstance().getReference().child("user").child(myUid).child("chat").child(key);
-        DatabaseReference otherSideDb = FirebaseDatabase.getInstance().getReference().child("user").child(otherUid).child("chat").child(key);
-
-        Map mySideChatMap = new HashMap();
-        mySideChatMap.put("userUid", otherUid);
-
-        Map otherSideChatMap = new HashMap();
-        otherSideChatMap.put("userUid", myUid);
-
-        mySideDb.updateChildren(mySideChatMap);
-        otherSideDb.updateChildren(otherSideChatMap);
-
-        Bundle bundle = new Bundle();
-        bundle.putString("chatID", key);
-        Intent intent = new Intent(ContactsActivity.this, ChatActivity.class);
-        intent.putExtras(bundle);
-        startActivity(intent);
-        finish();
     }
 }
