@@ -16,6 +16,7 @@ import android.provider.MediaStore;
 import android.text.TextUtils;
 import android.util.Log;
 import android.view.LayoutInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.ImageView;
@@ -27,6 +28,7 @@ import com.daimajia.androidanimations.library.YoYo;
 import com.essam.chatapp.R;
 import com.essam.chatapp.chat.adapter.ChatAdapter;
 import com.essam.chatapp.chat.model.Message;
+import com.essam.chatapp.contacts.utils.ContactsHelper;
 import com.essam.chatapp.utils.firebase.FirebaseHelper;
 import com.essam.chatapp.photoEditor.PhotoEditorActivity;
 import com.essam.chatapp.utils.Consts;
@@ -264,7 +266,7 @@ public class ChatActivity extends AppCompatActivity implements View.OnClickListe
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                 if (dataSnapshot.exists()) {
                     otherName = dataSnapshot.child(Consts.USER_NAME).getValue().toString();
-                    setTitle(otherName);
+                    setTitle(ContactsHelper.getContactName(ChatActivity.this,otherName));
                     otherUid = dataSnapshot.child(Consts.USER_UID).getValue().toString();
                 }
             }
@@ -289,7 +291,7 @@ public class ChatActivity extends AppCompatActivity implements View.OnClickListe
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                 if (dataSnapshot.exists())
                     otherName = dataSnapshot.child(Consts.NAME_CHILD).getValue().toString();
-                setTitle(otherName);
+                setTitle(ContactsHelper.getContactName(ChatActivity.this,otherName));
             }
 
             @Override
@@ -637,6 +639,16 @@ public class ChatActivity extends AppCompatActivity implements View.OnClickListe
         } else {
             super.onBackPressed();
         }
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()){
+            case android.R.id.home:
+                onBackPressed(); // make up button behave like back button
+                return true;
+        }
+        return super.onOptionsItemSelected(item);
     }
 
     private void instantiateWebSocket() {

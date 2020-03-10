@@ -11,6 +11,7 @@ import android.os.Bundle;
 import android.provider.ContactsContract;
 import android.telephony.TelephonyManager;
 import android.util.Log;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.ProgressBar;
 import android.widget.TextView;
@@ -20,7 +21,7 @@ import com.essam.chatapp.R;
 import com.essam.chatapp.chat.activity.ChatActivity;
 import com.essam.chatapp.contacts.adapter.ContactsAdapter;
 import com.essam.chatapp.contacts.model.Contact;
-import com.essam.chatapp.contacts.utils.CountryToPhonePrefix;
+import com.essam.chatapp.contacts.utils.ContactsHelper;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
@@ -39,12 +40,14 @@ public class ContactsActivity extends AppCompatActivity implements ContactsAdapt
     private ContactsAdapter contactsAdapter;
     private List<Contact> contacts,users;
 
+    private static final String TAG = ContactsContract.class.getSimpleName();
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_contacts);
-
         initViews();
+        // start fetching contacts from user device
         getContactsList();
     }
 
@@ -63,7 +66,7 @@ public class ContactsActivity extends AppCompatActivity implements ContactsAdapt
 
     private void getContactsList() {
         String isoPrefix = getCountryIso();
-        Log.e("Tag", "isoPrefix: " + isoPrefix );
+        Log.e(TAG, "isoPrefix: " + isoPrefix );
 
         Cursor cursor = getContentResolver().query(ContactsContract.CommonDataKinds.Phone.CONTENT_URI,
                 null,
@@ -87,7 +90,6 @@ public class ContactsActivity extends AppCompatActivity implements ContactsAdapt
                 Contact contact = new Contact("", name, phone);
                 if (!isRedundant(phone)){
                     contacts.add(contact);
-                    Log.e("Tag", "getContactsList: " + phone );
                     checkIfThisContactIsUser(contact);
                 }
             }
@@ -96,6 +98,8 @@ public class ContactsActivity extends AppCompatActivity implements ContactsAdapt
         progressBar.setVisibility(View.GONE);
     }
 
+    //sometimes contacts application repeats phone number that assigned in more than one application
+    // So we want to display a contact only one time
     private boolean isRedundant(String phone){
         for(Contact contact : contacts){
             if(contact.getPhone().equals(phone)){
@@ -108,7 +112,6 @@ public class ContactsActivity extends AppCompatActivity implements ContactsAdapt
     private void checkIfThisContactIsUser(final Contact mContact) {
         DatabaseReference mUserDb = FirebaseDatabase.getInstance().getReference().child("user");
         Query query = mUserDb.orderByChild("phone").equalTo(mContact.getPhone());
-
         query.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
@@ -142,19 +145,16 @@ public class ContactsActivity extends AppCompatActivity implements ContactsAdapt
                     emptyTextView.setVisibility(View.GONE);
                     contactsRv.setVisibility(View.VISIBLE);
                 }
-
             }
 
             @Override
             public void onCancelled(@NonNull DatabaseError databaseError) {
-
             }
         });
     }
 
     private String getCountryIso() {
         String iso = null;
-
         TelephonyManager telephonyManager = (TelephonyManager) getApplicationContext().getSystemService(getApplicationContext().TELEPHONY_SERVICE);
         if (telephonyManager.getNetworkCountryIso() != null) {
             if (!telephonyManager.getNetworkCountryIso().equals("")) {
@@ -162,7 +162,7 @@ public class ContactsActivity extends AppCompatActivity implements ContactsAdapt
             }
         }
 
-        return CountryToPhonePrefix.getPhone(iso);
+        return ContactsHelper.getPhone(iso);
     }
 
     @Override
@@ -207,5 +207,15 @@ public class ContactsActivity extends AppCompatActivity implements ContactsAdapt
         });
 
 
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()){
+            case android.R.id.home:
+                onBackPressed(); // make up button behave like back button
+                return true;
+        }
+        return super.onOptionsItemSelected(item);
     }
 }

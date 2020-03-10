@@ -1,16 +1,26 @@
 package com.essam.chatapp.contacts.utils;
 
+import android.app.Activity;
+import android.database.Cursor;
+import android.net.Uri;
+import android.provider.ContactsContract;
+
+import com.airbnb.lottie.animation.content.Content;
+
 import java.util.HashMap;
 import java.util.Map;
 
-public class CountryToPhonePrefix {
+public class ContactsHelper {
     public static String getPhone(String code) {
         return countryToPhonePrefix.get(code.toUpperCase());
     }
+
     public static Map<String, String> getAll(){
         return countryToPhonePrefix;
     }
+
     private static Map<String, String> countryToPhonePrefix = new HashMap<String, String>();
+
     static {
         countryToPhonePrefix.put("AF", "+93");
         countryToPhonePrefix.put("AL", "+355");
@@ -261,5 +271,21 @@ public class CountryToPhonePrefix {
         countryToPhonePrefix.put("CS", "+381");
         countryToPhonePrefix.put("PS", "+970");
         countryToPhonePrefix.put("EH", "+212");
+    }
+
+    public static String getContactName(Activity activity, String phoneNumber){
+        Uri uri=Uri.withAppendedPath(ContactsContract.PhoneLookup.CONTENT_FILTER_URI,Uri.encode(phoneNumber));
+        String[] projection = new String[]{ContactsContract.PhoneLookup.DISPLAY_NAME};
+
+        String contactName="";
+        Cursor cursor = activity.getContentResolver().query(uri,projection,null,null,null);
+
+        if (cursor != null) {
+            if(cursor.moveToFirst()) {
+                contactName=cursor.getString(0);
+            }
+            cursor.close();
+        }
+        return contactName;
     }
 }

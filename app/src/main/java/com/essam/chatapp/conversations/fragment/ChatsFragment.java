@@ -19,6 +19,7 @@ import android.widget.LinearLayout;
 
 import com.airbnb.lottie.LottieAnimationView;
 import com.essam.chatapp.R;
+import com.essam.chatapp.contacts.utils.ContactsHelper;
 import com.essam.chatapp.conversations.adapter.HomeChatAdapter;
 import com.essam.chatapp.utils.firebase.FirebaseHelper;
 import com.essam.chatapp.conversations.model.Chat;
@@ -89,11 +90,13 @@ public class ChatsFragment extends Fragment implements HomeChatAdapter.ListItemC
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                 if(dataSnapshot.exists()){
                     for(DataSnapshot childSnapShot : dataSnapshot.getChildren()){
+                        String name = "";
                         Chat chat = new Chat();
                         chat.setChatId(childSnapShot.getKey());
                         chat.setSentAt(childSnapShot.child(Consts.CREATED_AT_CHILD).getValue().toString());
                         chat.setLastMessage(childSnapShot.child(Consts.TEXT_CHILD).getValue().toString());
-                        chat.setSenderName(childSnapShot.child(Consts.USER_NAME).getValue().toString());
+                        name = (childSnapShot.child(Consts.USER_NAME).getValue().toString());
+                        chat.setSenderName(ContactsHelper.getContactName(getActivity(),name));
                         boolean exists = false;
                         for(int i=0; i<chatList.size();i++){
                             if(chatList.get(i).getChatId().equals(childSnapShot.getKey())){
