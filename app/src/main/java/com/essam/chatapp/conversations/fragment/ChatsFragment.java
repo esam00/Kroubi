@@ -1,6 +1,5 @@
 package com.essam.chatapp.conversations.fragment;
 
-
 import android.Manifest;
 import android.content.Intent;
 import android.os.Build;
@@ -42,7 +41,7 @@ public class ChatsFragment extends Fragment implements HomeChatAdapter.ListItemC
     private List<Chat> chatList = new ArrayList<>();
 
     private DatabaseReference appUserDb;
-
+    private final static String TAG = ChatsFragment.class.getSimpleName();
 
     public ChatsFragment() {
         // Required empty public constructor
@@ -95,15 +94,16 @@ public class ChatsFragment extends Fragment implements HomeChatAdapter.ListItemC
                         chat.setChatId(childSnapShot.getKey());
                         chat.setSentAt(childSnapShot.child(Consts.CREATED_AT_CHILD).getValue().toString());
                         chat.setLastMessage(childSnapShot.child(Consts.TEXT_CHILD).getValue().toString());
+                        chat.setUnSeenCount(Integer.parseInt(childSnapShot.child(Consts.UNSEEN_COUNT).getValue().toString()));
                         name = (childSnapShot.child(Consts.USER_NAME).getValue().toString());
                         chat.setSenderName(ContactsHelper.getContactName(getActivity(),name));
+
                         boolean exists = false;
                         for(int i=0; i<chatList.size();i++){
                             if(chatList.get(i).getChatId().equals(childSnapShot.getKey())){
                                 chatList.get(i).setLastMessage(childSnapShot.child(Consts.TEXT_CHILD).getValue().toString());
                                 chatList.get(i).setSentAt(childSnapShot.child(Consts.CREATED_AT_CHILD).getValue().toString());
                                 chatList.get(i).setUnSeenCount(Integer.parseInt(childSnapShot.child(Consts.UNSEEN_COUNT).getValue().toString()));
-
                                 homeChatAdapter.notifyDataSetChanged();
                                 exists=true;
                             }
@@ -125,18 +125,6 @@ public class ChatsFragment extends Fragment implements HomeChatAdapter.ListItemC
         });
     }
 
-    @Override
-    public void onClick(int index) {
-        chatList.get(index).setUnSeenCount(0);
-        homeChatAdapter.notifyDataSetChanged();
-
-        Bundle bundle = new Bundle();
-        bundle.putString(Consts.CHAT_ID,chatList.get(index).getChatId());
-        Intent intent = new Intent(this.getActivity(), ChatActivity.class);
-        intent.putExtras(bundle);
-        startActivity(intent);
-    }
-
     private void displayChatList(){
         hideLoading();
         homeChatRv.setVisibility(View.VISIBLE);
@@ -152,7 +140,7 @@ public class ChatsFragment extends Fragment implements HomeChatAdapter.ListItemC
     }
 
     private void hideLoading(){
-        Log.i("TAG", "hideLoading: ");
+        Log.i(TAG, "hideLoading: ");
         loadingAnimation.setVisibility(View.GONE);
         loadingAnimation.cancelAnimation();
     }
@@ -171,6 +159,19 @@ public class ChatsFragment extends Fragment implements HomeChatAdapter.ListItemC
                     Manifest.permission.CAMERA,
             },1);
         }
+    }
+
+    @Override
+    public void onClick(int index) {
+        // clear un seen count for this conversation
+        chatList.get(index).setUnSeenCount(0);
+        homeChatAdapter.notifyDataSetChanged();
+
+        Bundle bundle = new Bundle();
+        bundle.putString(Consts.CHAT_ID,chatList.get(index).getChatId());
+        Intent intent = new Intent(this.getActivity(), ChatActivity.class);
+        intent.putExtras(bundle);
+        startActivity(intent);
     }
 
 }

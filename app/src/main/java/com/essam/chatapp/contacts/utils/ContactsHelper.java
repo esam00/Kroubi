@@ -5,8 +5,6 @@ import android.database.Cursor;
 import android.net.Uri;
 import android.provider.ContactsContract;
 
-import com.airbnb.lottie.animation.content.Content;
-
 import java.util.HashMap;
 import java.util.Map;
 
@@ -277,7 +275,7 @@ public class ContactsHelper {
         Uri uri=Uri.withAppendedPath(ContactsContract.PhoneLookup.CONTENT_FILTER_URI,Uri.encode(phoneNumber));
         String[] projection = new String[]{ContactsContract.PhoneLookup.DISPLAY_NAME};
 
-        String contactName="";
+        String contactName = phoneNumber;
         Cursor cursor = activity.getContentResolver().query(uri,projection,null,null,null);
 
         if (cursor != null) {
