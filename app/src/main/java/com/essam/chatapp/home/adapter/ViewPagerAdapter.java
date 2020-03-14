@@ -49,4 +49,10 @@ public class ViewPagerAdapter extends FragmentStatePagerAdapter {
     public int getCount() {
         return 3;
     }
+
+    @Override
+    public int getItemPosition(@NonNull Object object) {
+        //used to reload chats fragment i don't know why but will search more about it
+        return POSITION_NONE;
+    }
 }

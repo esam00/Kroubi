@@ -1,9 +1,13 @@
 package com.essam.chatapp.contacts.utils;
 
+import android.Manifest;
 import android.app.Activity;
 import android.database.Cursor;
 import android.net.Uri;
 import android.provider.ContactsContract;
+
+import com.essam.chatapp.utils.Consts;
+import com.essam.chatapp.utils.ProjectUtils;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -276,13 +280,15 @@ public class ContactsHelper {
         String[] projection = new String[]{ContactsContract.PhoneLookup.DISPLAY_NAME};
 
         String contactName = phoneNumber;
-        Cursor cursor = activity.getContentResolver().query(uri,projection,null,null,null);
+        if(activity != null) {
+            Cursor cursor = activity.getContentResolver().query(uri, projection, null, null, null);
 
-        if (cursor != null) {
-            if(cursor.moveToFirst()) {
-                contactName=cursor.getString(0);
+            if (cursor != null) {
+                if (cursor.moveToFirst()) {
+                    contactName = cursor.getString(0);
+                }
+                cursor.close();
             }
-            cursor.close();
         }
         return contactName;
     }
