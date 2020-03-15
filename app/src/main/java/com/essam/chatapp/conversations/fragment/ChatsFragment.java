@@ -91,8 +91,8 @@ public class ChatsFragment extends Fragment implements HomeChatAdapter.ListItemC
                             String name = "";
                             Chat chat = new Chat();
                             chat.setChatId(childSnapShot.getKey());
-                            chat.setSentAt(childSnapShot.child(Consts.CREATED_AT_CHILD).getValue().toString());
-                            chat.setLastMessage(childSnapShot.child(Consts.TEXT_CHILD).getValue().toString());
+                            chat.setSentAt(childSnapShot.child(Consts.CREATED_AT).getValue().toString());
+                            chat.setLastMessage(childSnapShot.child(Consts.TEXT).getValue().toString());
                             chat.setUnSeenCount(Integer.parseInt(childSnapShot.child(Consts.UNSEEN_COUNT).getValue().toString()));
                             name = (childSnapShot.child(Consts.USER_NAME).getValue().toString());
                             chat.setSenderName(ContactsHelper.getContactName(getActivity(), name));
@@ -100,8 +100,8 @@ public class ChatsFragment extends Fragment implements HomeChatAdapter.ListItemC
                             boolean exists = false;
                             for (int i = 0; i < chatList.size(); i++) {
                                 if (chatList.get(i).getChatId().equals(childSnapShot.getKey())) {
-                                    chatList.get(i).setLastMessage(childSnapShot.child(Consts.TEXT_CHILD).getValue().toString());
-                                    chatList.get(i).setSentAt(childSnapShot.child(Consts.CREATED_AT_CHILD).getValue().toString());
+                                    chatList.get(i).setLastMessage(childSnapShot.child(Consts.TEXT).getValue().toString());
+                                    chatList.get(i).setSentAt(childSnapShot.child(Consts.CREATED_AT).getValue().toString());
                                     chatList.get(i).setUnSeenCount(Integer.parseInt(childSnapShot.child(Consts.UNSEEN_COUNT).getValue().toString()));
                                     homeChatAdapter.notifyDataSetChanged();
                                     exists = true;

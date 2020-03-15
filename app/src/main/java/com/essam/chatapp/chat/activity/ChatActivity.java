@@ -7,7 +7,9 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import android.Manifest;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.net.Uri;
 import android.os.Bundle;
@@ -29,6 +31,7 @@ import com.essam.chatapp.R;
 import com.essam.chatapp.chat.adapter.ChatAdapter;
 import com.essam.chatapp.chat.model.Message;
 import com.essam.chatapp.contacts.utils.ContactsHelper;
+import com.essam.chatapp.utils.ProjectUtils;
 import com.essam.chatapp.utils.firebase.FirebaseHelper;
 import com.essam.chatapp.photoEditor.PhotoEditorActivity;
 import com.essam.chatapp.utils.Consts;
@@ -91,6 +94,7 @@ public class ChatActivity extends AppCompatActivity implements View.OnClickListe
     private WebSocket webSocket;
     private String messageId;
 
+    private final static String TAG = ChatActivity.class.getSimpleName();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -145,14 +149,14 @@ public class ChatActivity extends AppCompatActivity implements View.OnClickListe
             public void onChildAdded(@NonNull DataSnapshot dataSnapshot, @Nullable String s) {
                 if (dataSnapshot.exists()) {
                     //ToDo replace this with a single class of Message
-                    String messageText = dataSnapshot.child(Consts.MESSAGE_CHILD).getValue().toString();
-                    String creatorID = dataSnapshot.child(Consts.CREATOR_CHILD).getValue().toString();
-                    String sentAt = dataSnapshot.child(Consts.CREATED_AT_CHILD).getValue().toString();
+                    String messageText = dataSnapshot.child(Consts.MESSAGE).getValue().toString();
+                    String creatorID = dataSnapshot.child(Consts.CREATOR).getValue().toString();
+                    String sentAt = dataSnapshot.child(Consts.CREATED_AT).getValue().toString();
                     boolean seen = (boolean) dataSnapshot.child(Consts.SEEN).getValue();
 
                     List<String> mediaUrlList = new ArrayList<>();
-                    if (dataSnapshot.child(Consts.CHILD_MEDIA).getChildrenCount()>0){
-                        for (DataSnapshot mediaSnapshot: dataSnapshot.child(Consts.CHILD_MEDIA).getChildren()){
+                    if (dataSnapshot.child(Consts.MEDIA).getChildrenCount()>0){
+                        for (DataSnapshot mediaSnapshot: dataSnapshot.child(Consts.MEDIA).getChildren()){
                             mediaUrlList.add(mediaSnapshot.getValue().toString());
                         }
                     }
@@ -290,7 +294,7 @@ public class ChatActivity extends AppCompatActivity implements View.OnClickListe
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                 if (dataSnapshot.exists())
-                    otherName = dataSnapshot.child(Consts.NAME_CHILD).getValue().toString();
+                    otherName = dataSnapshot.child(Consts.NAME).getValue().toString();
                 setTitle(ContactsHelper.getContactName(ChatActivity.this,otherName));
             }
 
@@ -305,7 +309,7 @@ public class ChatActivity extends AppCompatActivity implements View.OnClickListe
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                 if (dataSnapshot.exists())
-                    myName = dataSnapshot.child(Consts.NAME_CHILD).getValue().toString();
+                    myName = dataSnapshot.child(Consts.NAME).getValue().toString();
             }
 
             @Override
@@ -371,14 +375,14 @@ public class ChatActivity extends AppCompatActivity implements View.OnClickListe
         final DatabaseReference newMessageDb = mChatDb.child(messageId);
 
         final Map newMessageMap = new HashMap();
-        newMessageMap.put(Consts.MESSAGE_CHILD, inputMessage);
-        newMessageMap.put(Consts.CREATOR_CHILD, myUid);
-        newMessageMap.put(Consts.CREATED_AT_CHILD, formatter.format(date));
+        newMessageMap.put(Consts.MESSAGE, inputMessage);
+        newMessageMap.put(Consts.CREATOR, myUid);
+        newMessageMap.put(Consts.CREATED_AT, formatter.format(date));
         newMessageMap.put(Consts.SEEN, false);
 
         if(!mediaUriList.isEmpty()) {
             for (String mediaUri : mediaUriList) {
-                String mediaId = newMessageDb.child(Consts.CHILD_MEDIA).push().getKey();
+                String mediaId = newMessageDb.child(Consts.MEDIA).push().getKey();
                 mediaIdList.add(mediaId);
                 final StorageReference filePath = FirebaseStorage.getInstance().getReference().child(Consts.CHAT).child(chatID).child(messageId).child(mediaId);
 
@@ -427,15 +431,15 @@ public class ChatActivity extends AppCompatActivity implements View.OnClickListe
 
         mySideChatMap.put(Consts.USER_UID, otherUid);
         mySideChatMap.put(Consts.USER_NAME, otherName);
-        mySideChatMap.put(Consts.TEXT_CHILD, inputMessage);
-        mySideChatMap.put(Consts.CREATED_AT_CHILD, formatter.format(date));
+        mySideChatMap.put(Consts.TEXT, inputMessage);
+        mySideChatMap.put(Consts.CREATED_AT, formatter.format(date));
         mySideChatMap.put(Consts.UNSEEN_COUNT, "0");
 
         otherSideChatMap.put(Consts.USER_UID, myUid);
         otherSideChatMap.put(Consts.USER_NAME, myName);
-        otherSideChatMap.put(Consts.TEXT_CHILD, inputMessage);
+        otherSideChatMap.put(Consts.TEXT, inputMessage);
         otherSideChatMap.put(Consts.UNSEEN_COUNT, "1");
-        otherSideChatMap.put(Consts.CREATED_AT_CHILD, formatter.format(date));
+        otherSideChatMap.put(Consts.CREATED_AT, formatter.format(date));
 
         mySideDb.updateChildren(mySideChatMap);
         otherSideDb.updateChildren(otherSideChatMap);
@@ -456,10 +460,10 @@ public class ChatActivity extends AppCompatActivity implements View.OnClickListe
             }
         }
 
-        mySideDb.child(Consts.TEXT_CHILD).setValue(inputMessage);
-        mySideDb.child(Consts.CREATED_AT_CHILD).setValue(formatter.format(date));
-        otherSideDb.child(Consts.TEXT_CHILD).setValue(inputMessage);
-        otherSideDb.child(Consts.CREATED_AT_CHILD).setValue(formatter.format(date));
+        mySideDb.child(Consts.TEXT).setValue(inputMessage);
+        mySideDb.child(Consts.CREATED_AT).setValue(formatter.format(date));
+        otherSideDb.child(Consts.TEXT).setValue(inputMessage);
+        otherSideDb.child(Consts.CREATED_AT).setValue(formatter.format(date));
         otherSideDb.child(Consts.UNSEEN_COUNT).setValue(String.valueOf(otherUnseenCount + 1));
 
     }
@@ -478,20 +482,24 @@ public class ChatActivity extends AppCompatActivity implements View.OnClickListe
      * this method opens device's media to choose an image
      */
     private void openGalleryChooser() {
-        animateFilePickerDown();
-        Intent intent = new Intent();
-        intent.setType("image/*");
-        intent.setAction(Intent.ACTION_GET_CONTENT);
-        intent.putExtra(Intent.EXTRA_ALLOW_MULTIPLE, true);
-        startActivityForResult(intent, Consts.PICK_IMAGES_REQUEST);
+        if(ProjectUtils.hasPermissionInManifest(this,Consts.PICK_IMAGES_REQUEST,Manifest.permission.READ_EXTERNAL_STORAGE)){
+            animateFilePickerDown();
+            Intent intent = new Intent();
+            intent.setType("image/*");
+            intent.setAction(Intent.ACTION_GET_CONTENT);
+            intent.putExtra(Intent.EXTRA_ALLOW_MULTIPLE, true);
+            startActivityForResult(intent, Consts.PICK_IMAGES_REQUEST);
+        }
     }
 
     /**
      * this method opens device's camera to capture an image
      */
     private void openCamera() {
-        Intent cameraIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
-        startActivityForResult(cameraIntent, Consts.CAPTURE_IMAGE_REQUEST);
+        if(ProjectUtils.hasPermissionInManifest(this,Consts.CAPTURE_IMAGE_REQUEST, Manifest.permission.CAMERA)){
+            Intent cameraIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+            startActivityForResult(cameraIntent, Consts.CAPTURE_IMAGE_REQUEST);
+        }
     }
 
     private void toggleFilePicker() {
@@ -523,27 +531,6 @@ public class ChatActivity extends AppCompatActivity implements View.OnClickListe
 
     }
 
-    private void openFilePickerDialog() {
-        // TODO: 2/17/2020 make a custom dialog to present filePiker layout with nice animation
-        AlertDialog.Builder builder = new AlertDialog.Builder(this);
-        // Get the layout inflater
-        LayoutInflater inflater = getLayoutInflater();
-        View filePicker = inflater.inflate(R.layout.file_picker,null);
-
-
-        // Inflate and set the layout for the dialog
-        // Pass null as the parent view because its going in the
-        // dialog layout
-        builder.setView(inflater.inflate(R.layout.file_picker, null));
-
-        builder.create();
-        builder.show();
-
-        YoYo.with(Techniques.Pulse)
-                .duration(200)
-                .playOn(filePicker);
-    }
-
     private void openPhotoEditor(String imageUri) {
         Intent intent = new Intent(this, PhotoEditorActivity.class);
         intent.putExtra(Consts.EDIT_PHOTO, imageUri);
@@ -554,7 +541,6 @@ public class ChatActivity extends AppCompatActivity implements View.OnClickListe
     protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
         if (resultCode == RESULT_OK) {
-
             switch (requestCode) {
                 // image has picked from gallery
                 case Consts.PICK_IMAGES_REQUEST:
@@ -589,6 +575,27 @@ public class ChatActivity extends AppCompatActivity implements View.OnClickListe
 
             }
         }
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+
+        if(grantResults.length>0 && grantResults[0] == PackageManager.PERMISSION_GRANTED){
+            Log.i(TAG, "onRequestPermissionsResult: capture image permission granted ");
+            switch (requestCode){
+
+                case Consts.CAPTURE_IMAGE_REQUEST:
+                    openCamera();
+                    break;
+
+                case Consts.PICK_IMAGES_REQUEST:
+                    openGalleryChooser();
+            }
+        }else {
+            Log.i(TAG, "onRequestPermissionsResult: capture image permission denied ");
+        }
+
     }
 
     @Override
@@ -627,8 +634,6 @@ public class ChatActivity extends AppCompatActivity implements View.OnClickListe
 
             case R.id.open_gallery_iv:
                 openGalleryChooser();
-
-
         }
     }
 
@@ -649,6 +654,27 @@ public class ChatActivity extends AppCompatActivity implements View.OnClickListe
                 return true;
         }
         return super.onOptionsItemSelected(item);
+    }
+
+    private void openFilePickerDialog() {
+        // TODO: 2/17/2020 make a custom dialog to present filePiker layout with nice animation
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        // Get the layout inflater
+        LayoutInflater inflater = getLayoutInflater();
+        View filePicker = inflater.inflate(R.layout.file_picker,null);
+
+
+        // Inflate and set the layout for the dialog
+        // Pass null as the parent view because its going in the
+        // dialog layout
+        builder.setView(inflater.inflate(R.layout.file_picker, null));
+
+        builder.create();
+        builder.show();
+
+        YoYo.with(Techniques.Pulse)
+                .duration(200)
+                .playOn(filePicker);
     }
 
     private void instantiateWebSocket() {

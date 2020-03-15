@@ -31,9 +31,10 @@ public class HomeActivity extends AppCompatActivity {
     private ViewPager homeViewPager;
     private FloatingActionButton fab;
     private FragmentManager fragmentManager;
-    ViewPagerAdapter viewPagerAdapter;
-
+    private ViewPagerAdapter viewPagerAdapter;
     private ViewPager.OnPageChangeListener mPageChangeListener;
+
+    private final static String TAG = HomeActivity.class.getSimpleName();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -125,11 +126,10 @@ public class HomeActivity extends AppCompatActivity {
 
     private void refreshChatsFragment() {
         if (!(viewPagerAdapter == null)) {
-            Log.i("TAG", "refreshChatsFragment: ");
+            Log.i(TAG, "refreshChatsFragment..");
             viewPagerAdapter.notifyDataSetChanged();
         }
     }
-
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
@@ -187,7 +187,6 @@ public class HomeActivity extends AppCompatActivity {
                             startActivity(new Intent(HomeActivity.this, ContactsActivity.class));
                     } else {
                         Log.i("TAG", "onRequestPermissionsResult: denied");
-
                     }
         }
 
