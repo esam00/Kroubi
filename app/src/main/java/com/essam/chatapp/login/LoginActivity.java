@@ -58,6 +58,23 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
         FirebaseApp.initializeApp(this);
         mAuth = FirebaseAuth.getInstance();
 
+        checkUserSession();
+        initViews();
+        initCallBacks();
+    }
+
+    private void checkUserSession(){
+        // check if user is already logged in
+        FirebaseUser firebaseUser = mAuth.getCurrentUser();
+        if(firebaseUser!=null){
+            Intent intent = new Intent(this,HomeActivity.class);
+            startActivity(intent);
+            finish();
+        }
+        // TODO: 3/15/2020 move this logic to a splash screen
+    }
+
+    private void initViews(){
         //initialize views
         phoneNumberEditText = findViewById(R.id.et_phone_number);
         verificationCodeEditText = findViewById(R.id.et_verification_code);
@@ -69,8 +86,10 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
         //set click listener
         loginButton.setOnClickListener(this);
         verifyButton.setOnClickListener(this);
+    }
 
-        // call back for phone authentication
+    private void initCallBacks(){
+        // callback for phone authentication
         // this call back basically overrides three methods
         // 1- onVerificationCompleted : this means verification automatically done and no need to enter verify code
         // 2- onCodeSent : returns a string verification code to users phone number so we have to compare this code with the code that entered by user
@@ -98,22 +117,6 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
                 phoneRelativeLayout.setVisibility(View.GONE);
             }
         };
-    }
-
-    @Override
-    public void onClick(View view) {
-        switch (view.getId()){
-            case R.id.btn_login:
-                break;
-            case R.id.btn_verify:
-                String enteredCode = verificationCodeEditText.getText().toString();
-
-                if(mVerificationId!=null){
-                    verifyPhoneNumberWithCode(enteredCode);
-                }else {
-                    startPhoneNumberVerification();
-                }
-        }
     }
 
     /**
@@ -187,5 +190,21 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
                 TimeUnit.SECONDS,
                 this,
                 mCallBack);
+    }
+
+    @Override
+    public void onClick(View view) {
+        switch (view.getId()){
+            case R.id.btn_login:
+                break;
+            case R.id.btn_verify:
+                String enteredCode = verificationCodeEditText.getText().toString();
+
+                if(mVerificationId!=null){
+                    verifyPhoneNumberWithCode(enteredCode);
+                }else {
+                    startPhoneNumberVerification();
+                }
+        }
     }
 }
