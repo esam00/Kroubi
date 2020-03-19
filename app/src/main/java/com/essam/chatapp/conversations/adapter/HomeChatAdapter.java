@@ -22,7 +22,6 @@ public class HomeChatAdapter extends RecyclerView.Adapter<HomeChatAdapter.ViewHo
 
     private List<Chat> mChatList;
     private Context context;
-
     private ListItemClickListener listItemClickListener;
 
     public interface ListItemClickListener {
@@ -49,11 +48,14 @@ public class HomeChatAdapter extends RecyclerView.Adapter<HomeChatAdapter.ViewHo
             itemView.setOnClickListener(this);
 
         }
-        void bind (Chat chat, boolean isLastItem){
+
+        void bind (Chat chat, int position){
+            // update ui [name, message text, date
             senderNameTV.setText(chat.getSenderName());
             lastMessageTv.setText(chat.getLastMessage());
             dateTv.setText(getDisplayedDate(chat.getSentAt()));
 
+            //colors
             if(chat.getUnSeenCount()>0){
                 counterTv.setVisibility(View.VISIBLE);
                 dateTv.setTextColor(context.getResources().getColor(R.color.colorAccent));
@@ -63,7 +65,9 @@ public class HomeChatAdapter extends RecyclerView.Adapter<HomeChatAdapter.ViewHo
                 dateTv.setTextColor(context.getResources().getColor(R.color.dark_gray));
             }
 
-            if(isLastItem) separator.setVisibility(View.GONE);
+            // hide separator for last item in the list
+            if(isLastItem(position)) separator.setVisibility(View.GONE);
+            else separator.setVisibility(View.VISIBLE);
         }
 
         String getDisplayedDate(String dateString){
@@ -93,7 +97,6 @@ public class HomeChatAdapter extends RecyclerView.Adapter<HomeChatAdapter.ViewHo
         }
     }
 
-
     @NonNull
     @Override
     public ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
@@ -105,9 +108,7 @@ public class HomeChatAdapter extends RecyclerView.Adapter<HomeChatAdapter.ViewHo
     @Override
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
         Chat chat = mChatList.get(position);
-        boolean isLastItem = false;
-        if (position==getItemCount()-1)isLastItem=true;
-        holder.bind(chat,isLastItem);
+        holder.bind(chat,position);
     }
 
     @Override
@@ -121,6 +122,10 @@ public class HomeChatAdapter extends RecyclerView.Adapter<HomeChatAdapter.ViewHo
     public void setMessagesData(List<Chat> chatList) {
         mChatList = chatList;
         notifyDataSetChanged();
+    }
+
+    private boolean isLastItem(int position){
+        return position == getItemCount()-1;
     }
 
 }

@@ -12,6 +12,8 @@ public class FirebaseHelper {
     private static DatabaseReference userChatDb;
 
     private final static FirebaseAuth mAuth = FirebaseAuth.getInstance();
+    private final static FirebaseDatabase mDatabase = FirebaseDatabase.getInstance();
+    private final static DatabaseReference mReference = mDatabase.getReference();
     private final static String userUid = mAuth.getUid();
 
 
@@ -21,10 +23,9 @@ public class FirebaseHelper {
     public static DatabaseReference getAppChatDbReference() {
 
         if (appChatDb == null)
-            appChatDb = FirebaseDatabase.getInstance().getReference().child(Consts.CHAT);
+            appChatDb = mReference.child(Consts.CHAT);
 
         return  appChatDb;
-
     }
 
     /**
@@ -32,7 +33,7 @@ public class FirebaseHelper {
      * */
     public static DatabaseReference getAppUserDbReference() {
         if (appUserDb == null)
-            appUserDb = FirebaseDatabase.getInstance().getReference().child(Consts.USER);
+            appUserDb = mReference.child(Consts.USER);
 
         return appUserDb;
 
@@ -43,7 +44,7 @@ public class FirebaseHelper {
      * */
     public static DatabaseReference getUserChatDbReference() {
         if (userChatDb == null && userUid!=null)
-            userChatDb = appUserDb.child(userUid).child(Consts.CHAT);
+            userChatDb = mReference.child(Consts.USER).child(userUid).child(Consts.CHAT);
 
         return userChatDb;
 

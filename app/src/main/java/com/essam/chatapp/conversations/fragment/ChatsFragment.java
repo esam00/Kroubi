@@ -40,7 +40,6 @@ public class ChatsFragment extends Fragment implements HomeChatAdapter.ListItemC
     private LottieAnimationView welcomeAnimation, loadingAnimation;
     private List<Chat> chatList = new ArrayList<>();
 
-    private DatabaseReference appUserDb;
     private final static String TAG = ChatsFragment.class.getSimpleName();
 
     public ChatsFragment() {
@@ -58,11 +57,16 @@ public class ChatsFragment extends Fragment implements HomeChatAdapter.ListItemC
         // Inflate the layout for this fragment
         View view = inflater.inflate(R.layout.fragment_chats, container, false);
 
-        appUserDb = FirebaseHelper.getAppUserDbReference();
-
-        checkContactsPermission();
         initViews(view);
+        checkContactsPermission();
         return view;
+    }
+
+    private void checkContactsPermission() {
+        if (ProjectUtils.hasPermissionInManifest(getActivity(),
+                Consts.READ_CONTACTS_REQUEST,
+                Manifest.permission.READ_CONTACTS))
+            getUserChatList();
     }
 
     private void initViews(View view) {
@@ -87,31 +91,31 @@ public class ChatsFragment extends Fragment implements HomeChatAdapter.ListItemC
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                 if (dataSnapshot.exists()) {
-                        for (DataSnapshot childSnapShot : dataSnapshot.getChildren()) {
-                            String name = "";
-                            Chat chat = new Chat();
-                            chat.setChatId(childSnapShot.getKey());
-                            chat.setSentAt(childSnapShot.child(Consts.CREATED_AT).getValue().toString());
-                            chat.setLastMessage(childSnapShot.child(Consts.TEXT).getValue().toString());
-                            chat.setUnSeenCount(Integer.parseInt(childSnapShot.child(Consts.UNSEEN_COUNT).getValue().toString()));
-                            name = (childSnapShot.child(Consts.USER_NAME).getValue().toString());
-                            chat.setSenderName(ContactsHelper.getContactName(getActivity(), name));
+                    for (DataSnapshot childSnapShot : dataSnapshot.getChildren()) {
+                        String name = "";
+                        Chat chat = new Chat();
+                        chat.setChatId(childSnapShot.getKey());
+                        chat.setSentAt(childSnapShot.child(Consts.CREATED_AT).getValue().toString());
+                        chat.setLastMessage(childSnapShot.child(Consts.TEXT).getValue().toString());
+                        chat.setUnSeenCount(Integer.parseInt(childSnapShot.child(Consts.UNSEEN_COUNT).getValue().toString()));
+                        name = (childSnapShot.child(Consts.USER_NAME).getValue().toString());
+                        chat.setSenderName(ContactsHelper.getContactName(getActivity(), name));
 
-                            boolean exists = false;
-                            for (int i = 0; i < chatList.size(); i++) {
-                                if (chatList.get(i).getChatId().equals(childSnapShot.getKey())) {
-                                    chatList.get(i).setLastMessage(childSnapShot.child(Consts.TEXT).getValue().toString());
-                                    chatList.get(i).setSentAt(childSnapShot.child(Consts.CREATED_AT).getValue().toString());
-                                    chatList.get(i).setUnSeenCount(Integer.parseInt(childSnapShot.child(Consts.UNSEEN_COUNT).getValue().toString()));
-                                    homeChatAdapter.notifyDataSetChanged();
-                                    exists = true;
-                                }
+                        boolean exists = false;
+                        for (int i = 0; i < chatList.size(); i++) {
+                            if (chatList.get(i).getChatId().equals(childSnapShot.getKey())) {
+                                chatList.get(i).setLastMessage(childSnapShot.child(Consts.TEXT).getValue().toString());
+                                chatList.get(i).setSentAt(childSnapShot.child(Consts.CREATED_AT).getValue().toString());
+                                chatList.get(i).setUnSeenCount(Integer.parseInt(childSnapShot.child(Consts.UNSEEN_COUNT).getValue().toString()));
+                                homeChatAdapter.notifyDataSetChanged();
+                                exists = true;
                             }
-                            if (exists) continue;
-                            chatList.add(chat);
-                            homeChatAdapter.setMessagesData(chatList);
-                            displayChatList();
                         }
+                        if (exists) continue;
+                        chatList.add(chat);
+                        homeChatAdapter.setMessagesData(chatList);
+                        displayChatList();
+                    }
                 } else {
                     hideChatListAndDisplayWelcomeAnimation();
                 }
@@ -124,6 +128,9 @@ public class ChatsFragment extends Fragment implements HomeChatAdapter.ListItemC
         });
     }
 
+    /**
+     * hide loading and display user chats list as soon as they have been successfully fetched
+     */
     private void displayChatList() {
         hideLoading();
         homeChatRv.setVisibility(View.VISIBLE);
@@ -131,6 +138,9 @@ public class ChatsFragment extends Fragment implements HomeChatAdapter.ListItemC
         loadingAnimation.setVisibility(View.GONE);
     }
 
+    /**
+     * If this is the first time for user display a nice welcome view or animation
+     */
     private void hideChatListAndDisplayWelcomeAnimation() {
         hideLoading();
         homeChatRv.setVisibility(View.GONE);
@@ -149,11 +159,12 @@ public class ChatsFragment extends Fragment implements HomeChatAdapter.ListItemC
         loadingAnimation.playAnimation();
     }
 
-    private void checkContactsPermission() {
-        if (ProjectUtils.hasPermissionInManifest(getActivity(), Consts.READ_CONTACTS_REQUEST, Manifest.permission.READ_CONTACTS))
-            getUserChatList();
-    }
-
+    /**
+     * onClick method of listItemClickListener interface in chats adapter
+     * if a chat is clicked this listener will be triggered and it will  return the index of the item that was clicked
+     *
+     * @param index
+     */
     @Override
     public void onClick(int index) {
         // clear un seen count for this conversation
@@ -166,5 +177,4 @@ public class ChatsFragment extends Fragment implements HomeChatAdapter.ListItemC
         intent.putExtras(bundle);
         startActivity(intent);
     }
-
 }
