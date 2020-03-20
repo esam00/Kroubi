@@ -22,6 +22,7 @@ import com.essam.chatapp.home.adapter.ViewPagerAdapter;
 import com.essam.chatapp.login.LoginActivity;
 import com.essam.chatapp.utils.Consts;
 import com.essam.chatapp.utils.ProjectUtils;
+import com.essam.chatapp.utils.firebase.FirebaseHelper;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.android.material.tabs.TabLayout;
 import com.google.firebase.auth.FirebaseAuth;
@@ -141,7 +142,7 @@ public class HomeActivity extends AppCompatActivity {
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case R.id.sign_out:
-                FirebaseAuth.getInstance().signOut();
+                FirebaseHelper.signOut();
                 Intent intent = new Intent(this, LoginActivity.class);
                 intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
                 intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK);

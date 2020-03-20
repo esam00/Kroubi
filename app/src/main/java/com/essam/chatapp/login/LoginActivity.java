@@ -58,20 +58,8 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
         FirebaseApp.initializeApp(this);
         mAuth = FirebaseAuth.getInstance();
 
-        checkUserSession();
         initViews();
         initCallBacks();
-    }
-
-    private void checkUserSession(){
-        // check if user is already logged in
-        FirebaseUser firebaseUser = mAuth.getCurrentUser();
-        if(firebaseUser!=null){
-            Intent intent = new Intent(this,HomeActivity.class);
-            startActivity(intent);
-            finish();
-        }
-        // TODO: 3/15/2020 move this logic to a splash screen
     }
 
     private void initViews(){

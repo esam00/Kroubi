@@ -22,13 +22,20 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
+        <activity android:name=".SplashActivity"
+            android:theme="@style/AppTheme.NoActionBar">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <action android:name="android.intent.action.VIEW" />
+
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
         <activity
             android:name=".photoEditor.PhotoEditorActivity"
             android:label="@string/title_activity_image_presenter"
             android:theme="@style/ImagePresenterTheme"
-            android:windowSoftInputMode="stateHidden|adjustResize"
-            >
-
+            android:windowSoftInputMode="stateHidden|adjustResize">
         </activity>
         <activity
             android:name=".contacts.activity.ContactsActivity"
@@ -38,24 +45,18 @@
         <activity
             android:name=".login.LoginActivity"
             android:theme="@style/LoginTheme">
-            <intent-filter>
-                <action android:name="android.intent.action.MAIN" />
-                <action android:name="android.intent.action.VIEW" />
-
-                <category android:name="android.intent.category.LAUNCHER" />
-            </intent-filter>
         </activity>
         <activity
             android:name=".home.activity.HomeActivity"
             android:label="@string/home_activity_title"
             android:theme="@style/AppTheme.NoActionBar">
         </activity>
-        <activity android:name=".chat.activity.ChatActivity"
+        <activity
+            android:name=".chat.activity.ChatActivity"
             android:parentActivityName=".home.activity.HomeActivity">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value=".home.activity.HomeActivity" />
-
         </activity>
     </application>
 
