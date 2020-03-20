@@ -38,7 +38,7 @@ public class ContactsActivity extends AppCompatActivity implements ContactsAdapt
     private TextView emptyTextView;
     private ProgressBar progressBar;
     private ContactsAdapter contactsAdapter;
-    private List<Contact> contacts,users;
+    private List<Contact> contacts, users;
 
     private static final String TAG = ContactsContract.class.getSimpleName();
 
@@ -66,14 +66,14 @@ public class ContactsActivity extends AppCompatActivity implements ContactsAdapt
 
     private void getContactsList() {
         String isoPrefix = getCountryIso();
-        Log.e(TAG, "isoPrefix: " + isoPrefix );
+        Log.e(TAG, "isoPrefix: " + isoPrefix);
 
         Cursor cursor = getContentResolver().query(ContactsContract.CommonDataKinds.Phone.CONTENT_URI,
                 null,
                 null,
                 null,
                 null);
-        if(cursor != null && cursor.getCount()>0){
+        if (cursor != null && cursor.getCount() > 0) {
             while (cursor.moveToNext()) {
                 String name = cursor.getString(cursor.getColumnIndex(ContactsContract.CommonDataKinds.Phone.DISPLAY_NAME));
                 String phone = cursor.getString(cursor.getColumnIndex(ContactsContract.CommonDataKinds.Phone.NUMBER));
@@ -88,21 +88,23 @@ public class ContactsActivity extends AppCompatActivity implements ContactsAdapt
                 }
 
                 Contact contact = new Contact("", name, phone);
-                if (!isRedundant(phone)){
+                if (!isRedundant(phone)) {
                     contacts.add(contact);
                     checkIfThisContactIsUser(contact);
                 }
             }
             cursor.close();
+        }else {
+            Log.i(TAG, "contacts list size=0");
+            noUsersState();
         }
-        progressBar.setVisibility(View.GONE);
     }
 
     //sometimes contacts application repeats phone number that assigned in more than one application
     // So we want to display a contact only one time
-    private boolean isRedundant(String phone){
-        for(Contact contact : contacts){
-            if(contact.getPhone().equals(phone)){
+    private boolean isRedundant(String phone) {
+        for (Contact contact : contacts) {
+            if (contact.getPhone().equals(phone)) {
                 return true;
             }
         }
@@ -135,21 +137,16 @@ public class ContactsActivity extends AppCompatActivity implements ContactsAdapt
 
                         users.add(mUser);
                         contactsAdapter.notifyDataSetChanged();
-                    }
-                }
+                        progressBar.setVisibility(View.GONE);
 
-                if (users.size() == 0) {
-                    emptyTextView.setVisibility(View.VISIBLE);
-                    contactsRv.setVisibility(View.GONE);
-                } else {
-                    emptyTextView.setVisibility(View.GONE);
-                    contactsRv.setVisibility(View.VISIBLE);
+                    }
                 }
             }
 
             @Override
             public void onCancelled(@NonNull DatabaseError databaseError) {
             }
+
         });
     }
 
@@ -163,6 +160,12 @@ public class ContactsActivity extends AppCompatActivity implements ContactsAdapt
         }
 
         return ContactsHelper.getPhone(iso);
+    }
+
+    private void noUsersState(){
+        emptyTextView.setVisibility(View.VISIBLE);
+        progressBar.setVisibility(View.GONE);
+        contactsRv.setVisibility(View.GONE);
     }
 
     @Override
@@ -184,13 +187,13 @@ public class ContactsActivity extends AppCompatActivity implements ContactsAdapt
                             Toast.makeText(ContactsActivity.this, "already had a chat with this user!", Toast.LENGTH_SHORT).show();
                             bundle.putString("chatID", snapshot.getKey());
 
-                        }else {
-                            bundle.putString("userUid",otherUid);
+                        } else {
+                            bundle.putString("userUid", otherUid);
                         }
                     }
 
-                }else {
-                    bundle.putString("userUid",otherUid);
+                } else {
+                    bundle.putString("userUid", otherUid);
                 }
 
                 Intent intent = new Intent(ContactsActivity.this, ChatActivity.class);
@@ -211,7 +214,7 @@ public class ContactsActivity extends AppCompatActivity implements ContactsAdapt
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        switch (item.getItemId()){
+        switch (item.getItemId()) {
             case android.R.id.home:
                 onBackPressed(); // make up button behave like back button
                 return true;
