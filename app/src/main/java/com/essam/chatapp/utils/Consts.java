@@ -28,4 +28,6 @@ public class Consts {
     public static final String EDIT_PHOTO ="edit_photo";
     public static final String LATITUDE ="latitude" ;
     public static final String LONGITUDE = "longitude";
+    public static final String APP_NAME = "Chat App" ;
+    public static final String IMAGE_URI_CAMERA ="image_uri_camera" ;
 }

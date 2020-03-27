@@ -4,12 +4,16 @@ package com.essam.chatapp.chat.adapter;
 /*
   Created by esammosbah1@gmail.com on 01/10/19.
  */
+import android.app.Dialog;
 import android.content.Context;
+import android.graphics.Color;
+import android.graphics.drawable.ColorDrawable;
 import android.net.Uri;
 
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.Window;
 import android.widget.ImageView;
 import android.widget.TextView;
 
@@ -17,6 +21,7 @@ import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.Glide;
+import com.bumptech.glide.load.engine.DiskCacheStrategy;
 import com.essam.chatapp.R;
 import com.essam.chatapp.chat.model.Message;
 import com.essam.chatapp.utils.Consts;
@@ -131,7 +136,7 @@ public class ChatAdapter extends RecyclerView.Adapter {
             imageMessageIv = itemView.findViewById(R.id.image_message_iv);
         }
 
-        void bind(Message message) {
+        void bind(final Message message) {
             //bind message sent time
             sentAtTextView.setText(message.getSentAt().split("\\s+")[1] + " " + message.getSentAt().split("\\s+")[2]);
 
@@ -153,6 +158,12 @@ public class ChatAdapter extends RecyclerView.Adapter {
             if (message.getMediaUrls() != null && !message.getMediaUrls().isEmpty()) {
                 imageMessageIv.setVisibility(View.VISIBLE);
                 Glide.with(context).load(Uri.parse(message.getMediaUrls().get(0))).into(imageMessageIv);
+                imageMessageIv.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        dialogZoom(Uri.parse(message.getMediaUrls().get(0)));
+                    }
+                });
             }else {
                 imageMessageIv.setVisibility(View.GONE);
             }
@@ -172,7 +183,7 @@ public class ChatAdapter extends RecyclerView.Adapter {
             imageMessageIv = itemView.findViewById(R.id.image_message_iv);
         }
 
-        void bind(Message message) {
+        void bind(final Message message) {
             //bind message time
             sentAtTextView.setText(message.getSentAt().split("\\s+")[1]+" "+message.getSentAt().split("\\s+")[2]);
 
@@ -192,6 +203,12 @@ public class ChatAdapter extends RecyclerView.Adapter {
             if (message.getMediaUrls() != null && !message.getMediaUrls().isEmpty()) {
                 imageMessageIv.setVisibility(View.VISIBLE);
                 Glide.with(context).load(Uri.parse(message.getMediaUrls().get(0))).into(imageMessageIv);
+                imageMessageIv.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        dialogZoom(Uri.parse(message.getMediaUrls().get(0)));
+                    }
+                });
             }else {
                 imageMessageIv.setVisibility(View.GONE);
             }
@@ -217,5 +234,24 @@ public class ChatAdapter extends RecyclerView.Adapter {
         mMessages.get(index).setSeen(true);
         mMessages.get(mMessages.size()-1).setSeen(true);
         notifyDataSetChanged();
+    }
+
+    Dialog zoomDialog;
+    ImageView ZoomDialogIv;
+    private void dialogZoom(Uri imgUrl){
+        zoomDialog = new Dialog(context);
+        zoomDialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
+        zoomDialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
+        zoomDialog.setContentView(R.layout.dialog_image_zoom);
+
+        ZoomDialogIv = zoomDialog.findViewById(R.id.ZoomDialogIv);
+        Glide.with(context).
+                load(imgUrl)
+                .dontAnimate()
+                .diskCacheStrategy(DiskCacheStrategy.ALL)
+                .into(ZoomDialogIv);
+        zoomDialog.show();
+        Window window = zoomDialog.getWindow();
+        window.setLayout(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
     }
 }

@@ -29,4 +29,15 @@
             android:gravity="center"
             android:text="whatsapp cloning app "/>
     </LinearLayout>
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:textColor="@color/white"
+        android:layout_margin="30dp"
+        android:layout_alignParentBottom="true"
+        android:textStyle="bold"
+        android:textSize="20sp"
+        android:gravity="center"
+        android:text="Special thanks to \n @mahmoud_islam"/>
 </RelativeLayout>

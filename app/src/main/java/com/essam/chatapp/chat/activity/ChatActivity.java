@@ -4,6 +4,7 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.content.FileProvider;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -12,7 +13,9 @@ import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
+import android.os.Environment;
 import android.os.Handler;
 import android.provider.MediaStore;
 import android.text.TextUtils;
@@ -32,6 +35,7 @@ import com.essam.chatapp.chat.adapter.ChatAdapter;
 import com.essam.chatapp.chat.model.Message;
 import com.essam.chatapp.contacts.utils.ContactsHelper;
 import com.essam.chatapp.utils.ProjectUtils;
+import com.essam.chatapp.utils.SharedPrefrence;
 import com.essam.chatapp.utils.firebase.FirebaseHelper;
 import com.essam.chatapp.photoEditor.PhotoEditorActivity;
 import com.essam.chatapp.utils.Consts;
@@ -48,6 +52,8 @@ import com.google.firebase.storage.StorageReference;
 import com.google.firebase.storage.UploadTask;
 import com.google.gson.Gson;
 
+import java.io.File;
+import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
@@ -81,6 +87,9 @@ public class ChatActivity extends AppCompatActivity implements View.OnClickListe
     private int otherUnseenCount;
     private String myUid, otherUid;
     private List<String> mediaUriList;
+    private SharedPrefrence prefrence;
+    private Uri picUri;
+
 
     //firebase
     private DatabaseReference appChatDb, appUserDb, mChatDb, otherSideUnseenChildDb;
@@ -155,8 +164,8 @@ public class ChatActivity extends AppCompatActivity implements View.OnClickListe
                     boolean seen = (boolean) dataSnapshot.child(Consts.SEEN).getValue();
 
                     List<String> mediaUrlList = new ArrayList<>();
-                    if (dataSnapshot.child(Consts.MEDIA).getChildrenCount()>0){
-                        for (DataSnapshot mediaSnapshot: dataSnapshot.child(Consts.MEDIA).getChildren()){
+                    if (dataSnapshot.child(Consts.MEDIA).getChildrenCount() > 0) {
+                        for (DataSnapshot mediaSnapshot : dataSnapshot.child(Consts.MEDIA).getChildren()) {
                             mediaUrlList.add(mediaSnapshot.getValue().toString());
                         }
                     }
@@ -235,6 +244,7 @@ public class ChatActivity extends AppCompatActivity implements View.OnClickListe
         openGalleryIv = findViewById(R.id.open_gallery_iv);
         emptyLayout = findViewById(R.id.empty_ll);
         mediaUriList = new ArrayList<>();
+        prefrence = SharedPrefrence.getInstance(this);
 
         //recyclerView
         adapter = new ChatAdapter(this);
@@ -270,7 +280,7 @@ public class ChatActivity extends AppCompatActivity implements View.OnClickListe
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                 if (dataSnapshot.exists()) {
                     otherName = dataSnapshot.child(Consts.USER_NAME).getValue().toString();
-                    setTitle(ContactsHelper.getContactName(ChatActivity.this,otherName));
+                    setTitle(ContactsHelper.getContactName(ChatActivity.this, otherName));
                     otherUid = dataSnapshot.child(Consts.USER_UID).getValue().toString();
                 }
             }
@@ -295,7 +305,7 @@ public class ChatActivity extends AppCompatActivity implements View.OnClickListe
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                 if (dataSnapshot.exists())
                     otherName = dataSnapshot.child(Consts.NAME).getValue().toString();
-                setTitle(ContactsHelper.getContactName(ChatActivity.this,otherName));
+                setTitle(ContactsHelper.getContactName(ChatActivity.this, otherName));
             }
 
             @Override
@@ -362,8 +372,9 @@ public class ChatActivity extends AppCompatActivity implements View.OnClickListe
         pushNewChat();
     }
 
-    private List<String>mediaIdList;
-    private  int mediaUploaded;
+    private List<String> mediaIdList;
+    private int mediaUploaded;
+
     private void pushNewMessage() {
         mediaIdList = new ArrayList<>();
         mediaUploaded = 0;
@@ -380,7 +391,7 @@ public class ChatActivity extends AppCompatActivity implements View.OnClickListe
         newMessageMap.put(Consts.CREATED_AT, formatter.format(date));
         newMessageMap.put(Consts.SEEN, false);
 
-        if(!mediaUriList.isEmpty()) {
+        if (!mediaUriList.isEmpty()) {
             for (String mediaUri : mediaUriList) {
                 String mediaId = newMessageDb.child(Consts.MEDIA).push().getKey();
                 mediaIdList.add(mediaId);
@@ -393,25 +404,28 @@ public class ChatActivity extends AppCompatActivity implements View.OnClickListe
                         filePath.getDownloadUrl().addOnSuccessListener(new OnSuccessListener<Uri>() {
                             @Override
                             public void onSuccess(Uri uri) {
-                                newMessageMap.put("/media/"+mediaIdList.get(mediaUploaded)+"/",uri.toString());
-                                mediaUploaded ++;
-                                if (mediaUploaded==mediaUriList.size()){
-                                    updateDataBaseWithNewMessage(newMessageDb,newMessageMap);
+                                newMessageMap.put("/media/" + mediaIdList.get(mediaUploaded) + "/", uri.toString());
+                                mediaUploaded++;
+                                if (mediaUploaded == mediaUriList.size()) {
+                                    updateDataBaseWithNewMessage(newMessageDb, newMessageMap);
+
                                 }
                             }
                         });
                     }
                 });
             }
-        }else {
+        } else {
 
             updateDataBaseWithNewMessage(newMessageDb, newMessageMap);
         }
 
     }
 
-    private void updateDataBaseWithNewMessage(DatabaseReference newMessageDb,Map newMessageMap){
+    private void updateDataBaseWithNewMessage(DatabaseReference newMessageDb, Map newMessageMap) {
         newMessageDb.updateChildren(newMessageMap);
+        mediaUriList.clear();
+        Log.i(TAG, "updateDataBaseWithNewMessage: " + mediaUriList.size());
     }
 
     public void updateUi(Message message) {
@@ -454,8 +468,8 @@ public class ChatActivity extends AppCompatActivity implements View.OnClickListe
         SimpleDateFormat formatter = new SimpleDateFormat("dd/MM/yyyy hh:mm a", Locale.getDefault());
         Date date = new Date();
 
-        if(TextUtils.isEmpty(inputMessage)){
-            if(!mediaUriList.isEmpty()){
+        if (TextUtils.isEmpty(inputMessage)) {
+            if (!mediaUriList.isEmpty()) {
                 inputMessage = "Photo";
             }
         }
@@ -482,7 +496,7 @@ public class ChatActivity extends AppCompatActivity implements View.OnClickListe
      * this method opens device's media to choose an image
      */
     private void openGalleryChooser() {
-        if(ProjectUtils.hasPermissionInManifest(this,Consts.PICK_IMAGES_REQUEST,Manifest.permission.READ_EXTERNAL_STORAGE)){
+        if (ProjectUtils.hasPermissionInManifest(this, Consts.PICK_IMAGES_REQUEST, Manifest.permission.READ_EXTERNAL_STORAGE)) {
             animateFilePickerDown();
             Intent intent = new Intent();
             intent.setType("image/*");
@@ -496,10 +510,54 @@ public class ChatActivity extends AppCompatActivity implements View.OnClickListe
      * this method opens device's camera to capture an image
      */
     private void openCamera() {
-        if(ProjectUtils.hasPermissionInManifest(this,Consts.CAPTURE_IMAGE_REQUEST, Manifest.permission.CAMERA)){
-            Intent cameraIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
-            startActivityForResult(cameraIntent, Consts.CAPTURE_IMAGE_REQUEST);
+        if (ProjectUtils.hasPermissionInManifest(this, Consts.CAPTURE_IMAGE_REQUEST, Manifest.permission.CAMERA)) {
+            try {
+                Intent intent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+                File file = getOutputMediaFile(1);
+                if (!file.exists()) {
+                    try {
+                        ProjectUtils.pauseProgressDialog();
+                        file.createNewFile();
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+                }
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+                    //Uri contentUri = FileProvider.getUriForFile(getApplicationContext(), "com.example.asd", newFile);
+                    picUri = FileProvider.getUriForFile(getApplicationContext(), getApplicationContext().getPackageName() + ".fileprovider", file);
+                } else {
+                    picUri = Uri.fromFile(file); // create
+                }
+
+                prefrence.setValue(Consts.IMAGE_URI_CAMERA, picUri.toString());
+                intent.putExtra(MediaStore.EXTRA_OUTPUT, picUri); // set the image file
+                startActivityForResult(intent, Consts.CAPTURE_IMAGE_REQUEST);
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
         }
+    }
+
+    private File getOutputMediaFile(int type) {
+        String root = Environment.getExternalStorageDirectory().toString();
+        File mediaStorageDir = new File(root, Consts.APP_NAME);
+        if (!mediaStorageDir.exists()) {
+            if (!mediaStorageDir.mkdirs()) {
+                return null;
+            }
+        }
+
+        String timeStamp = new SimpleDateFormat("yyyyMMdd_HHmmss").format(new Date());
+        File mediaFile;
+        if (type == 1) {
+            mediaFile = new File(mediaStorageDir.getPath() + File.separator +
+                    Consts.APP_NAME + timeStamp + ".png");
+
+            String imageName = Consts.APP_NAME + timeStamp + ".png";
+        } else {
+            return null;
+        }
+        return mediaFile;
     }
 
     private void toggleFilePicker() {
@@ -531,9 +589,10 @@ public class ChatActivity extends AppCompatActivity implements View.OnClickListe
 
     }
 
-    private void openPhotoEditor(String imageUri) {
+    private void openPhotoEditor(String imageUri, int requestCode) {
         Intent intent = new Intent(this, PhotoEditorActivity.class);
         intent.putExtra(Consts.EDIT_PHOTO, imageUri);
+        intent.putExtra("requestCode", requestCode);
         startActivityForResult(intent, Consts.EDIT_PHOTO_REQUEST);
     }
 
@@ -548,7 +607,7 @@ public class ChatActivity extends AppCompatActivity implements View.OnClickListe
                         if (data.getClipData() == null) {
                             mediaUriList = new ArrayList<>();
                             String uri = data.getData().toString();
-                            openPhotoEditor(uri);
+                            openPhotoEditor(uri, Consts.PICK_IMAGES_REQUEST);
                             mediaUriList.add(uri);
 //                            mediaUriList.add(uri);
                         } else {
@@ -561,16 +620,29 @@ public class ChatActivity extends AppCompatActivity implements View.OnClickListe
 
                 // image has been captured from camera
                 case Consts.CAPTURE_IMAGE_REQUEST:
-                    if (data != null && data.getExtras() != null) {
-                        Bitmap image = (Bitmap) data.getExtras().get("data");
+                    if (picUri != null) {
+                        picUri = Uri.parse(prefrence.getValue(Consts.IMAGE_URI_CAMERA));
+                        mediaUriList = new ArrayList<>();
+                        openPhotoEditor(picUri.toString(), Consts.CAPTURE_IMAGE_REQUEST);
+                        mediaUriList.add(picUri.toString());
+                    } else {
+                        picUri = Uri.parse(prefrence.getValue(Consts.IMAGE_URI_CAMERA));
+                        mediaUriList = new ArrayList<>();
+                        openPhotoEditor(picUri.toString(), Consts.CAPTURE_IMAGE_REQUEST);
+                        mediaUriList.add(picUri.toString());
                     }
                     break;
 
                 // resulting photo and caption from photo editor
                 case Consts.EDIT_PHOTO_REQUEST:
-                    if (data != null && data.getExtras() != null) {
+                    if (data != null && data.getExtras() != null && data.getStringExtra("message") != null) {
                         inputMessage = data.getStringExtra("message");
                         checkState();
+                    } else {
+                        Log.i(TAG, "onActivityResult: no Image was retrived ");
+                        mediaUriList.clear();
+                        if (data.getIntExtra("requestCode", -1) == Consts.PICK_IMAGES_REQUEST)
+                            openGalleryChooser();
                     }
 
             }
@@ -581,9 +653,9 @@ public class ChatActivity extends AppCompatActivity implements View.OnClickListe
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
 
-        if(grantResults.length>0 && grantResults[0] == PackageManager.PERMISSION_GRANTED){
+        if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
             Log.i(TAG, "onRequestPermissionsResult: capture image permission granted ");
-            switch (requestCode){
+            switch (requestCode) {
 
                 case Consts.CAPTURE_IMAGE_REQUEST:
                     openCamera();
@@ -592,7 +664,7 @@ public class ChatActivity extends AppCompatActivity implements View.OnClickListe
                 case Consts.PICK_IMAGES_REQUEST:
                     openGalleryChooser();
             }
-        }else {
+        } else {
             Log.i(TAG, "onRequestPermissionsResult: capture image permission denied ");
         }
 
@@ -648,7 +720,7 @@ public class ChatActivity extends AppCompatActivity implements View.OnClickListe
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        switch (item.getItemId()){
+        switch (item.getItemId()) {
             case android.R.id.home:
                 onBackPressed(); // make up button behave like back button
                 return true;
@@ -661,7 +733,7 @@ public class ChatActivity extends AppCompatActivity implements View.OnClickListe
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
         // Get the layout inflater
         LayoutInflater inflater = getLayoutInflater();
-        View filePicker = inflater.inflate(R.layout.file_picker,null);
+        View filePicker = inflater.inflate(R.layout.file_picker, null);
 
 
         // Inflate and set the layout for the dialog
