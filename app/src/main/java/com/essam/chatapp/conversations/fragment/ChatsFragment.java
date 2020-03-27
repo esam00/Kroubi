@@ -62,13 +62,6 @@ public class ChatsFragment extends Fragment implements HomeChatAdapter.ListItemC
         return view;
     }
 
-    private void checkContactsPermission() {
-        if (ProjectUtils.hasPermissionInManifest(getActivity(),
-                Consts.READ_CONTACTS_REQUEST,
-                Manifest.permission.READ_CONTACTS))
-            getUserChatList();
-    }
-
     private void initViews(View view) {
         welcomeLl = view.findViewById(R.id.welcome_ll);
         welcomeAnimation = view.findViewById(R.id.welcome_animation);
@@ -83,6 +76,19 @@ public class ChatsFragment extends Fragment implements HomeChatAdapter.ListItemC
         LinearLayoutManager layoutManager = new LinearLayoutManager(this.getContext());
         homeChatRv.setLayoutManager(layoutManager);
         homeChatAdapter.setMessagesData(chatList);
+    }
+
+    /**
+     * Before fetching user conversations list we need to be sure that user has accepted READ_CONTACTS
+     * permission , we might need this permission granted to display chat's user name as it is saved [ if it is save]
+     * in device contacts list
+     */
+    private void checkContactsPermission() {
+        if (ProjectUtils.hasPermissionInManifest(getActivity(),
+                Consts.READ_CONTACTS_REQUEST,
+                Manifest.permission.READ_CONTACTS))
+            // if contacts permission already granted >> fetch chats list
+            getUserChatList();
     }
 
     private void getUserChatList() {

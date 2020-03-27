@@ -10,7 +10,6 @@ import android.util.Log;
 import com.essam.chatapp.home.activity.HomeActivity;
 import com.essam.chatapp.login.LoginActivity;
 import com.essam.chatapp.utils.firebase.FirebaseHelper;
-import com.google.firebase.auth.FirebaseUser;
 
 public class SplashActivity extends AppCompatActivity {
 
