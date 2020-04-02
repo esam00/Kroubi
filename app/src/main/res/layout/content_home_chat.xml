@@ -18,6 +18,7 @@
             android:layout_height="?attr/actionBarSize"
             android:background="@color/colorPrimary"
             app:tabTextColor="@color/disabledColor"
+            app:tabRippleColor="@color/white"
             app:tabIndicatorColor="@color/white"
             app:tabIndicatorHeight="3dp"
             android:elevation="4dp"

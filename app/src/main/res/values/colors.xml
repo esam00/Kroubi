@@ -7,6 +7,8 @@
     <color name="colorMain">#1D255E</color>
     <color name="colorMainLight">#3F51B5</color>
 
+    <color name="colorMainWithOpacity">#991D255E</color>
+
     <color name="chat_background">#ECE5DD</color>
     <color name="outgoing_chat_bubble">#DCF8C6</color>
 

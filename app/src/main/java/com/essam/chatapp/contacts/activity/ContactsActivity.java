@@ -22,6 +22,8 @@ import com.essam.chatapp.chat.activity.ChatActivity;
 import com.essam.chatapp.contacts.adapter.ContactsAdapter;
 import com.essam.chatapp.contacts.model.Contact;
 import com.essam.chatapp.contacts.utils.ContactsHelper;
+import com.essam.chatapp.utils.Consts;
+import com.essam.chatapp.utils.firebase.FirebaseHelper;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
@@ -112,8 +114,8 @@ public class ContactsActivity extends AppCompatActivity implements ContactsAdapt
     }
 
     private void checkIfThisContactIsUser(final Contact mContact) {
-        DatabaseReference mUserDb = FirebaseDatabase.getInstance().getReference().child("user");
-        Query query = mUserDb.orderByChild("phone").equalTo(mContact.getPhone());
+        DatabaseReference mUserDb = FirebaseHelper.getAppUserDbReference();
+        Query query = mUserDb.orderByChild(Consts.PHONE).equalTo(mContact.getPhone());
         query.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
@@ -121,12 +123,12 @@ public class ContactsActivity extends AppCompatActivity implements ContactsAdapt
                     String phone = "", name = "";
 
                     for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
-                        if (snapshot.child("phone").getValue() != null) {
-                            phone = snapshot.child("phone").getValue().toString();
+                        if (snapshot.child(Consts.PHONE).getValue() != null) {
+                            phone = snapshot.child(Consts.PHONE).getValue().toString();
                         }
 
-                        if (snapshot.child("name").getValue() != null) {
-                            name = snapshot.child("name").getValue().toString();
+                        if (snapshot.child(Consts.NAME).getValue() != null) {
+                            name = snapshot.child(Consts.NAME).getValue().toString();
                         }
 
                         Contact mUser = new Contact(snapshot.getKey(), name, phone);
@@ -152,7 +154,8 @@ public class ContactsActivity extends AppCompatActivity implements ContactsAdapt
 
     private String getCountryIso() {
         String iso = null;
-        TelephonyManager telephonyManager = (TelephonyManager) getApplicationContext().getSystemService(getApplicationContext().TELEPHONY_SERVICE);
+        TelephonyManager telephonyManager = (TelephonyManager) getApplicationContext()
+                .getSystemService(TELEPHONY_SERVICE);
         if (telephonyManager.getNetworkCountryIso() != null) {
             if (!telephonyManager.getNetworkCountryIso().equals("")) {
                 iso = telephonyManager.getNetworkCountryIso();
