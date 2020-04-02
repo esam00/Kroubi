@@ -1,7 +1,10 @@
 package com.essam.chatapp.conversations.fragment;
 
 import android.Manifest;
+import android.app.Dialog;
 import android.content.Intent;
+import android.graphics.Color;
+import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
@@ -13,7 +16,9 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.Window;
 import android.widget.LinearLayout;
+import android.widget.TextView;
 
 import com.airbnb.lottie.LottieAnimationView;
 import com.essam.chatapp.R;
@@ -58,6 +63,7 @@ public class ChatsFragment extends Fragment implements HomeChatAdapter.ListItemC
         View view = inflater.inflate(R.layout.fragment_chats, container, false);
 
         initViews(view);
+//        showNotificationDialog("");
         checkContactsPermission();
         return view;
     }
@@ -163,6 +169,19 @@ public class ChatsFragment extends Fragment implements HomeChatAdapter.ListItemC
     private void showLoading() {
         loadingAnimation.setVisibility(View.VISIBLE);
         loadingAnimation.playAnimation();
+    }
+
+    private void showNotificationDialog(String message) {
+        final Dialog dialog = new Dialog(getContext());
+        dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
+        dialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
+
+        dialog.setContentView(R.layout.notification_dialog);
+        dialog.setCancelable(true);
+        ((TextView)dialog.findViewById(R.id.notificationText)).setText(message);
+        dialog.show();
+        Window window = dialog.getWindow();
+        window.setLayout(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
     }
 
     /**
