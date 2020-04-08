@@ -60,6 +60,14 @@ public class FirebaseHelper {
 
     }
 
+    public static DatabaseReference getReferenceToThisChatOfCurrentUser(String chatId){
+        return userChatDb.child(chatId);
+    }
+
+    public static DatabaseReference getReferenceToThisChatInOfOtherUser(String otherUid, String chatId){
+        return appUserDb.child(otherUid).child(Consts.CHAT).child(chatId);
+    }
+
     public static boolean isUserLoggedIn(){
         return firebaseUser != null;
     }

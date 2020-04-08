@@ -11,7 +11,6 @@ import androidx.recyclerview.widget.RecyclerView;
 import android.Manifest;
 import android.content.Intent;
 import android.content.pm.PackageManager;
-import android.graphics.Bitmap;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
@@ -34,6 +33,7 @@ import com.essam.chatapp.R;
 import com.essam.chatapp.chat.adapter.ChatAdapter;
 import com.essam.chatapp.chat.model.Message;
 import com.essam.chatapp.contacts.utils.ContactsHelper;
+import com.essam.chatapp.conversations.model.Chat;
 import com.essam.chatapp.utils.ProjectUtils;
 import com.essam.chatapp.utils.SharedPrefrence;
 import com.essam.chatapp.utils.firebase.FirebaseHelper;
@@ -90,14 +90,10 @@ public class ChatActivity extends AppCompatActivity implements View.OnClickListe
     private SharedPrefrence prefrence;
     private Uri picUri;
 
-
     //firebase
     private DatabaseReference appChatDb, appUserDb, mChatDb, otherSideUnseenChildDb;
     private ChildEventListener childEventListener;
     private ValueEventListener checkSeenEventListener;
-
-    Map mySideChatMap;
-    Map otherSideChatMap;
 
     //web Socket
     private WebSocket webSocket;
@@ -113,9 +109,6 @@ public class ChatActivity extends AppCompatActivity implements View.OnClickListe
         appChatDb = FirebaseHelper.getAppChatDbReference();
         appUserDb = FirebaseHelper.getAppUserDbReference();
         myUid = FirebaseAuth.getInstance().getUid();
-
-        mySideChatMap = new HashMap();
-        otherSideChatMap = new HashMap();
 
         initEventListeners();
         initViews();
@@ -435,35 +428,24 @@ public class ChatActivity extends AppCompatActivity implements View.OnClickListe
     }
 
     private void pushNewChat() {
-        DatabaseReference mySideDb = appUserDb.child(myUid).child(Consts.CHAT).child(chatID);
-        DatabaseReference otherSideDb = appUserDb.child(otherUid).child(Consts.CHAT).child(chatID);
+        DatabaseReference mySideDb = FirebaseHelper.getReferenceToThisChatOfCurrentUser(chatID);
+        DatabaseReference otherSideDb = FirebaseHelper.getReferenceToThisChatInOfOtherUser(otherUid,chatID);
 
         SimpleDateFormat formatter = new SimpleDateFormat("dd/MM/yyyy hh:mm a", Locale.getDefault());
         Date date = new Date();
 
-//        updateLastMessage();
+        Chat mySideChat = new Chat(chatID,otherName,otherUid,inputMessage,formatter.format(date),0,System.currentTimeMillis());
+        Chat otherSideChat = new Chat(chatID,myName,myUid,inputMessage,formatter.format(date),1,System.currentTimeMillis());
 
-        mySideChatMap.put(Consts.USER_UID, otherUid);
-        mySideChatMap.put(Consts.USER_NAME, otherName);
-        mySideChatMap.put(Consts.TEXT, inputMessage);
-        mySideChatMap.put(Consts.CREATED_AT, formatter.format(date));
-        mySideChatMap.put(Consts.UNSEEN_COUNT, "0");
-
-        otherSideChatMap.put(Consts.USER_UID, myUid);
-        otherSideChatMap.put(Consts.USER_NAME, myName);
-        otherSideChatMap.put(Consts.TEXT, inputMessage);
-        otherSideChatMap.put(Consts.UNSEEN_COUNT, "1");
-        otherSideChatMap.put(Consts.CREATED_AT, formatter.format(date));
-
-        mySideDb.updateChildren(mySideChatMap);
-        otherSideDb.updateChildren(otherSideChatMap);
+        mySideDb.setValue(mySideChat);
+        otherSideDb.setValue(otherSideChat);
 
         getLastUnseenCont();
     }
 
     private void updateLastMessage() {
-        DatabaseReference mySideDb = appUserDb.child(myUid).child(Consts.CHAT).child(chatID);
-        DatabaseReference otherSideDb = appUserDb.child(otherUid).child(Consts.CHAT).child(chatID);
+        DatabaseReference mySideDb = FirebaseHelper.getReferenceToThisChatOfCurrentUser(chatID);
+        DatabaseReference otherSideDb = FirebaseHelper.getReferenceToThisChatInOfOtherUser(otherUid,chatID);
 
         SimpleDateFormat formatter = new SimpleDateFormat("dd/MM/yyyy hh:mm a", Locale.getDefault());
         Date date = new Date();
@@ -474,17 +456,17 @@ public class ChatActivity extends AppCompatActivity implements View.OnClickListe
             }
         }
 
-        mySideDb.child(Consts.TEXT).setValue(inputMessage);
-        mySideDb.child(Consts.CREATED_AT).setValue(formatter.format(date));
-        otherSideDb.child(Consts.TEXT).setValue(inputMessage);
-        otherSideDb.child(Consts.CREATED_AT).setValue(formatter.format(date));
-        otherSideDb.child(Consts.UNSEEN_COUNT).setValue(String.valueOf(otherUnseenCount + 1));
+        mySideDb.child(Consts.LAST_MESSAGE).setValue(inputMessage);
+        mySideDb.child(Consts.SENT_AT).setValue(formatter.format(date));
+        otherSideDb.child(Consts.LAST_MESSAGE).setValue(inputMessage);
+        otherSideDb.child(Consts.SENT_AT).setValue(formatter.format(date));
+        otherSideDb.child(Consts.UNSEEN_COUNT).setValue(otherUnseenCount + 1);
 
     }
 
     private void resetMyUnseenCount() {
         DatabaseReference mySideDb = appUserDb.child(myUid).child(Consts.CHAT).child(chatID);
-        mySideDb.child(Consts.UNSEEN_COUNT).setValue("0");
+        mySideDb.child(Consts.UNSEEN_COUNT).setValue(0);
     }
 
     private void getLastUnseenCont() {

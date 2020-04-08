@@ -8,6 +8,7 @@ import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -29,6 +30,7 @@ import com.essam.chatapp.utils.firebase.FirebaseHelper;
 import com.essam.chatapp.conversations.model.Chat;
 import com.essam.chatapp.chat.activity.ChatActivity;
 import com.essam.chatapp.utils.Consts;
+import com.google.firebase.database.ChildEventListener;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
@@ -44,6 +46,9 @@ public class ChatsFragment extends Fragment implements HomeChatAdapter.ListItemC
     private LinearLayout welcomeLl;
     private LottieAnimationView welcomeAnimation, loadingAnimation;
     private List<Chat> chatList = new ArrayList<>();
+
+    private ChildEventListener onChatAddedEventListener;
+    private ValueEventListener onChatUpdatedEventListener;
 
     private final static String TAG = ChatsFragment.class.getSimpleName();
 
@@ -63,7 +68,7 @@ public class ChatsFragment extends Fragment implements HomeChatAdapter.ListItemC
         View view = inflater.inflate(R.layout.fragment_chats, container, false);
 
         initViews(view);
-//        showNotificationDialog("");
+        initEventListener();
         checkContactsPermission();
         return view;
     }
@@ -74,7 +79,7 @@ public class ChatsFragment extends Fragment implements HomeChatAdapter.ListItemC
         loadingAnimation = view.findViewById(R.id.loading_animation);
         showLoading();
 
-        // recycler view
+        // recyclerView
         chatList = new ArrayList<>();
         homeChatRv = view.findViewById(R.id.my_messages_rv);
         homeChatAdapter = new HomeChatAdapter(this, this.getContext());
@@ -82,6 +87,76 @@ public class ChatsFragment extends Fragment implements HomeChatAdapter.ListItemC
         LinearLayoutManager layoutManager = new LinearLayoutManager(this.getContext());
         homeChatRv.setLayoutManager(layoutManager);
         homeChatAdapter.setMessagesData(chatList);
+    }
+
+    private void initEventListener(){
+        // this value event listener is triggered once a new chat added Or existing chat updated
+        onChatAddedEventListener = new ChildEventListener() {
+            @Override
+            public void onChildAdded(@NonNull DataSnapshot dataSnapshot, @Nullable String s) {
+                    Chat chat= dataSnapshot.getValue(Chat.class);
+                    if (chat!=null){
+                        Log.i(TAG, "onChildAdded: username"+chat.getUserName());
+                        // if this user name is saved into my contacts replace name with the name of the saved contact
+                        chat.setUserName(ContactsHelper.getContactName(getActivity(), chat.getUserName()));
+
+                        chatList.add(chat);
+                        homeChatAdapter.setMessagesData(chatList);
+                        displayChatList();
+                    }
+            }
+
+            @Override
+            public void onChildChanged(@NonNull DataSnapshot dataSnapshot, @Nullable String s) {
+                Chat chat= dataSnapshot.getValue(Chat.class);
+                if (chat!=null){
+                    Log.i(TAG, "on child changed: username"+chat.getUserName()+"what changed : "+s);
+
+                    for (int i = 0; i < chatList.size(); i++) {
+                            if (chatList.get(i).getChatId().equals(chat.getChatId())) {
+                                chatList.get(i).setLastMessage(chat.getLastMessage());
+                                chatList.get(i).setSentAt(chat.getSentAt());
+                                chatList.get(i).setUnSeenCount(chat.getUnSeenCount());
+                                homeChatAdapter.notifyDataSetChanged();
+                            }
+                        }
+
+                }
+            }
+
+            @Override
+            public void onChildRemoved(@NonNull DataSnapshot dataSnapshot) {
+
+            }
+
+            @Override
+            public void onChildMoved(@NonNull DataSnapshot dataSnapshot, @Nullable String s) {
+
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
+                Log.e(TAG, "onCancelled: "+databaseError );
+            }
+        };
+
+        //single value event listener to check if user has any previous chats
+        onChatUpdatedEventListener = new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                if (dataSnapshot.exists()){
+                    Log.i(TAG, "onDataChange: Exist");
+                }else {
+                    Log.i(TAG, "onDataChange: not exist");
+                    hideChatListAndDisplayWelcomeAnimation();
+                }
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
+
+            }
+        };
     }
 
     /**
@@ -99,45 +174,8 @@ public class ChatsFragment extends Fragment implements HomeChatAdapter.ListItemC
 
     private void getUserChatList() {
         DatabaseReference mUserChatDb = FirebaseHelper.getUserChatDbReference();
-        mUserChatDb.addValueEventListener(new ValueEventListener() {
-            @Override
-            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                if (dataSnapshot.exists()) {
-                    for (DataSnapshot childSnapShot : dataSnapshot.getChildren()) {
-                        String name = "";
-                        Chat chat = new Chat();
-                        chat.setChatId(childSnapShot.getKey());
-                        chat.setSentAt(childSnapShot.child(Consts.CREATED_AT).getValue().toString());
-                        chat.setLastMessage(childSnapShot.child(Consts.TEXT).getValue().toString());
-                        chat.setUnSeenCount(Integer.parseInt(childSnapShot.child(Consts.UNSEEN_COUNT).getValue().toString()));
-                        name = (childSnapShot.child(Consts.USER_NAME).getValue().toString());
-                        chat.setSenderName(ContactsHelper.getContactName(getActivity(), name));
-
-                        boolean exists = false;
-                        for (int i = 0; i < chatList.size(); i++) {
-                            if (chatList.get(i).getChatId().equals(childSnapShot.getKey())) {
-                                chatList.get(i).setLastMessage(childSnapShot.child(Consts.TEXT).getValue().toString());
-                                chatList.get(i).setSentAt(childSnapShot.child(Consts.CREATED_AT).getValue().toString());
-                                chatList.get(i).setUnSeenCount(Integer.parseInt(childSnapShot.child(Consts.UNSEEN_COUNT).getValue().toString()));
-                                homeChatAdapter.notifyDataSetChanged();
-                                exists = true;
-                            }
-                        }
-                        if (exists) continue;
-                        chatList.add(chat);
-                        homeChatAdapter.setMessagesData(chatList);
-                        displayChatList();
-                    }
-                } else {
-                    hideChatListAndDisplayWelcomeAnimation();
-                }
-            }
-
-            @Override
-            public void onCancelled(@NonNull DatabaseError databaseError) {
-
-            }
-        });
+        mUserChatDb.addChildEventListener(onChatAddedEventListener);
+        mUserChatDb.addListenerForSingleValueEvent(onChatUpdatedEventListener);
     }
 
     /**

@@ -51,7 +51,7 @@ public class HomeChatAdapter extends RecyclerView.Adapter<HomeChatAdapter.ViewHo
 
         void bind (Chat chat, int position){
             // update ui [name, message text, date
-            senderNameTV.setText(chat.getSenderName());
+            senderNameTV.setText(chat.getUserName());
             lastMessageTv.setText(chat.getLastMessage());
             dateTv.setText(getDisplayedDate(chat.getSentAt()));
 

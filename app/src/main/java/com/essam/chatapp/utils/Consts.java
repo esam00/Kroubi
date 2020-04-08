@@ -10,8 +10,10 @@ public class Consts {
     public static final String PHONE ="phone" ;
 
     public static final String CREATED_AT = "createdAt";
-    public static final String TEXT = "text";
-    public static final String UNSEEN_COUNT ="unseenCount" ;
+    public static final String SENT_AT = "sentAt";
+    public static final String LAST_MESSAGE = "lastMessage";
+    public static final String UNSEEN_COUNT ="unSeenCount" ;
+    public static final String TIME_STAMP ="timeStamp" ;
     public static final String USER_NAME = "userName";
     public static final String USER_UID = "userUid";
 
