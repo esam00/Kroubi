@@ -8,6 +8,8 @@ import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 
+/** Created by esammosbah1@gmail.com 1/1/2020 */
+
 public class FirebaseHelper {
 
     private static DatabaseReference appChatDb;
@@ -19,7 +21,7 @@ public class FirebaseHelper {
     private final static DatabaseReference mReference = mDatabase.getReference();
     private static FirebaseUser firebaseUser = mAuth.getCurrentUser();
 
-    private static String userUid = mAuth.getUid();
+    public static String userUid = mAuth.getUid();
 
     private static final String TAG = FirebaseHelper.class.getSimpleName();
 
@@ -60,11 +62,21 @@ public class FirebaseHelper {
 
     }
 
+    /**
+     * @param chatId
+     * returns a database reference to user/myUid/chat/{chatId} node in firebase database
+     * */
     public static DatabaseReference getReferenceToThisChatOfCurrentUser(String chatId){
         return userChatDb.child(chatId);
     }
 
-    public static DatabaseReference getReferenceToThisChatInOfOtherUser(String otherUid, String chatId){
+    /**
+     *
+      * @param otherUid userUid of the user that this chat is with
+     * @param chatId id of this chat
+     * @return a database reference to user/otherUid/chat/{chatId} node in firebase database
+     */
+    public static DatabaseReference getReferenceToThisChatOfOtherUser(String otherUid, String chatId){
         return appUserDb.child(otherUid).child(Consts.CHAT).child(chatId);
     }
 

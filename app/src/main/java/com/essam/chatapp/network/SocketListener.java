@@ -43,7 +43,6 @@ public class SocketListener extends WebSocketListener {
             public void run() {
                 Gson gson = new Gson();
                 Message message = gson.fromJson(receivedMessage,Message.class);
-                message.setFromServer(true);
                 activity.updateUi(message);
 
             }

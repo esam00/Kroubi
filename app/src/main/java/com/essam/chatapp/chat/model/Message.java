@@ -4,29 +4,40 @@ import java.util.List;
 
 public class Message {
     private String messageId;
-    private String senderId;
-    private String senderName;
-    private String picture;
-    private String sentAt;
     private String message;
-    private String imageUrl;
-    private List<String>mediaUrls;
-    private boolean isFromServer,seen;
+    private String creatorId;
+    private String createdAt;
+    private long timeStamp;
+    private String media;
+    private boolean seen;
 
-    public List<String> getMediaUrls() {
-        return mediaUrls;
+    public Message() {
+        // Default constructor required for calls to DataSnapshot.getValue(User.class)
     }
 
-    public void setMediaUrls(List<String> mediaUrls) {
-        this.mediaUrls = mediaUrls;
+    public Message(String messageId, String message, String creatorId, String createdAt, boolean seen) {
+        this.messageId = messageId;
+        this.message = message;
+        this.creatorId = creatorId;
+        this.createdAt = createdAt;
+        this.seen = seen;
     }
 
-    public String getImageUrl() {
-        return imageUrl;
+    public Message(String messageId, String message, String creatorId, String createdAt, String media, boolean seen) {
+        this.messageId = messageId;
+        this.message = message;
+        this.creatorId = creatorId;
+        this.createdAt = createdAt;
+        this.media = media;
+        this.seen = seen;
     }
 
-    public void setImageUrl(String imageUrl) {
-        this.imageUrl = imageUrl;
+    public String getMedia() {
+        return media;
+    }
+
+    public void setMedia(String media) {
+        this.media = media;
     }
 
     public boolean isSeen() {
@@ -37,12 +48,12 @@ public class Message {
         this.seen = seen;
     }
 
-    public String getSentAt() {
-        return sentAt;
+    public String getCreatedAt() {
+        return createdAt;
     }
 
-    public void setSentAt(String sentAt) {
-        this.sentAt = sentAt;
+    public void setCreatedAt(String createdAt) {
+        this.createdAt = createdAt;
     }
 
     public String getMessageId() {
@@ -53,28 +64,12 @@ public class Message {
         this.messageId = messageId;
     }
 
-    public String getSenderId() {
-        return senderId;
+    public String getCreatorId() {
+        return creatorId;
     }
 
-    public void setSenderId(String senderId) {
-        this.senderId = senderId;
-    }
-
-    public String getSenderName() {
-        return senderName;
-    }
-
-    public void setSenderName(String senderName) {
-        this.senderName = senderName;
-    }
-
-    public String getPicture() {
-        return picture;
-    }
-
-    public void setPicture(String picture) {
-        this.picture = picture;
+    public void setCreatorId(String creatorId) {
+        this.creatorId = creatorId;
     }
 
     public String getMessage() {
@@ -85,11 +80,11 @@ public class Message {
         this.message = message;
     }
 
-    public boolean isFromServer() {
-        return isFromServer;
+    public long getTimeStamp() {
+        return timeStamp;
     }
 
-    public void setFromServer(boolean fromServer) {
-        isFromServer = fromServer;
+    public void setTimeStamp(long timeStamp) {
+        this.timeStamp = timeStamp;
     }
 }

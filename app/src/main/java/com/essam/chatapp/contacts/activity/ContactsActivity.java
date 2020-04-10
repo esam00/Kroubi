@@ -24,11 +24,9 @@ import com.essam.chatapp.contacts.model.Contact;
 import com.essam.chatapp.contacts.utils.ContactsHelper;
 import com.essam.chatapp.utils.Consts;
 import com.essam.chatapp.utils.firebase.FirebaseHelper;
-import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
-import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.Query;
 import com.google.firebase.database.ValueEventListener;
 
@@ -140,7 +138,6 @@ public class ContactsActivity extends AppCompatActivity implements ContactsAdapt
                         users.add(mUser);
                         contactsAdapter.notifyDataSetChanged();
                         progressBar.setVisibility(View.GONE);
-
                     }
                 }
             }
@@ -173,46 +170,39 @@ public class ContactsActivity extends AppCompatActivity implements ContactsAdapt
 
     @Override
     public void onClick(final int index) {
-        final String myUid = FirebaseAuth.getInstance().getUid();
         final String otherUid = users.get(index).getUid();
-        DatabaseReference userChatDb = FirebaseDatabase.getInstance().getReference().child("user").child(myUid).child("chat");
+        DatabaseReference userChatDb = FirebaseHelper.getUserChatDbReference();
 
         userChatDb.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-
                 Bundle bundle = new Bundle();
                 if (dataSnapshot.exists()) {
-//                    pushNewChat(myUid, otherUid);
-
                     for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
-                        if (otherUid.equals(snapshot.child("userUid").getValue().toString())) {
-                            Toast.makeText(ContactsActivity.this, "already had a chat with this user!", Toast.LENGTH_SHORT).show();
-                            bundle.putString("chatID", snapshot.getKey());
 
-                        } else {
-                            bundle.putString("userUid", otherUid);
+                        if (otherUid.equals(snapshot.child(Consts.CREATOR_ID).getValue().toString())) {
+                            Toast.makeText(ContactsActivity.this, "already had a chat with this user!", Toast.LENGTH_SHORT).show();
+                            bundle.putString(Consts.CHAT_ID, snapshot.getKey());
+                        }
+                        else {
+                            bundle.putString(Consts.USER_UID, otherUid);
                         }
                     }
 
                 } else {
-                    bundle.putString("userUid", otherUid);
+                    bundle.putString(Consts.USER_UID, otherUid);
                 }
 
                 Intent intent = new Intent(ContactsActivity.this, ChatActivity.class);
                 intent.putExtras(bundle);
                 startActivity(intent);
                 finish();
-
             }
 
             @Override
             public void onCancelled(@NonNull DatabaseError databaseError) {
-
             }
         });
-
-
     }
 
     @Override

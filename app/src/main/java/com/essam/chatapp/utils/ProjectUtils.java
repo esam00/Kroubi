@@ -37,13 +37,14 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.Locale;
 import java.util.StringTokenizer;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 
 public class ProjectUtils {
-    public static final String TAG = "ProjectUtility";
+    public static final String TAG = ProjectUtils.class.getSimpleName();
     private static AlertDialog dialog;
     private static Toast toast;
     private static ProgressDialog mProgressDialog;
@@ -648,6 +649,11 @@ public class ProjectUtils {
             }
         }
         return null;
+    }
+
+    public static String getDisplayableCurrentDateTime(){
+        SimpleDateFormat formatter = new SimpleDateFormat("dd/MM/yyyy hh:mm a", Locale.getDefault());
+        return formatter.format(new Date());
     }
 
 

@@ -48,7 +48,7 @@ public class ChatsFragment extends Fragment implements HomeChatAdapter.ListItemC
     private List<Chat> chatList = new ArrayList<>();
 
     private ChildEventListener onChatAddedEventListener;
-    private ValueEventListener onChatUpdatedEventListener;
+    private ValueEventListener checkExistValueEventListener;
 
     private final static String TAG = ChatsFragment.class.getSimpleName();
 
@@ -89,37 +89,38 @@ public class ChatsFragment extends Fragment implements HomeChatAdapter.ListItemC
         homeChatAdapter.setMessagesData(chatList);
     }
 
-    private void initEventListener(){
+    private void initEventListener() {
         // this value event listener is triggered once a new chat added Or existing chat updated
         onChatAddedEventListener = new ChildEventListener() {
             @Override
             public void onChildAdded(@NonNull DataSnapshot dataSnapshot, @Nullable String s) {
-                    Chat chat= dataSnapshot.getValue(Chat.class);
-                    if (chat!=null){
-                        Log.i(TAG, "onChildAdded: username"+chat.getUserName());
-                        // if this user name is saved into my contacts replace name with the name of the saved contact
-                        chat.setUserName(ContactsHelper.getContactName(getActivity(), chat.getUserName()));
+                Chat chat = dataSnapshot.getValue(Chat.class);
+                if (chat != null) {
+                    Log.i(TAG, "new chat added with : " + chat.getUserName());
+                    // if this user name is already saved into my contacts replace user name with this saved name
+                    chat.setUserName(ContactsHelper.getContactName(getActivity(), chat.getUserName()));
 
-                        chatList.add(chat);
-                        homeChatAdapter.setMessagesData(chatList);
-                        displayChatList();
-                    }
+                    chatList.add(chat);
+                    homeChatAdapter.setMessagesData(chatList);
+                    displayChatList();
+                }
             }
 
             @Override
             public void onChildChanged(@NonNull DataSnapshot dataSnapshot, @Nullable String s) {
-                Chat chat= dataSnapshot.getValue(Chat.class);
-                if (chat!=null){
-                    Log.i(TAG, "on child changed: username"+chat.getUserName()+"what changed : "+s);
+                Chat chat = dataSnapshot.getValue(Chat.class);
+                if (chat != null) {
+                    Log.i(TAG, "new message added to chat with : " + chat.getUserName());
 
+                    //update this chat with the new data
                     for (int i = 0; i < chatList.size(); i++) {
-                            if (chatList.get(i).getChatId().equals(chat.getChatId())) {
-                                chatList.get(i).setLastMessage(chat.getLastMessage());
-                                chatList.get(i).setSentAt(chat.getSentAt());
-                                chatList.get(i).setUnSeenCount(chat.getUnSeenCount());
-                                homeChatAdapter.notifyDataSetChanged();
-                            }
+                        if (chatList.get(i).getChatId().equals(chat.getChatId())) {
+                            chatList.get(i).setMessage(chat.getMessage());
+                            chatList.get(i).setCreatedAt(chat.getCreatedAt());
+                            chatList.get(i).setUnSeenCount(chat.getUnSeenCount());
+                            homeChatAdapter.notifyDataSetChanged();
                         }
+                    }
 
                 }
             }
@@ -136,17 +137,17 @@ public class ChatsFragment extends Fragment implements HomeChatAdapter.ListItemC
 
             @Override
             public void onCancelled(@NonNull DatabaseError databaseError) {
-                Log.e(TAG, "onCancelled: "+databaseError );
+                Log.e(TAG, "onCancelled: " + databaseError);
             }
         };
 
         //single value event listener to check if user has any previous chats
-        onChatUpdatedEventListener = new ValueEventListener() {
+        checkExistValueEventListener = new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                if (dataSnapshot.exists()){
+                if (dataSnapshot.exists()) {
                     Log.i(TAG, "onDataChange: Exist");
-                }else {
+                } else {
                     Log.i(TAG, "onDataChange: not exist");
                     hideChatListAndDisplayWelcomeAnimation();
                 }
@@ -161,7 +162,7 @@ public class ChatsFragment extends Fragment implements HomeChatAdapter.ListItemC
 
     /**
      * Before fetching user conversations list we need to be sure that user has accepted READ_CONTACTS
-     * permission , we might need this permission granted to display chat's user name as it is saved [ if it is save]
+     * permission , we might need this permission granted to display chat's user name as it is saved [ if it is saved]
      * in device contacts list
      */
     private void checkContactsPermission() {
@@ -172,14 +173,17 @@ public class ChatsFragment extends Fragment implements HomeChatAdapter.ListItemC
             getUserChatList();
     }
 
+    /**
+     * This is the main method that is responsible for fetching previous chats AND listen for new messages
+     */
     private void getUserChatList() {
         DatabaseReference mUserChatDb = FirebaseHelper.getUserChatDbReference();
         mUserChatDb.addChildEventListener(onChatAddedEventListener);
-        mUserChatDb.addListenerForSingleValueEvent(onChatUpdatedEventListener);
+        mUserChatDb.addListenerForSingleValueEvent(checkExistValueEventListener);
     }
 
     /**
-     * hide loading and display user chats list as soon as they have been successfully fetched
+     * hide loading and display user chats list as soon as they are successfully fetched
      */
     private void displayChatList() {
         hideLoading();
@@ -216,7 +220,7 @@ public class ChatsFragment extends Fragment implements HomeChatAdapter.ListItemC
 
         dialog.setContentView(R.layout.notification_dialog);
         dialog.setCancelable(true);
-        ((TextView)dialog.findViewById(R.id.notificationText)).setText(message);
+        ((TextView) dialog.findViewById(R.id.notificationText)).setText(message);
         dialog.show();
         Window window = dialog.getWindow();
         window.setLayout(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);

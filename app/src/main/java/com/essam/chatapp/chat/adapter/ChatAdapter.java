@@ -25,6 +25,7 @@ import com.bumptech.glide.load.engine.DiskCacheStrategy;
 import com.essam.chatapp.R;
 import com.essam.chatapp.chat.model.Message;
 import com.essam.chatapp.utils.Consts;
+import com.essam.chatapp.utils.firebase.FirebaseHelper;
 import com.google.firebase.database.DatabaseReference;
 
 import java.util.List;
@@ -49,21 +50,22 @@ public class ChatAdapter extends RecyclerView.Adapter {
     @Override
     public int getItemViewType(int position) {
         Message message = mMessages.get(position);
+        boolean isReceiving = !message.getCreatorId().equals(FirebaseHelper.userUid);
         Message prevMessage= null;
 
         if(position>0){
             prevMessage = mMessages.get(position - 1);
         }
 
-        if (message.isFromServer()) {
-            if (prevMessage!=null && prevMessage.isFromServer()) {
+        if (isReceiving) {
+            if (prevMessage != null) {
                 return VIEW_TYPE_SIMPLE_MESSAGE_RECEIVED;
             } else {
                 // If some other user sent the message
                 return VIEW_TYPE_MESSAGE_RECEIVED;
             }
         } else {
-            if (prevMessage!=null && !prevMessage.isFromServer()) {
+            if (prevMessage!=null) {
                 return VIEW_TYPE_SIMPLE_MESSAGE_SENT;
             } else {
                 // If some other user sent the message
@@ -138,7 +140,7 @@ public class ChatAdapter extends RecyclerView.Adapter {
 
         void bind(final Message message) {
             //bind message sent time
-            sentAtTextView.setText(message.getSentAt().split("\\s+")[1] + " " + message.getSentAt().split("\\s+")[2]);
+            sentAtTextView.setText(message.getCreatedAt().split("\\s+")[1] + " " + message.getCreatedAt().split("\\s+")[2]);
 
             //bind seen
             if (message.isSeen())
@@ -155,13 +157,13 @@ public class ChatAdapter extends RecyclerView.Adapter {
             }
 
             //bind message image
-            if (message.getMediaUrls() != null && !message.getMediaUrls().isEmpty()) {
+            if (message.getMedia() != null && !message.getMedia().isEmpty()) {
                 imageMessageIv.setVisibility(View.VISIBLE);
-                Glide.with(context).load(Uri.parse(message.getMediaUrls().get(0))).into(imageMessageIv);
+                Glide.with(context).load(Uri.parse(message.getMedia())).into(imageMessageIv);
                 imageMessageIv.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View view) {
-                        dialogZoom(Uri.parse(message.getMediaUrls().get(0)));
+                        dialogZoom(Uri.parse(message.getMedia()));
                     }
                 });
             }else {
@@ -185,7 +187,7 @@ public class ChatAdapter extends RecyclerView.Adapter {
 
         void bind(final Message message) {
             //bind message time
-            sentAtTextView.setText(message.getSentAt().split("\\s+")[1]+" "+message.getSentAt().split("\\s+")[2]);
+            sentAtTextView.setText(message.getCreatedAt().split("\\s+")[1]+" "+message.getCreatedAt().split("\\s+")[2]);
 
             //update message seen = true
             msgDb = chatDb.child(message.getMessageId());
@@ -200,13 +202,13 @@ public class ChatAdapter extends RecyclerView.Adapter {
             }
 
             //bind message image
-            if (message.getMediaUrls() != null && !message.getMediaUrls().isEmpty()) {
+            if (message.getMedia() != null && !message.getMedia().isEmpty()) {
                 imageMessageIv.setVisibility(View.VISIBLE);
-                Glide.with(context).load(Uri.parse(message.getMediaUrls().get(0))).into(imageMessageIv);
+                Glide.with(context).load(Uri.parse(message.getMedia())).into(imageMessageIv);
                 imageMessageIv.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View view) {
-                        dialogZoom(Uri.parse(message.getMediaUrls().get(0)));
+                        dialogZoom(Uri.parse(message.getMedia()));
                     }
                 });
             }else {

@@ -2,28 +2,26 @@ package com.essam.chatapp.conversations.model;
 
 public class Chat {
     private String chatId;
-    private String userName;
-    private String userUid;
-    private String lastMessage;
-    private String sentAt;
+    private String creatorId;
+    private String message;
+    private String createdAt;
     private int unSeenCount;
     private long timeStamp;
+    private String userName;
 
     public Chat() {
         // Default constructor required for calls to DataSnapshot.getValue(User.class)
     }
 
-    public Chat(String chatId, String userName, String userUid, String lastMessage, String sentAt, int unSeenCount, long timeStamp) {
+    public Chat(String chatId, String userName, String creatorId, String message, String createdAt, int unSeenCount, long timeStamp) {
         this.chatId = chatId;
         this.userName = userName;
-        this.userUid = userUid;
-        this.lastMessage = lastMessage;
-        this.sentAt = sentAt;
+        this.creatorId = creatorId;
+        this.message = message;
+        this.createdAt = createdAt;
         this.unSeenCount = unSeenCount;
         this.timeStamp = timeStamp;
     }
-
-
 
     public String getChatId() {
         return chatId;
@@ -41,20 +39,20 @@ public class Chat {
         this.userName = userName;
     }
 
-    public String getLastMessage() {
-        return lastMessage;
+    public String getMessage() {
+        return message;
     }
 
-    public void setLastMessage(String lastMessage) {
-        this.lastMessage = lastMessage;
+    public void setMessage(String message) {
+        this.message = message;
     }
 
-    public String getSentAt() {
-        return sentAt;
+    public String getCreatedAt() {
+        return createdAt;
     }
 
-    public void setSentAt(String sentAt) {
-        this.sentAt = sentAt;
+    public void setCreatedAt(String createdAt) {
+        this.createdAt = createdAt;
     }
 
     public int getUnSeenCount() {
@@ -73,11 +71,11 @@ public class Chat {
         this.timeStamp = timeStamp;
     }
 
-    public String getUserUid() {
-        return userUid;
+    public String getCreatorId() {
+        return creatorId;
     }
 
-    public void setUserUid(String userUid) {
-        this.userUid = userUid;
+    public void setCreatorId(String creatorId) {
+        this.creatorId = creatorId;
     }
 }

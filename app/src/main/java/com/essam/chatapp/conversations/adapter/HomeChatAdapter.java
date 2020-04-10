@@ -52,8 +52,8 @@ public class HomeChatAdapter extends RecyclerView.Adapter<HomeChatAdapter.ViewHo
         void bind (Chat chat, int position){
             // update ui [name, message text, date
             senderNameTV.setText(chat.getUserName());
-            lastMessageTv.setText(chat.getLastMessage());
-            dateTv.setText(getDisplayedDate(chat.getSentAt()));
+            lastMessageTv.setText(chat.getMessage());
+            dateTv.setText(getDisplayedDate(chat.getCreatedAt()));
 
             //colors
             if(chat.getUnSeenCount()>0){
@@ -66,15 +66,16 @@ public class HomeChatAdapter extends RecyclerView.Adapter<HomeChatAdapter.ViewHo
             }
 
             // hide separator for last item in the list
-            if(isLastItem(position)) separator.setVisibility(View.GONE);
-            else separator.setVisibility(View.VISIBLE);
+            if(isLastItem(position))
+                separator.setVisibility(View.GONE);
+            else
+                separator.setVisibility(View.VISIBLE);
         }
 
         String getDisplayedDate(String dateString){
             String date = dateString.split("\\s+")[0];
 
             String time = dateString.split("\\s+")[1]+" "+dateString.split("\\s+")[2];
-
 
             ParsePosition pos = new ParsePosition(0);
             Calendar cal = Calendar.getInstance();

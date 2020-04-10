@@ -10,18 +10,13 @@ public class Consts {
     public static final String PHONE ="phone" ;
 
     public static final String CREATED_AT = "createdAt";
-    public static final String SENT_AT = "sentAt";
-    public static final String LAST_MESSAGE = "lastMessage";
     public static final String UNSEEN_COUNT ="unSeenCount" ;
     public static final String TIME_STAMP ="timeStamp" ;
     public static final String USER_NAME = "userName";
-    public static final String USER_UID = "userUid";
-
-    public static final String SEEN = "Seen";
+    public static final String SEEN = "seen";
     public static final String MESSAGE = "message";
-    public static final String CREATOR = "creator";
+    public static final String CREATOR_ID = "creatorId";
     public static final String MEDIA = "media";
-
 
     //request
     public static final int PICK_IMAGES_REQUEST =1;
@@ -33,6 +28,7 @@ public class Consts {
     //bundles
     public static final String APP_NAME = "Chat App" ;
 
+    public static final String USER_UID ="userUid";
     public static final String EDIT_PHOTO ="edit_photo";
     public static final String LATITUDE ="latitude" ;
     public static final String LONGITUDE = "longitude";
