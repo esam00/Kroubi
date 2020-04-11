@@ -14,6 +14,8 @@ import android.widget.Toast;
 
 import com.essam.chatapp.R;
 import com.essam.chatapp.home.activity.HomeActivity;
+import com.essam.chatapp.utils.Consts;
+import com.essam.chatapp.utils.SharedPrefrence;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.FirebaseApp;
@@ -41,6 +43,7 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
     private Button loginButton, verifyButton;
     private ProgressBar progressBar;
     private RelativeLayout phoneRelativeLayout;
+    private SharedPrefrence prefrence;
 
     //firebase
     private FirebaseAuth mAuth;
@@ -70,6 +73,7 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
         loginButton = findViewById(R.id.btn_login);
         verifyButton = findViewById(R.id.btn_verify);
         phoneRelativeLayout = findViewById(R.id.rl_phone_entry);
+        prefrence = SharedPrefrence.getInstance(this);
 
         //set click listener
         loginButton.setOnClickListener(this);
@@ -148,6 +152,7 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
 
                             }
                         });
+                        prefrence.setValue(Consts.USER_NAME,user.getPhoneNumber());
                     }
                     userLoggedIn();
                 }

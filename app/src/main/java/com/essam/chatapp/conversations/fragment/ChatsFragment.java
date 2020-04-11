@@ -26,14 +26,15 @@ import com.essam.chatapp.R;
 import com.essam.chatapp.contacts.utils.ContactsHelper;
 import com.essam.chatapp.conversations.adapter.HomeChatAdapter;
 import com.essam.chatapp.utils.ProjectUtils;
-import com.essam.chatapp.utils.firebase.FirebaseHelper;
 import com.essam.chatapp.conversations.model.Chat;
 import com.essam.chatapp.chat.activity.ChatActivity;
 import com.essam.chatapp.utils.Consts;
+import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.ChildEventListener;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
 import java.util.ArrayList;
@@ -47,6 +48,8 @@ public class ChatsFragment extends Fragment implements HomeChatAdapter.ListItemC
     private LottieAnimationView welcomeAnimation, loadingAnimation;
     private List<Chat> chatList = new ArrayList<>();
 
+    //firebase
+    private  DatabaseReference userChatDb;
     private ChildEventListener onChatAddedEventListener;
     private ValueEventListener checkExistValueEventListener;
 
@@ -67,6 +70,7 @@ public class ChatsFragment extends Fragment implements HomeChatAdapter.ListItemC
         // Inflate the layout for this fragment
         View view = inflater.inflate(R.layout.fragment_chats, container, false);
 
+        initFirebase();
         initViews(view);
         initEventListener();
         checkContactsPermission();
@@ -87,6 +91,15 @@ public class ChatsFragment extends Fragment implements HomeChatAdapter.ListItemC
         LinearLayoutManager layoutManager = new LinearLayoutManager(this.getContext());
         homeChatRv.setLayoutManager(layoutManager);
         homeChatAdapter.setMessagesData(chatList);
+    }
+
+    private void initFirebase(){
+        FirebaseAuth mAuth = FirebaseAuth.getInstance();
+        FirebaseDatabase mDatabase = FirebaseDatabase.getInstance();
+        DatabaseReference mReference = mDatabase.getReference();
+
+        String userUid = mAuth.getUid();
+        if(userUid!=null) userChatDb = mReference.child(Consts.USER).child(userUid).child(Consts.CHAT);
     }
 
     private void initEventListener() {
@@ -177,9 +190,8 @@ public class ChatsFragment extends Fragment implements HomeChatAdapter.ListItemC
      * This is the main method that is responsible for fetching previous chats AND listen for new messages
      */
     private void getUserChatList() {
-        DatabaseReference mUserChatDb = FirebaseHelper.getUserChatDbReference();
-        mUserChatDb.addChildEventListener(onChatAddedEventListener);
-        mUserChatDb.addListenerForSingleValueEvent(checkExistValueEventListener);
+        userChatDb.addChildEventListener(onChatAddedEventListener);
+        userChatDb.addListenerForSingleValueEvent(checkExistValueEventListener);
     }
 
     /**
@@ -239,9 +251,22 @@ public class ChatsFragment extends Fragment implements HomeChatAdapter.ListItemC
         homeChatAdapter.notifyDataSetChanged();
 
         Bundle bundle = new Bundle();
-        bundle.putString(Consts.CHAT_ID, chatList.get(index).getChatId());
+        bundle.putString(Consts.USER_UID, chatList.get(index).getUserUid());
         Intent intent = new Intent(this.getActivity(), ChatActivity.class);
         intent.putExtras(bundle);
         startActivity(intent);
+    }
+
+    @Override
+    public void onPause() {
+        userChatDb.removeEventListener(onChatAddedEventListener);
+        userChatDb.removeEventListener(checkExistValueEventListener);
+        super.onPause();
+    }
+
+    @Override
+    public void onResume() {
+        initEventListener();
+        super.onResume();
     }
 }

@@ -36,7 +36,6 @@ import com.essam.chatapp.contacts.utils.ContactsHelper;
 import com.essam.chatapp.conversations.model.Chat;
 import com.essam.chatapp.utils.ProjectUtils;
 import com.essam.chatapp.utils.SharedPrefrence;
-import com.essam.chatapp.utils.firebase.FirebaseHelper;
 import com.essam.chatapp.photoEditor.PhotoEditorActivity;
 import com.essam.chatapp.utils.Consts;
 import com.essam.chatapp.network.SocketListener;
@@ -46,6 +45,7 @@ import com.google.firebase.database.ChildEventListener;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
@@ -85,11 +85,14 @@ public class ChatActivity extends AppCompatActivity implements View.OnClickListe
     private SharedPrefrence prefrence;
     private Uri picUri;
     private String currentFormatDate;
+    private boolean isFirstTime = true;
+    private List<String> messageIdList;
+    private int mediaUploaded;
 
     //firebase
-    private DatabaseReference appChatDb, appUserDb, mChatDb, otherSideUnseenChildDb;
+    private DatabaseReference appChatDb, appUserDb,userChatDb, mChatDb, otherSideUnseenChildDb, myDb, otherDb;
     private ChildEventListener childEventListener;
-    private ValueEventListener checkSeenEventListener;
+    private ValueEventListener checkSeenEventListener, userInfoListener, myInfoListener, checkPreviousConversations;
 
     //web Socket
     private WebSocket webSocket;
@@ -102,13 +105,10 @@ public class ChatActivity extends AppCompatActivity implements View.OnClickListe
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_chat);
 
-        appChatDb = FirebaseHelper.getAppChatDbReference();
-        appUserDb = FirebaseHelper.getAppUserDbReference();
-        myUid = FirebaseHelper.userUid;
-
+        initFirebase();
         initEventListeners();
-        initViews();
         receiveIntents();
+        initViews();
     }
 
     /**
@@ -119,39 +119,68 @@ public class ChatActivity extends AppCompatActivity implements View.OnClickListe
      * chat when sending the first message
      */
     private void receiveIntents() {
-        //
         Intent intent = getIntent();
-        if (!intent.hasExtra(Consts.CHAT_ID) || intent.getStringExtra(Consts.CHAT_ID) == null) {
-            // no chat id found >> look for user uid
-            if (intent.hasExtra(Consts.USER_UID) && intent.getStringExtra(Consts.USER_UID) != null) {
-                otherUid = intent.getStringExtra(Consts.USER_UID);
-                fetchUserData();
-            }
-        } else {
-            // there is chatId found
-            chatID = intent.getStringExtra(Consts.CHAT_ID);
-            Log.i(TAG, chatID);
-            //get the reference to this chat id chat database >> chat/chatId
-            mChatDb = appChatDb.child(chatID);
-            // pass this reference to adapter in order to handle and update seen state
-            adapter.setChatDp(mChatDb);
-            getUserInfo();
-            getMessages();
+        if (intent.hasExtra(Consts.USER_UID) && intent.getStringExtra(Consts.USER_UID) != null) {
+            otherUid = intent.getStringExtra(Consts.USER_UID);
+            fetchUserData();
+            checkPrevoiusConversations();
         }
     }
 
+    private void initFirebase() {
+        FirebaseAuth mAuth = FirebaseAuth.getInstance();
+        FirebaseDatabase mDatabase = FirebaseDatabase.getInstance();
+        DatabaseReference mReference = mDatabase.getReference();
+
+        myUid = mAuth.getUid();
+        appUserDb = mReference.child(Consts.USER);
+        appChatDb = mReference.child(Consts.CHAT);
+        userChatDb = mReference.child(Consts.USER).child(myUid).child(Consts.CHAT);
+        myDb = appUserDb.child(myUid).child(Consts.NAME);
+    }
+
     private void initEventListeners() {
+        checkPreviousConversations = new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                if (dataSnapshot.exists()) {
+                    for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
+                        Chat chat = snapshot.getValue(Chat.class);
+                        if (chat != null && otherUid.equals(chat.getUserUid())) {
+                            isFirstTime = false;
+                            chatID = chat.getChatId();
+                            //get the reference to this chat id chat database >> chat/chatId
+                            mChatDb = appChatDb.child(chatID);
+                            // pass this reference to adapter in order to handle and update seen state
+                            adapter.setChatDp(mChatDb);
+                            getMessages();
+                            Log.i(TAG, "onDataChange: there is previous conversation with this user , ChatId : " + chatID);
+                        }
+                    }
+                } else {
+                    isFirstTime = true;
+                    Log.i(TAG, "onDataChange: User has no previous chat yet! ");
+                }
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
+
+            }
+        };
+
         // this listener is basically listening for a new message added to this conversation
         childEventListener = new ChildEventListener() {
             @Override
             public void onChildAdded(@NonNull DataSnapshot dataSnapshot, @Nullable String s) {
                 if (dataSnapshot.exists()) {
-                   Message message = dataSnapshot.getValue(Message.class);
-                   if(message!=null){
-                       updateUi(message);
-                       getLastUnseenCont();
-                       resetMyUnseenCount();
-                   }
+                    Message message = dataSnapshot.getValue(Message.class);
+                    if (message != null) {
+                        isFirstTime = false;
+                        updateUi(message);
+                        getLastUnseenCont();
+                        resetMyUnseenCount();
+                    }
                 }
             }
 
@@ -183,7 +212,6 @@ public class ChatActivity extends AppCompatActivity implements View.OnClickListe
         };
 
         checkSeenEventListener = new ValueEventListener() {
-
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                 if (dataSnapshot.exists())
@@ -192,7 +220,33 @@ public class ChatActivity extends AppCompatActivity implements View.OnClickListe
 
             @Override
             public void onCancelled(@NonNull DatabaseError databaseError) {
+            }
+        };
 
+        userInfoListener = new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                if (dataSnapshot.exists()) {
+                    Log.i(TAG, "onDataChange: "+dataSnapshot);
+                    otherName = dataSnapshot.getValue().toString();
+                    setTitle(ContactsHelper.getContactName(ChatActivity.this, otherName));
+                }
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
+
+            }
+        };
+
+        myInfoListener = new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                if (dataSnapshot.exists())
+                    myName = dataSnapshot.getValue().toString();
+            }
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
             }
         };
     }
@@ -237,23 +291,8 @@ public class ChatActivity extends AppCompatActivity implements View.OnClickListe
         for (View view : onClickViews) view.setOnClickListener(this);
     }
 
-    private void getUserInfo() {
-        DatabaseReference mySideDb = appUserDb.child(myUid).child(Consts.CHAT).child(chatID);
-        mySideDb.addValueEventListener(new ValueEventListener() {
-            @Override
-            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                if (dataSnapshot.exists()) {
-                    otherName = dataSnapshot.child(Consts.USER_NAME).getValue().toString();
-                    setTitle(ContactsHelper.getContactName(ChatActivity.this, otherName));
-                    otherUid = dataSnapshot.child(Consts.CREATOR_ID).getValue().toString();
-                }
-            }
-
-            @Override
-            public void onCancelled(@NonNull DatabaseError databaseError) {
-
-            }
-        });
+    private void checkPrevoiusConversations() {
+        userChatDb.addListenerForSingleValueEvent(checkPreviousConversations);
     }
 
     /**
@@ -261,36 +300,11 @@ public class ChatActivity extends AppCompatActivity implements View.OnClickListe
      * We can get only public data like name, image , online state and so on..
      */
     private void fetchUserData() {
-        emptyLayout.setVisibility(View.VISIBLE);
         //get user name and update actionBar title with this name
-        DatabaseReference otherDb = appUserDb.child(otherUid);
-        otherDb.addListenerForSingleValueEvent(new ValueEventListener() {
-            @Override
-            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                if (dataSnapshot.exists())
-                    otherName = dataSnapshot.child(Consts.NAME).getValue().toString();
-                setTitle(ContactsHelper.getContactName(ChatActivity.this, otherName));
-            }
+        otherDb = appUserDb.child(otherUid).child(Consts.NAME);
+        otherDb.addValueEventListener(userInfoListener);
 
-            @Override
-            public void onCancelled(@NonNull DatabaseError databaseError) {
-
-            }
-        });
-
-        DatabaseReference myDb = appUserDb.child(myUid);
-        myDb.addListenerForSingleValueEvent(new ValueEventListener() {
-            @Override
-            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                if (dataSnapshot.exists())
-                    myName = dataSnapshot.child(Consts.NAME).getValue().toString();
-            }
-
-            @Override
-            public void onCancelled(@NonNull DatabaseError databaseError) {
-
-            }
-        });
+        myDb.addListenerForSingleValueEvent(myInfoListener);
     }
 
     private void getMessages() {
@@ -315,7 +329,7 @@ public class ChatActivity extends AppCompatActivity implements View.OnClickListe
 
     private void checkState() {
 
-        if (chatID == null) {
+        if (isFirstTime) {
             sendFirstMessage();
         } else {
             pushNewMessage();
@@ -337,22 +351,21 @@ public class ChatActivity extends AppCompatActivity implements View.OnClickListe
 
     private void pushNewMessage() {
         if (!mediaUriList.isEmpty()) {
-         pushMediaMessages();
+            pushMediaMessages();
         } else {
             currentFormatDate = ProjectUtils.getDisplayableCurrentDateTime();
             messageId = mChatDb.push().getKey();
             DatabaseReference newMessageDb = mChatDb.child(messageId);
 
-            Message message = new Message(messageId,inputMessage,myUid,currentFormatDate,false);
+            Message message = new Message(messageId, inputMessage, myUid, currentFormatDate, false);
             newMessageDb.setValue(message);
-            updateLastMessage();
+
+            if (!isFirstTime) updateLastMessage();
         }
 
     }
 
-    private List<String> messageIdList;
-    private int mediaUploaded;
-    private void pushMediaMessages(){
+    private void pushMediaMessages() {
         mediaUploaded = 0;
         messageIdList = new ArrayList<>();
 
@@ -370,13 +383,13 @@ public class ChatActivity extends AppCompatActivity implements View.OnClickListe
                         public void onSuccess(Uri uri) {
 
                             currentFormatDate = ProjectUtils.getDisplayableCurrentDateTime();
-                            Message message = new Message(messageIdList.get(mediaUploaded),inputMessage,myUid,currentFormatDate,uri.toString(),false);
+                            Message message = new Message(messageIdList.get(mediaUploaded), inputMessage, myUid, currentFormatDate, uri.toString(), false);
                             DatabaseReference newMessageDb = mChatDb.child(messageIdList.get(mediaUploaded));
                             newMessageDb.setValue(message);
-                            updateLastMessage();
+                            if (!isFirstTime) updateLastMessage();
                             inputMessage = "";
-                            mediaUploaded ++;
-                            if(mediaUriList.size() == mediaUploaded){
+                            mediaUploaded++;
+                            if (mediaUriList.size() == mediaUploaded) {
                                 mediaUriList.clear();
                             }
                         }
@@ -395,12 +408,12 @@ public class ChatActivity extends AppCompatActivity implements View.OnClickListe
     private void pushNewChat() {
         currentFormatDate = ProjectUtils.getDisplayableCurrentDateTime();
 
-        DatabaseReference mySideDb = FirebaseHelper.getReferenceToThisChatOfCurrentUser(chatID);
-        Chat mySideChat = new Chat(chatID,otherName,otherUid,inputMessage,currentFormatDate,0,System.currentTimeMillis());
+        DatabaseReference mySideDb = userChatDb.child(chatID);
+        Chat mySideChat = new Chat(chatID, otherName, otherUid, inputMessage, currentFormatDate, 0, System.currentTimeMillis());
         mySideDb.setValue(mySideChat);
 
-        DatabaseReference otherSideDb = FirebaseHelper.getReferenceToThisChatOfOtherUser(otherUid,chatID);
-        Chat otherSideChat = new Chat(chatID,myName,myUid,inputMessage,currentFormatDate,1,System.currentTimeMillis());
+        DatabaseReference otherSideDb = appUserDb.child(otherUid).child(Consts.CHAT).child(chatID);
+        Chat otherSideChat = new Chat(chatID, myName, myUid, inputMessage, currentFormatDate, 1, System.currentTimeMillis());
         otherSideDb.setValue(otherSideChat);
 
         getLastUnseenCont();
@@ -414,23 +427,23 @@ public class ChatActivity extends AppCompatActivity implements View.OnClickListe
             }
         }
 
-        DatabaseReference mySideDb = FirebaseHelper.getReferenceToThisChatOfCurrentUser(chatID);
+        DatabaseReference mySideDb = userChatDb.child(chatID);
         mySideDb.child(Consts.MESSAGE).setValue(inputMessage);
         mySideDb.child(Consts.CREATED_AT).setValue(currentFormatDate);
 
-        DatabaseReference otherSideDb = FirebaseHelper.getReferenceToThisChatOfOtherUser(otherUid,chatID);
+        DatabaseReference otherSideDb = appUserDb.child(otherUid).child(Consts.CHAT).child(chatID);
         otherSideDb.child(Consts.MESSAGE).setValue(inputMessage);
         otherSideDb.child(Consts.CREATED_AT).setValue(currentFormatDate);
         otherSideDb.child(Consts.UNSEEN_COUNT).setValue(otherUnseenCount + 1);
     }
 
     private void resetMyUnseenCount() {
-        DatabaseReference mySideDb = FirebaseHelper.getReferenceToThisChatOfCurrentUser(chatID);
+        DatabaseReference mySideDb = userChatDb.child(chatID);
         mySideDb.child(Consts.UNSEEN_COUNT).setValue(0);
     }
 
     private void getLastUnseenCont() {
-        otherSideUnseenChildDb = FirebaseHelper.getReferenceToThisChatOfOtherUser(otherUid,chatID).child(Consts.UNSEEN_COUNT);
+        otherSideUnseenChildDb = appUserDb.child(otherUid).child(Consts.CHAT).child(chatID).child(Consts.UNSEEN_COUNT);
         otherSideUnseenChildDb.addValueEventListener(checkSeenEventListener);
     }
 
@@ -614,13 +627,23 @@ public class ChatActivity extends AppCompatActivity implements View.OnClickListe
 
     @Override
     protected void onDestroy() {
+        removeListener();
         super.onDestroy();
+    }
+
+    private void removeListener() {
         // remove firebase eventListener .. no need for them since activity is shutting down
         if (mChatDb != null)
             mChatDb.removeEventListener(childEventListener);
 
         if (otherSideUnseenChildDb != null)
             otherSideUnseenChildDb.removeEventListener(checkSeenEventListener);
+
+        if (otherDb != null)
+            otherDb.removeEventListener(userInfoListener);
+
+        if (myDb != null)
+            myDb.removeEventListener(myInfoListener);
     }
 
     @Override
@@ -656,6 +679,7 @@ public class ChatActivity extends AppCompatActivity implements View.OnClickListe
         if (filePickerLl.getVisibility() == View.VISIBLE) {
             animateFilePickerDown();
         } else {
+            removeListener();
             super.onBackPressed();
         }
     }

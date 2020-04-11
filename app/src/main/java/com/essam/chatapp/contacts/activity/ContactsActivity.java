@@ -15,7 +15,6 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.ProgressBar;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.essam.chatapp.R;
 import com.essam.chatapp.chat.activity.ChatActivity;
@@ -23,10 +22,10 @@ import com.essam.chatapp.contacts.adapter.ContactsAdapter;
 import com.essam.chatapp.contacts.model.Contact;
 import com.essam.chatapp.contacts.utils.ContactsHelper;
 import com.essam.chatapp.utils.Consts;
-import com.essam.chatapp.utils.firebase.FirebaseHelper;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.Query;
 import com.google.firebase.database.ValueEventListener;
 
@@ -40,15 +39,26 @@ public class ContactsActivity extends AppCompatActivity implements ContactsAdapt
     private ContactsAdapter contactsAdapter;
     private List<Contact> contacts, users;
 
+    // firebase
+    private  DatabaseReference appUserDb;
+
     private static final String TAG = ContactsContract.class.getSimpleName();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_contacts);
+        initFirebase();
         initViews();
+
         // start fetching contacts from user device
         getContactsList();
+    }
+
+    private void initFirebase(){
+        FirebaseDatabase mDatabase = FirebaseDatabase.getInstance();
+        DatabaseReference mReference = mDatabase.getReference();
+        appUserDb = mReference.child(Consts.USER);
     }
 
     private void initViews() {
@@ -112,8 +122,7 @@ public class ContactsActivity extends AppCompatActivity implements ContactsAdapt
     }
 
     private void checkIfThisContactIsUser(final Contact mContact) {
-        DatabaseReference mUserDb = FirebaseHelper.getAppUserDbReference();
-        Query query = mUserDb.orderByChild(Consts.PHONE).equalTo(mContact.getPhone());
+        Query query = appUserDb.orderByChild(Consts.PHONE).equalTo(mContact.getPhone());
         query.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
@@ -170,39 +179,11 @@ public class ContactsActivity extends AppCompatActivity implements ContactsAdapt
 
     @Override
     public void onClick(final int index) {
-        final String otherUid = users.get(index).getUid();
-        DatabaseReference userChatDb = FirebaseHelper.getUserChatDbReference();
-
-        userChatDb.addListenerForSingleValueEvent(new ValueEventListener() {
-            @Override
-            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                Bundle bundle = new Bundle();
-                if (dataSnapshot.exists()) {
-                    for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
-
-                        if (otherUid.equals(snapshot.child(Consts.CREATOR_ID).getValue().toString())) {
-                            Toast.makeText(ContactsActivity.this, "already had a chat with this user!", Toast.LENGTH_SHORT).show();
-                            bundle.putString(Consts.CHAT_ID, snapshot.getKey());
-                        }
-                        else {
-                            bundle.putString(Consts.USER_UID, otherUid);
-                        }
-                    }
-
-                } else {
-                    bundle.putString(Consts.USER_UID, otherUid);
-                }
-
-                Intent intent = new Intent(ContactsActivity.this, ChatActivity.class);
-                intent.putExtras(bundle);
-                startActivity(intent);
-                finish();
-            }
-
-            @Override
-            public void onCancelled(@NonNull DatabaseError databaseError) {
-            }
-        });
+        String otherUid = users.get(index).getUid();
+        Intent intent = new Intent(ContactsActivity.this, ChatActivity.class);
+        intent.putExtra(Consts.USER_UID,otherUid);
+        startActivity(intent);
+        finish();
     }
 
     @Override

@@ -13,6 +13,7 @@ public class Consts {
     public static final String UNSEEN_COUNT ="unSeenCount" ;
     public static final String TIME_STAMP ="timeStamp" ;
     public static final String USER_NAME = "userName";
+    public static final String USER_UID ="userUid";
     public static final String SEEN = "seen";
     public static final String MESSAGE = "message";
     public static final String CREATOR_ID = "creatorId";
@@ -28,7 +29,6 @@ public class Consts {
     //bundles
     public static final String APP_NAME = "Chat App" ;
 
-    public static final String USER_UID ="userUid";
     public static final String EDIT_PHOTO ="edit_photo";
     public static final String LATITUDE ="latitude" ;
     public static final String LONGITUDE = "longitude";

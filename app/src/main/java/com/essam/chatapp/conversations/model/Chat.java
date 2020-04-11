@@ -2,21 +2,21 @@ package com.essam.chatapp.conversations.model;
 
 public class Chat {
     private String chatId;
-    private String creatorId;
+    private String userUid;
+    private String userName = "";
     private String message;
     private String createdAt;
     private int unSeenCount;
     private long timeStamp;
-    private String userName;
 
     public Chat() {
         // Default constructor required for calls to DataSnapshot.getValue(User.class)
     }
 
-    public Chat(String chatId, String userName, String creatorId, String message, String createdAt, int unSeenCount, long timeStamp) {
+    public Chat(String chatId,String userName, String userUid, String message, String createdAt, int unSeenCount, long timeStamp) {
         this.chatId = chatId;
+        this.userUid = userUid;
         this.userName = userName;
-        this.creatorId = creatorId;
         this.message = message;
         this.createdAt = createdAt;
         this.unSeenCount = unSeenCount;
@@ -71,11 +71,11 @@ public class Chat {
         this.timeStamp = timeStamp;
     }
 
-    public String getCreatorId() {
-        return creatorId;
+    public String getUserUid() {
+        return userUid;
     }
 
-    public void setCreatorId(String creatorId) {
-        this.creatorId = creatorId;
+    public void setUserUid(String userUid) {
+        this.userUid = userUid;
     }
 }
