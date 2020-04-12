@@ -113,16 +113,20 @@ public class ChatActivity extends AppCompatActivity implements View.OnClickListe
 
     /**
      * there are two scenarios to open this chat activity :
-     * 1- from home chats >> means this is not the first time and should expect to receive chat id
-     * 2- from contacts activity >> if there is already chat with this user should also receive chat id
-     * BUT if this is the first time >> should receive user uid and crete
-     * chat when sending the first message
+     * 1- from home chats >> means this is not the first time
+     * 2- from contacts activity >> then we need to check if there is a previous chat with this user
      */
     private void receiveIntents() {
         Intent intent = getIntent();
+        if (intent.hasExtra(Consts.USER_NAME) && intent.getStringExtra(Consts.USER_NAME) != null) {
+            otherName = intent.getStringExtra(Consts.USER_NAME);
+            setTitle(ContactsHelper.getContactName(this,otherName));
+        }else {
+            fetchUserData();
+        }
+
         if (intent.hasExtra(Consts.USER_UID) && intent.getStringExtra(Consts.USER_UID) != null) {
             otherUid = intent.getStringExtra(Consts.USER_UID);
-            fetchUserData();
             checkPrevoiusConversations();
         }
     }
@@ -249,6 +253,8 @@ public class ChatActivity extends AppCompatActivity implements View.OnClickListe
             public void onCancelled(@NonNull DatabaseError databaseError) {
             }
         };
+        myDb.addValueEventListener(myInfoListener);
+
     }
 
     private void initViews() {
@@ -303,8 +309,6 @@ public class ChatActivity extends AppCompatActivity implements View.OnClickListe
         //get user name and update actionBar title with this name
         otherDb = appUserDb.child(otherUid).child(Consts.NAME);
         otherDb.addValueEventListener(userInfoListener);
-
-        myDb.addListenerForSingleValueEvent(myInfoListener);
     }
 
     private void getMessages() {
@@ -494,7 +498,7 @@ public class ChatActivity extends AppCompatActivity implements View.OnClickListe
     }
 
     private File getOutputMediaFile(int type) {
-        String root = Environment.getExternalStorageDirectory().toString();
+        String root = this.getExternalFilesDir(Environment.DIRECTORY_PICTURES).toString();
         File mediaStorageDir = new File(root, Consts.APP_NAME);
         if (!mediaStorageDir.exists()) {
             if (!mediaStorageDir.mkdirs()) {

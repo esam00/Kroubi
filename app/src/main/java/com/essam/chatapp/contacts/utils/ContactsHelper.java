@@ -5,6 +5,7 @@ import android.app.Activity;
 import android.database.Cursor;
 import android.net.Uri;
 import android.provider.ContactsContract;
+import android.util.Log;
 
 import com.essam.chatapp.utils.Consts;
 import com.essam.chatapp.utils.ProjectUtils;
@@ -279,8 +280,9 @@ public class ContactsHelper {
         Uri uri=Uri.withAppendedPath(ContactsContract.PhoneLookup.CONTENT_FILTER_URI,Uri.encode(phoneNumber));
         String[] projection = new String[]{ContactsContract.PhoneLookup.DISPLAY_NAME};
 
+        Log.i("TAG", "getContactName: "+phoneNumber);
         String contactName = phoneNumber;
-        if(activity != null) {
+        if(activity != null && !contactName.isEmpty()) {
             Cursor cursor = activity.getContentResolver().query(uri, projection, null, null, null);
 
             if (cursor != null) {

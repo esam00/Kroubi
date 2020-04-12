@@ -252,6 +252,7 @@ public class ChatsFragment extends Fragment implements HomeChatAdapter.ListItemC
 
         Bundle bundle = new Bundle();
         bundle.putString(Consts.USER_UID, chatList.get(index).getUserUid());
+        bundle.putString(Consts.USER_NAME, chatList.get(index).getUserName());
         Intent intent = new Intent(this.getActivity(), ChatActivity.class);
         intent.putExtras(bundle);
         startActivity(intent);

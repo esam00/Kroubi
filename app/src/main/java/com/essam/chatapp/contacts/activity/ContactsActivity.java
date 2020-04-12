@@ -179,9 +179,11 @@ public class ContactsActivity extends AppCompatActivity implements ContactsAdapt
 
     @Override
     public void onClick(final int index) {
-        String otherUid = users.get(index).getUid();
+        String userUid = users.get(index).getUid();
+        String userName = users.get(index).getName();
         Intent intent = new Intent(ContactsActivity.this, ChatActivity.class);
-        intent.putExtra(Consts.USER_UID,otherUid);
+        intent.putExtra(Consts.USER_UID,userUid);
+        intent.putExtra(Consts.USER_NAME,userName);
         startActivity(intent);
         finish();
     }
