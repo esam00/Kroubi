@@ -57,6 +57,11 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login);
 
+        View decorView = getWindow().getDecorView();
+        // Hide the status bar.
+        int uiOptions = View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN;
+        decorView.setSystemUiVisibility(uiOptions);
+
         //initialize firebase
         FirebaseApp.initializeApp(this);
         mAuth = FirebaseAuth.getInstance();
@@ -65,7 +70,7 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
         initCallBacks();
     }
 
-    private void initViews(){
+    private void initViews() {
         //initialize views
         phoneNumberEditText = findViewById(R.id.et_phone_number);
         verificationCodeEditText = findViewById(R.id.et_verification_code);
@@ -80,7 +85,7 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
         verifyButton.setOnClickListener(this);
     }
 
-    private void initCallBacks(){
+    private void initCallBacks() {
         // callback for phone authentication
         // this call back basically overrides three methods
         // 1- onVerificationCompleted : this means verification automatically done and no need to enter verify code
@@ -114,15 +119,16 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
     /**
      * when calling this methods means that verification code has been sent , so this method will check
      * that edit text is not empty and then create PhoneAuthCredential object to use this credential for signing in
+     *
      * @param enteredCode content of verification edit text
      */
-    private void verifyPhoneNumberWithCode(String enteredCode){
-        if(enteredCode.isEmpty()){
+    private void verifyPhoneNumberWithCode(String enteredCode) {
+        if (enteredCode.isEmpty()) {
             Toast.makeText(this, "please enter verification Code", Toast.LENGTH_SHORT).show();
             return;
         }
         progressBar.setVisibility(View.VISIBLE);
-        PhoneAuthCredential credential = PhoneAuthProvider.getCredential(mVerificationId,enteredCode);
+        PhoneAuthCredential credential = PhoneAuthProvider.getCredential(mVerificationId, enteredCode);
         signInWithPhoneCredential(credential);
     }
 
@@ -131,17 +137,17 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
             @Override
             public void onComplete(@NonNull Task<AuthResult> task) {
                 progressBar.setVisibility(View.INVISIBLE);
-                if(task.isSuccessful()){
+                if (task.isSuccessful()) {
                     final FirebaseUser user = mAuth.getCurrentUser();
-                    if(user!=null){
+                    if (user != null) {
                         final DatabaseReference mUserDb = FirebaseDatabase.getInstance().getReference().child("user").child(user.getUid());
                         mUserDb.addListenerForSingleValueEvent(new ValueEventListener() {
                             @Override
                             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                                if(!dataSnapshot.exists()){
-                                    Map<String,Object> userMap = new HashMap<>();
-                                    userMap.put("phone",user.getPhoneNumber());
-                                    userMap.put("name",user.getPhoneNumber());
+                                if (!dataSnapshot.exists()) {
+                                    Map<String, Object> userMap = new HashMap<>();
+                                    userMap.put("phone", user.getPhoneNumber());
+                                    userMap.put("name", user.getPhoneNumber());
                                     mUserDb.updateChildren(userMap);
 
                                 }
@@ -152,7 +158,7 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
 
                             }
                         });
-                        prefrence.setValue(Consts.USER_NAME,user.getPhoneNumber());
+                        prefrence.setValue(Consts.USER_NAME, user.getPhoneNumber());
                     }
                     userLoggedIn();
                 }
@@ -164,15 +170,15 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
         Toast.makeText(LoginActivity.this, "Login Successful", Toast.LENGTH_SHORT).show();
         FirebaseUser user = mAuth.getCurrentUser();
 
-        if(user!=null){
+        if (user != null) {
             startActivity(new Intent(this, HomeActivity.class));
             finish();
         }
     }
 
     private void startPhoneNumberVerification() {
-        String phoneNumber= phoneNumberEditText.getText().toString();
-        if(phoneNumber.isEmpty()){
+        String phoneNumber = phoneNumberEditText.getText().toString();
+        if (phoneNumber.isEmpty()) {
             Toast.makeText(this, "Please enter your phone number!", Toast.LENGTH_SHORT).show();
             return;
         }
@@ -187,15 +193,15 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
 
     @Override
     public void onClick(View view) {
-        switch (view.getId()){
+        switch (view.getId()) {
             case R.id.btn_login:
                 break;
             case R.id.btn_verify:
                 String enteredCode = verificationCodeEditText.getText().toString();
 
-                if(mVerificationId!=null){
+                if (mVerificationId != null) {
                     verifyPhoneNumberWithCode(enteredCode);
-                }else {
+                } else {
                     startPhoneNumberVerification();
                 }
         }

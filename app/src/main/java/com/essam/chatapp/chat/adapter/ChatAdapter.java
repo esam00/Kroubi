@@ -10,6 +10,7 @@ import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
 import android.net.Uri;
 
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -26,6 +27,7 @@ import com.essam.chatapp.R;
 import com.essam.chatapp.chat.model.Message;
 import com.essam.chatapp.utils.Consts;
 import com.essam.chatapp.utils.firebase.FirebaseHelper;
+import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DatabaseReference;
 
 import java.util.List;
@@ -50,7 +52,8 @@ public class ChatAdapter extends RecyclerView.Adapter {
     @Override
     public int getItemViewType(int position) {
         Message message = mMessages.get(position);
-        boolean isReceiving = !message.getCreatorId().equals(FirebaseHelper.userUid);
+        boolean isReceiving = !message.getCreatorId().equals(FirebaseAuth.getInstance().getUid());
+        Log.i("TAG", "getItemViewType: "+isReceiving);
         Message prevMessage= null;
 
         if(position>0){

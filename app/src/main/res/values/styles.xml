@@ -16,7 +16,7 @@
 
     <style name="LoginTheme" parent="Theme.AppCompat.Light.NoActionBar">
         <item name="colorPrimary">@color/colorMain</item>
-        <item name="colorPrimaryDark">@android:color/black</item>
+        <item name="colorPrimaryDark">@android:color/transparent</item>
         <item name="colorAccent">@color/colorAccent</item>
     </style>
 
