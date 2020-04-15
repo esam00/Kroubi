@@ -9,13 +9,13 @@ import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.essam.chatapp.R;
-import com.essam.chatapp.contacts.model.Contact;
+import com.essam.chatapp.contacts.model.User;
 
 import java.util.List;
 
 public class ContactsAdapter extends RecyclerView.Adapter<ContactsAdapter.ViewHolder> {
 
-    private List<Contact> mContacts;
+    private List<User> mUsers;
 
     private ListItemClickListener listItemClickListener;
 
@@ -23,9 +23,9 @@ public class ContactsAdapter extends RecyclerView.Adapter<ContactsAdapter.ViewHo
         void onClick(int index);
     }
 
-    public ContactsAdapter(ListItemClickListener listener, List<Contact> contacts) {
+    public ContactsAdapter(ListItemClickListener listener, List<User> users) {
         this.listItemClickListener = listener;
-        this.mContacts= contacts;
+        this.mUsers = users;
     }
 
     public class ViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
@@ -38,9 +38,9 @@ public class ContactsAdapter extends RecyclerView.Adapter<ContactsAdapter.ViewHo
             itemView.setOnClickListener(this);
 
         }
-        void bind (Contact contact){
-            contactNameTV.setText(contact.getName());
-            statusTv.setText(contact.getPhone());
+        void bind (User user){
+            contactNameTV.setText(user.getName());
+            statusTv.setText(user.getPhone());
         }
 
         @Override
@@ -60,20 +60,20 @@ public class ContactsAdapter extends RecyclerView.Adapter<ContactsAdapter.ViewHo
 
     @Override
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
-        Contact contact = mContacts.get(position);
-        holder.bind(contact);
+        User user = mUsers.get(position);
+        holder.bind(user);
     }
 
     @Override
     public int getItemCount() {
-        if(null== mContacts){
+        if(null== mUsers){
             return 0;
         }
-        return mContacts.size();
+        return mUsers.size();
     }
 
-    public void setContactsData(List<Contact> contacts) {
-        mContacts = contacts;
+    public void setContactsData(List<User> users) {
+        mUsers = users;
         notifyDataSetChanged();
     }
 

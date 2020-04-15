@@ -13,6 +13,7 @@ import android.widget.RelativeLayout;
 import android.widget.Toast;
 
 import com.essam.chatapp.R;
+import com.essam.chatapp.contacts.model.User;
 import com.essam.chatapp.home.activity.HomeActivity;
 import com.essam.chatapp.utils.Consts;
 import com.essam.chatapp.utils.SharedPrefrence;
@@ -31,22 +32,23 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
-
-import java.util.HashMap;
-import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
 public class LoginActivity extends AppCompatActivity implements View.OnClickListener {
 
     //view
     private EditText phoneNumberEditText, verificationCodeEditText;
-    private Button loginButton, verifyButton;
+    private Button verifyButton;
     private ProgressBar progressBar;
     private RelativeLayout phoneRelativeLayout;
     private SharedPrefrence prefrence;
 
     //firebase
     private FirebaseAuth mAuth;
+    private FirebaseUser mUser;
+    private DatabaseReference mUserDb;
+    private DatabaseReference appUserDb;
+    private ValueEventListener userEventListener;
     private PhoneAuthProvider.OnVerificationStateChangedCallbacks mCallBack;
 
     //vars
@@ -62,12 +64,17 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
         int uiOptions = View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN;
         decorView.setSystemUiVisibility(uiOptions);
 
+        initFirebase();
+        initViews();
+        initCallBacks();
+    }
+
+    private void initFirebase(){
         //initialize firebase
         FirebaseApp.initializeApp(this);
         mAuth = FirebaseAuth.getInstance();
+        appUserDb = FirebaseDatabase.getInstance().getReference().child(Consts.USER);
 
-        initViews();
-        initCallBacks();
     }
 
     private void initViews() {
@@ -75,12 +82,12 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
         phoneNumberEditText = findViewById(R.id.et_phone_number);
         verificationCodeEditText = findViewById(R.id.et_verification_code);
         progressBar = findViewById(R.id.progress);
-        loginButton = findViewById(R.id.btn_login);
+        Button loginButton = findViewById(R.id.btn_login);
         verifyButton = findViewById(R.id.btn_verify);
         phoneRelativeLayout = findViewById(R.id.rl_phone_entry);
         prefrence = SharedPrefrence.getInstance(this);
 
-        //set click listener
+        //set click listeners
         loginButton.setOnClickListener(this);
         verifyButton.setOnClickListener(this);
     }
@@ -110,8 +117,20 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
                 phoneNumberEditText.setVisibility(View.GONE);
                 verificationCodeEditText.setVisibility(View.VISIBLE);
                 mVerificationId = code;
-                verifyButton.setText("Verify Code");
+                verifyButton.setText(R.string.verify_code);
                 phoneRelativeLayout.setVisibility(View.GONE);
+            }
+        };
+
+        userEventListener = new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                if (!dataSnapshot.exists()) {
+                    createNewUser();
+                }
+            }
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
             }
         };
     }
@@ -138,42 +157,31 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
             public void onComplete(@NonNull Task<AuthResult> task) {
                 progressBar.setVisibility(View.INVISIBLE);
                 if (task.isSuccessful()) {
-                    final FirebaseUser user = mAuth.getCurrentUser();
-                    if (user != null) {
-                        final DatabaseReference mUserDb = FirebaseDatabase.getInstance().getReference().child("user").child(user.getUid());
-                        mUserDb.addListenerForSingleValueEvent(new ValueEventListener() {
-                            @Override
-                            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                                if (!dataSnapshot.exists()) {
-                                    Map<String, Object> userMap = new HashMap<>();
-                                    userMap.put("phone", user.getPhoneNumber());
-                                    userMap.put("name", user.getPhoneNumber());
-                                    mUserDb.updateChildren(userMap);
-
-                                }
-                            }
-
-                            @Override
-                            public void onCancelled(@NonNull DatabaseError databaseError) {
-
-                            }
-                        });
-                        prefrence.setValue(Consts.USER_NAME, user.getPhoneNumber());
+                    mUser = mAuth.getCurrentUser();
+                    if (mUser != null) {
+                        checkIfUserExistInDataBase();
+                        userLoggedIn();
                     }
-                    userLoggedIn();
                 }
             }
         });
     }
 
+    private void checkIfUserExistInDataBase(){
+        mUserDb = appUserDb.child(mUser.getUid());
+        mUserDb.addListenerForSingleValueEvent(userEventListener);
+        prefrence.setValue(Consts.USER_NAME, mUser.getPhoneNumber());
+    }
+
+    private void createNewUser(){
+        User user = new User(mUser.getUid(),mUser.getPhoneNumber(),mUser.getPhoneNumber());
+        mUserDb.setValue(user);
+    }
+
     private void userLoggedIn() {
         Toast.makeText(LoginActivity.this, "Login Successful", Toast.LENGTH_SHORT).show();
-        FirebaseUser user = mAuth.getCurrentUser();
-
-        if (user != null) {
-            startActivity(new Intent(this, HomeActivity.class));
-            finish();
-        }
+        startActivity(new Intent(this, HomeActivity.class));
+        finish();
     }
 
     private void startPhoneNumberVerification() {

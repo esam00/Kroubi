@@ -1,13 +1,17 @@
 package com.essam.chatapp.contacts.model;
 
-public class Contact {
+public class User {
     private String uid;
     private String name;
     private String phone;
     private String status;
     private String image;
 
-    public Contact(String uid, String name, String phone) {
+    public User() {
+        // Default constructor required for calls to DataSnapshot.getValue(User.class)
+    }
+
+    public User(String uid, String name, String phone) {
         this.uid = uid;
         this.name = name;
         this.phone = phone;
@@ -15,10 +19,6 @@ public class Contact {
 
     public String getUid() {
         return uid;
-    }
-
-    public void setUid(String uid) {
-        this.uid = uid;
     }
 
     public String getName() {
@@ -31,10 +31,6 @@ public class Contact {
 
     public String getPhone() {
         return phone;
-    }
-
-    public void setPhone(String phone) {
-        this.phone = phone;
     }
 
     public String getImage() {

@@ -19,7 +19,7 @@ import android.widget.TextView;
 import com.essam.chatapp.R;
 import com.essam.chatapp.chat.activity.ChatActivity;
 import com.essam.chatapp.contacts.adapter.ContactsAdapter;
-import com.essam.chatapp.contacts.model.Contact;
+import com.essam.chatapp.contacts.model.User;
 import com.essam.chatapp.contacts.utils.ContactsHelper;
 import com.essam.chatapp.utils.Consts;
 import com.google.firebase.database.DataSnapshot;
@@ -37,7 +37,7 @@ public class ContactsActivity extends AppCompatActivity implements ContactsAdapt
     private TextView emptyTextView;
     private ProgressBar progressBar;
     private ContactsAdapter contactsAdapter;
-    private List<Contact> contacts, users;
+    private List<User> users, contacts;
 
     // firebase
     private  DatabaseReference appUserDb;
@@ -58,12 +58,13 @@ public class ContactsActivity extends AppCompatActivity implements ContactsAdapt
     private void initFirebase(){
         FirebaseDatabase mDatabase = FirebaseDatabase.getInstance();
         DatabaseReference mReference = mDatabase.getReference();
+        // Database reference to user/ node in firebaseDatabase
         appUserDb = mReference.child(Consts.USER);
     }
 
     private void initViews() {
-        contacts = new ArrayList<>();
         users = new ArrayList<>();
+        contacts = new ArrayList<>();
         contactsRv = findViewById(R.id.rv_contacts);
         emptyTextView = findViewById(R.id.tv_empty);
         progressBar = findViewById(R.id.progress_bar);
@@ -74,10 +75,19 @@ public class ContactsActivity extends AppCompatActivity implements ContactsAdapt
         contactsRv.setAdapter(contactsAdapter);
     }
 
+    /**
+     * Basically we need to read all user contacts that are saved on device,
+     * and for each item on this contacts list we make a firebase query by phone number to check
+     * if this user is exist on our database [We need to display only users who are using our app]
+     */
     private void getContactsList() {
+        // isoPrefix is country code before each number like [+20, +966 ..]
+        // this must be added to the phone number because all numbers in firebase database starts with
+        // this iso code
         String isoPrefix = getCountryIso();
         Log.e(TAG, "isoPrefix: " + isoPrefix);
 
+        // TODO: 4/15/2020 Use CursorLoader for better performance
         Cursor cursor = getContentResolver().query(ContactsContract.CommonDataKinds.Phone.CONTENT_URI,
                 null,
                 null,
@@ -97,7 +107,7 @@ public class ContactsActivity extends AppCompatActivity implements ContactsAdapt
                     phone = isoPrefix + phone;
                 }
 
-                Contact contact = new Contact("", name, phone);
+                User contact = new User("", name, phone);
                 if (!isRedundant(phone)) {
                     contacts.add(contact);
                     checkIfThisContactIsUser(contact);
@@ -110,10 +120,15 @@ public class ContactsActivity extends AppCompatActivity implements ContactsAdapt
         }
     }
 
-    //sometimes contacts application repeats phone number that assigned in more than one application
-    // So we want to display a contact only one time
+    /**
+     * In some cases contacts application repeats phone number which is assigned
+     * to more than one application [whatsAap , telegram ..]
+     * So we want to display a contact only one time
+     * @param phone of contact that we want to check if we already parsed it
+     * @return true if contacts list contains this one
+     */
     private boolean isRedundant(String phone) {
-        for (Contact contact : contacts) {
+        for (User contact : contacts) {
             if (contact.getPhone().equals(phone)) {
                 return true;
             }
@@ -121,30 +136,26 @@ public class ContactsActivity extends AppCompatActivity implements ContactsAdapt
         return false;
     }
 
-    private void checkIfThisContactIsUser(final Contact mContact) {
+    /**
+     * For every contact of this user we will check if this contact is a user of our application
+     * So we make query by phone number to check if this phone number is in our database
+     * and if so add this to users list and display it
+     * @param mContact item of contacts list
+     */
+    private void checkIfThisContactIsUser(final User mContact) {
         Query query = appUserDb.orderByChild(Consts.PHONE).equalTo(mContact.getPhone());
         query.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                 if (dataSnapshot.exists()) {
-                    String phone = "", name = "";
-
                     for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
-                        if (snapshot.child(Consts.PHONE).getValue() != null) {
-                            phone = snapshot.child(Consts.PHONE).getValue().toString();
+                        User mUser = snapshot.getValue(User.class);
+                        if(mUser !=null){
+                            if (mUser.getName().equals(mUser.getPhone())) {
+                                mUser.setName(mContact.getName());
+                            }
+                            users.add(mUser);
                         }
-
-                        if (snapshot.child(Consts.NAME).getValue() != null) {
-                            name = snapshot.child(Consts.NAME).getValue().toString();
-                        }
-
-                        Contact mUser = new Contact(snapshot.getKey(), name, phone);
-
-                        if (name.equals(phone)) {
-                            mUser.setName(mContact.getName());
-                        }
-
-                        users.add(mUser);
                         contactsAdapter.notifyDataSetChanged();
                         progressBar.setVisibility(View.GONE);
                     }
@@ -154,12 +165,17 @@ public class ContactsActivity extends AppCompatActivity implements ContactsAdapt
             @Override
             public void onCancelled(@NonNull DatabaseError databaseError) {
             }
-
         });
     }
 
+    /**
+     * isoPrefix is country code before each number like [+20, +966 ..]
+     * this must be added to the phone number because all numbers in
+     * firebase database starts with this iso code
+     * @return iso according to country
+     */
     private String getCountryIso() {
-        String iso = null;
+        String iso = "";
         TelephonyManager telephonyManager = (TelephonyManager) getApplicationContext()
                 .getSystemService(TELEPHONY_SERVICE);
         if (telephonyManager.getNetworkCountryIso() != null) {
@@ -190,10 +206,9 @@ public class ContactsActivity extends AppCompatActivity implements ContactsAdapt
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        switch (item.getItemId()) {
-            case android.R.id.home:
-                onBackPressed(); // make up button behave like back button
-                return true;
+        if(item.getItemId() == android.R.id.home){
+            onBackPressed(); // make up button behave like back button
+            return true;
         }
         return super.onOptionsItemSelected(item);
     }

@@ -27,6 +27,6 @@
         android:visibility="gone"
         android:textSize="18sp"
         android:layout_margin="14dp"
-        android:text="Non of your contacts is using NotWhatsApp"/>
+        android:text="@string/no_contacts"/>
 
 </RelativeLayout>

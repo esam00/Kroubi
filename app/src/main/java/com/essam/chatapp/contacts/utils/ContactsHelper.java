@@ -1,14 +1,10 @@
 package com.essam.chatapp.contacts.utils;
 
-import android.Manifest;
 import android.app.Activity;
 import android.database.Cursor;
 import android.net.Uri;
 import android.provider.ContactsContract;
 import android.util.Log;
-
-import com.essam.chatapp.utils.Consts;
-import com.essam.chatapp.utils.ProjectUtils;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -22,7 +18,7 @@ public class ContactsHelper {
         return countryToPhonePrefix;
     }
 
-    private static Map<String, String> countryToPhonePrefix = new HashMap<String, String>();
+    private static Map<String, String> countryToPhonePrefix = new HashMap<>();
 
     static {
         countryToPhonePrefix.put("AF", "+93");
@@ -218,20 +214,13 @@ public class ContactsHelper {
         countryToPhonePrefix.put("YE", "+967");
         countryToPhonePrefix.put("ZM", "+260");
         countryToPhonePrefix.put("ZW", "+263");
-        countryToPhonePrefix.put("GE", "+995");
         countryToPhonePrefix.put("TW", "+886");
-        countryToPhonePrefix.put("AZ", "+374-97");
-        countryToPhonePrefix.put("CY", "+90-392");
-        countryToPhonePrefix.put("MD", "+373-533");
-        countryToPhonePrefix.put("SO", "+252");
-        countryToPhonePrefix.put("GE", "+995");
         countryToPhonePrefix.put("CX", "+61");
         countryToPhonePrefix.put("CC", "+61");
         countryToPhonePrefix.put("NF", "+672");
         countryToPhonePrefix.put("NC", "+687");
         countryToPhonePrefix.put("PF", "+689");
         countryToPhonePrefix.put("YT", "+262");
-        countryToPhonePrefix.put("GP", "+590");
         countryToPhonePrefix.put("GP", "+590");
         countryToPhonePrefix.put("PM", "+508");
         countryToPhonePrefix.put("WF", "+681");
@@ -262,7 +251,6 @@ public class ContactsHelper {
         countryToPhonePrefix.put("FO", "+298");
         countryToPhonePrefix.put("GL", "+299");
         countryToPhonePrefix.put("GF", "+594");
-        countryToPhonePrefix.put("GP", "+590");
         countryToPhonePrefix.put("MQ", "+596");
         countryToPhonePrefix.put("RE", "+262");
         countryToPhonePrefix.put("AX", "+358-18");

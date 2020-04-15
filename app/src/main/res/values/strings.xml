@@ -5,5 +5,7 @@
     <string name="please_wait">please wait ..</string>
     <string name="ok">OK</string>
     <string name="cancel">Cancel</string>
+    <string name="verify_code">Verify Code</string>
+    <string name="no_contacts">Non of your users is using NotWhatsApp</string>
 
 </resources>
