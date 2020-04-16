@@ -3,133 +3,139 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:orientation="vertical"
     android:background="@drawable/login_bg"
+    android:orientation="vertical"
     tools:context=".login.LoginActivity">
 
 
     <ImageView
         android:layout_width="match_parent"
         android:layout_height="match_parent"
+        android:contentDescription="@string/app_name"
         android:scaleType="centerCrop"
-        android:src="@drawable/background_image"
-        android:contentDescription="@string/app_name" />
+        android:src="@drawable/background_image" />
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:background="@color/colorMainWithOpacity"/>
+        android:background="@color/colorMainWithOpacity" />
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:padding="25dp"
-        android:layout_margin="25dp"
         android:layout_centerInParent="true"
+        android:layout_margin="25dp"
         android:background="@drawable/rounded_bg_with_alpha"
-        android:orientation="vertical">
+        android:orientation="vertical"
+        android:padding="25dp">
 
-            <ImageView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:src="@drawable/ic_logo"
-                android:layout_gravity="center"
-                android:contentDescription="@string/app_name"/>
+        <ImageView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:contentDescription="@string/app_name"
+            android:src="@drawable/ic_logo" />
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:text="@string/app_name"
+            android:layout_marginBottom="20dp"
+            android:textAppearance="@style/TextAppearance.AppCompat.Medium"
+            android:textColor="@color/white"
+            android:textSize="20sp"
+            android:textStyle="bold" />
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:text="We will send a verification code to your phone number"
+            android:textAppearance="@style/TextAppearance.AppCompat.Medium"
+            android:textColor="@color/white"
+            android:textSize="16sp"
+            />
+
+        <RelativeLayout
+            android:id="@+id/rl_phone_entry"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
 
             <TextView
-                android:layout_width="match_parent"
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:gravity="center"
-                android:text="@string/app_name"
-                android:textSize="20sp"
-                android:textStyle="bold"
+                android:layout_marginStart="30dp"
+                android:layout_marginTop="54dp"
+                android:text="+2"
                 android:textColor="@color/white"
-                android:textAppearance="@style/TextAppearance.AppCompat.Medium"/>
-
-            <RelativeLayout
-                android:id="@+id/rl_phone_entry"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content">
-
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:textColor="@color/white"
-                    android:layout_marginTop="54dp"
-                    android:textSize="18sp"
-                    android:visibility="gone"
-                    android:text="+2"
-                    android:layout_marginStart="30dp">
-                </TextView>
-
-                <EditText
-                    android:id="@+id/et_phone_number"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:paddingStart="42dp"
-                    android:paddingEnd="42dp"
-                    android:layout_marginTop="40dp"
-                    android:layout_marginBottom="20dp"
-                    android:drawablePadding="15dp"
-                    android:background="@drawable/login_et_bg"
-                    android:hint="Phone number"
-                    android:textColor="@color/white"
-                    android:inputType="phone"
-                    android:padding="14dp"
-                    android:textColorHint="@android:color/secondary_text_dark">
-                </EditText>
-
-                <ProgressBar
-                    android:id="@+id/progress"
-                    android:layout_width="36dp"
-                    android:layout_height="36dp"
-                    android:visibility="invisible"
-                    android:layout_marginTop="44dp"
-                    android:layout_marginEnd="24dp"
-                    android:layout_alignParentEnd="true">
-                </ProgressBar>
-
-            </RelativeLayout>
+                android:textSize="18sp"
+                android:visibility="gone"/>
 
             <EditText
-                android:id="@+id/et_verification_code"
+                android:id="@+id/et_phone_number"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="40dp"
+                android:layout_marginTop="10dp"
                 android:layout_marginBottom="20dp"
                 android:background="@drawable/login_et_bg"
-                android:hint="Enter verification code"
-                android:visibility="gone"
-                android:textColor="@color/white"
+                android:drawableStart="@drawable/ic_phone"
+                android:drawablePadding="15dp"
+                android:hint="Phone number"
                 android:inputType="phone"
                 android:padding="14dp"
-                android:textColorHint="@android:color/secondary_text_dark">
-            </EditText>
-
-            <Button
-                android:id="@+id/btn_verify"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:textColor="@color/colorAccent"
-                android:textSize="15sp"
-                android:layout_marginBottom="10dp"
-                android:text="Send Verification Code"
-                android:backgroundTint="@color/white"
-                android:background="@drawable/login_et_bg">
-            </Button>
-
-            <Button
-                android:id="@+id/btn_login"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
+                android:paddingStart="12dp"
+                android:paddingEnd="42dp"
                 android:textColor="@color/white"
-                android:textSize="15sp"
-                android:text="Login"
-                android:backgroundTint="@color/colorAccent"
-                android:background="@drawable/login_et_bg"
-                android:visibility="gone"
-                android:layout_margin="20dp">
-            </Button>
-        </LinearLayout>
+                android:textColorHint="@android:color/secondary_text_dark"/>
+
+            <ProgressBar
+                android:id="@+id/progress"
+                android:layout_width="36dp"
+                android:layout_height="36dp"
+                android:layout_alignParentEnd="true"
+                android:layout_marginTop="16dp"
+                android:layout_marginEnd="24dp"
+                android:visibility="invisible"/>
+
+        </RelativeLayout>
+
+        <EditText
+            android:id="@+id/et_verification_code"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="40dp"
+            android:layout_marginBottom="20dp"
+            android:background="@drawable/login_et_bg"
+            android:hint="Enter verification code"
+            android:inputType="phone"
+            android:padding="14dp"
+            android:textColor="@color/white"
+            android:textColorHint="@android:color/secondary_text_dark"
+            android:visibility="gone"/>
+
+        <Button
+            android:id="@+id/btn_verify"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="10dp"
+            android:background="@drawable/login_et_bg"
+            android:backgroundTint="@color/white"
+            android:text="Submit"
+            android:textColor="@color/colorAccent"
+            android:textSize="15sp"/>
+
+        <Button
+            android:id="@+id/btn_login"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_margin="20dp"
+            android:background="@drawable/login_et_bg"
+            android:backgroundTint="@color/colorAccent"
+            android:text="Login"
+            android:textColor="@color/white"
+            android:textSize="15sp"
+            android:visibility="gone"/>
+    </LinearLayout>
 
 </RelativeLayout>

@@ -42,14 +42,4 @@
 
     </LinearLayout>
 
-    <com.airbnb.lottie.LottieAnimationView
-        android:id="@+id/loading_animation"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_centerInParent="true"
-        app:lottie_repeatMode="restart"
-        app:lottie_loop="true"
-        android:visibility="gone"
-        app:lottie_fileName="loading-animation.json" />
-
 </RelativeLayout>

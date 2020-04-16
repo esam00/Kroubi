@@ -18,7 +18,6 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.Window;
-import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
@@ -46,8 +45,6 @@ public class ChatsFragment extends Fragment implements HomeChatAdapter.ListItemC
     private RecyclerView homeChatRv;
     private HomeChatAdapter homeChatAdapter;
     private LinearLayout welcomeLl;
-    private LottieAnimationView loadingAnimation;
-    private ImageView welcomeAnimation;
     private List<Chat> chatList = new ArrayList<>();
 
     //firebase
@@ -81,9 +78,7 @@ public class ChatsFragment extends Fragment implements HomeChatAdapter.ListItemC
 
     private void initViews(View view) {
         welcomeLl = view.findViewById(R.id.welcome_ll);
-        welcomeAnimation = view.findViewById(R.id.welcome_animation);
-        loadingAnimation = view.findViewById(R.id.loading_animation);
-        showLoading();
+        showLoadingDialog();
 
         // recyclerView
         chatList = new ArrayList<>();
@@ -203,7 +198,6 @@ public class ChatsFragment extends Fragment implements HomeChatAdapter.ListItemC
         hideLoading();
         homeChatRv.setVisibility(View.VISIBLE);
         welcomeLl.setVisibility(View.GONE);
-        loadingAnimation.setVisibility(View.GONE);
     }
 
     /**
@@ -217,13 +211,8 @@ public class ChatsFragment extends Fragment implements HomeChatAdapter.ListItemC
 
     private void hideLoading() {
         Log.i(TAG, "hideLoading: ");
-        loadingAnimation.setVisibility(View.GONE);
-        loadingAnimation.cancelAnimation();
-    }
-
-    private void showLoading() {
-        loadingAnimation.setVisibility(View.VISIBLE);
-        loadingAnimation.playAnimation();
+        loadingDialog.dismiss();
+//        showNotificationDialog("إهداء الى قروبي الحبيب ❤️");
     }
 
     private void showNotificationDialog(String message) {
@@ -239,11 +228,28 @@ public class ChatsFragment extends Fragment implements HomeChatAdapter.ListItemC
         window.setLayout(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
     }
 
+    private Dialog loadingDialog;
+    private void showLoadingDialog() {
+        loadingDialog = new Dialog(getActivity());
+        loadingDialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
+        loadingDialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
+
+        loadingDialog.setContentView(R.layout.loading_dialog);
+
+        LottieAnimationView lottieAnimationView = loadingDialog.findViewById(R.id.loading_animation);
+        lottieAnimationView.playAnimation();
+        loadingDialog.setCancelable(false);
+        loadingDialog.show();
+        Window window = loadingDialog.getWindow();
+        window.setLayout(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);
+    }
+
+
     /**
      * onClick method of listItemClickListener interface in chats adapter
      * if a chat is clicked this listener will be triggered and it will  return the index of the item that was clicked
      *
-     * @param index
+     * @param index of selected item
      */
     @Override
     public void onClick(int index) {
