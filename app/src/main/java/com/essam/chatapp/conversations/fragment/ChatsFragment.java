@@ -18,6 +18,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.Window;
+import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
@@ -45,7 +46,8 @@ public class ChatsFragment extends Fragment implements HomeChatAdapter.ListItemC
     private RecyclerView homeChatRv;
     private HomeChatAdapter homeChatAdapter;
     private LinearLayout welcomeLl;
-    private LottieAnimationView welcomeAnimation, loadingAnimation;
+    private LottieAnimationView loadingAnimation;
+    private ImageView welcomeAnimation;
     private List<Chat> chatList = new ArrayList<>();
 
     //firebase
@@ -211,7 +213,6 @@ public class ChatsFragment extends Fragment implements HomeChatAdapter.ListItemC
         hideLoading();
         homeChatRv.setVisibility(View.GONE);
         welcomeLl.setVisibility(View.VISIBLE);
-        welcomeAnimation.playAnimation();
     }
 
     private void hideLoading() {

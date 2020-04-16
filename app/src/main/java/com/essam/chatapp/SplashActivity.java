@@ -17,22 +17,22 @@ public class SplashActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_splash);
 
-        new Handler().postDelayed(new Runnable() {
-            @Override
-            public void run() {
-                if(FirebaseHelper.isUserLoggedIn()){
-                    Log.i(TAG, "isUserLoggedIn: YES");
-                    startActivity(new Intent(SplashActivity.this,HomeActivity.class));
-                }
-                else{
-                    Log.i(TAG, "isUserLoggedIn: No");
-                    startActivity(new Intent(SplashActivity.this, LoginActivity.class));
-                }
-                finish();
-            }
-        },3000);
+        try {
+            Thread.sleep(1000);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+
+        if(FirebaseHelper.isUserLoggedIn()){
+            Log.i(TAG, "isUserLoggedIn: YES");
+            startActivity(new Intent(SplashActivity.this,HomeActivity.class));
+        }
+        else{
+            Log.i(TAG, "isUserLoggedIn: No");
+            startActivity(new Intent(SplashActivity.this, LoginActivity.class));
+        }
+        finish();
     }
 
 }
