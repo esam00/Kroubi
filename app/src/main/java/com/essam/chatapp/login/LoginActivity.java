@@ -41,7 +41,6 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
     private Button verifyButton;
     private ProgressBar progressBar;
     private RelativeLayout phoneRelativeLayout;
-    private SharedPrefrence prefrence;
 
     //firebase
     private FirebaseAuth mAuth;
@@ -53,6 +52,7 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
 
     //vars
     private String mVerificationId;
+    private SharedPrefrence preference;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -85,7 +85,7 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
         Button loginButton = findViewById(R.id.btn_login);
         verifyButton = findViewById(R.id.btn_verify);
         phoneRelativeLayout = findViewById(R.id.rl_phone_entry);
-        prefrence = SharedPrefrence.getInstance(this);
+        preference = SharedPrefrence.getInstance(this);
 
         //set click listeners
         loginButton.setOnClickListener(this);
@@ -170,7 +170,7 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
     private void checkIfUserExistInDataBase(){
         mUserDb = appUserDb.child(mUser.getUid());
         mUserDb.addListenerForSingleValueEvent(userEventListener);
-        prefrence.setValue(Consts.USER_NAME, mUser.getPhoneNumber());
+        preference.setValue(Consts.USER_NAME, mUser.getPhoneNumber());
     }
 
     private void createNewUser(){

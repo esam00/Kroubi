@@ -3,11 +3,10 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@drawable/login_bg"
     android:orientation="vertical"
     tools:context=".login.LoginActivity">
 
-
+<!--    background image -->
     <ImageView
         android:layout_width="match_parent"
         android:layout_height="match_parent"
@@ -27,8 +26,7 @@
         android:layout_margin="25dp"
         android:background="@drawable/rounded_bg_with_alpha"
         android:orientation="vertical"
-        android:padding="25dp">
-
+        android:padding="20dp">
         <ImageView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -39,9 +37,9 @@
         <TextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:layout_marginBottom="20dp"
             android:gravity="center"
             android:text="@string/app_name"
-            android:layout_marginBottom="20dp"
             android:textAppearance="@style/TextAppearance.AppCompat.Medium"
             android:textColor="@color/white"
             android:textSize="20sp"
@@ -51,26 +49,24 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:gravity="center"
-            android:text="We will send a verification code to your phone number"
+            android:text="@string/we_will_send_code"
             android:textAppearance="@style/TextAppearance.AppCompat.Medium"
             android:textColor="@color/white"
-            android:textSize="16sp"
-            />
+            android:textSize="16sp" />
 
         <RelativeLayout
             android:id="@+id/rl_phone_entry"
             android:layout_width="match_parent"
             android:layout_height="wrap_content">
-
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="30dp"
                 android:layout_marginTop="54dp"
-                android:text="+2"
+                android:text="@string/egypt_code"
                 android:textColor="@color/white"
                 android:textSize="18sp"
-                android:visibility="gone"/>
+                android:visibility="gone" />
 
             <EditText
                 android:id="@+id/et_phone_number"
@@ -79,15 +75,16 @@
                 android:layout_marginTop="10dp"
                 android:layout_marginBottom="20dp"
                 android:background="@drawable/login_et_bg"
+                android:autofillHints="@string/phone_number"
                 android:drawableStart="@drawable/ic_phone"
                 android:drawablePadding="15dp"
-                android:hint="Phone number"
+                android:hint="@string/phone_number"
                 android:inputType="phone"
                 android:padding="14dp"
                 android:paddingStart="12dp"
                 android:paddingEnd="42dp"
                 android:textColor="@color/white"
-                android:textColorHint="@android:color/secondary_text_dark"/>
+                android:textColorHint="@android:color/secondary_text_dark" />
 
             <ProgressBar
                 android:id="@+id/progress"
@@ -96,8 +93,7 @@
                 android:layout_alignParentEnd="true"
                 android:layout_marginTop="16dp"
                 android:layout_marginEnd="24dp"
-                android:visibility="invisible"/>
-
+                android:visibility="invisible" />
         </RelativeLayout>
 
         <EditText
@@ -107,35 +103,34 @@
             android:layout_marginTop="40dp"
             android:layout_marginBottom="20dp"
             android:background="@drawable/login_et_bg"
-            android:hint="Enter verification code"
-            android:inputType="phone"
+            android:hint="@string/enter_verification_code"
+            android:autofillHints="@string/enter_verification_code"
+            android:inputType="number"
             android:padding="14dp"
             android:textColor="@color/white"
             android:textColorHint="@android:color/secondary_text_dark"
-            android:visibility="gone"/>
+            android:visibility="gone" />
 
         <Button
             android:id="@+id/btn_verify"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginBottom="10dp"
-            android:background="@drawable/login_et_bg"
-            android:backgroundTint="@color/white"
-            android:text="Submit"
+            android:background="@drawable/white_rounded_bg"
+            android:text="@string/submit"
             android:textColor="@color/colorAccent"
-            android:textSize="15sp"/>
+            android:textSize="15sp" />
 
         <Button
             android:id="@+id/btn_login"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_margin="20dp"
-            android:background="@drawable/login_et_bg"
-            android:backgroundTint="@color/colorAccent"
-            android:text="Login"
+            android:background="@drawable/white_rounded_bg"
+            android:text="@string/login"
             android:textColor="@color/white"
             android:textSize="15sp"
-            android:visibility="gone"/>
+            android:visibility="gone" />
     </LinearLayout>
 
 </RelativeLayout>

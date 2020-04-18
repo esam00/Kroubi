@@ -1,6 +1,5 @@
 package com.essam.chatapp.home.activity;
 
-
 import android.Manifest;
 import android.content.Intent;
 import android.content.pm.PackageManager;
@@ -22,7 +21,6 @@ import com.essam.chatapp.home.adapter.ViewPagerAdapter;
 import com.essam.chatapp.login.LoginActivity;
 import com.essam.chatapp.utils.Consts;
 import com.essam.chatapp.utils.ProjectUtils;
-import com.essam.chatapp.utils.firebase.FirebaseHelper;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.android.material.tabs.TabLayout;
 import com.google.firebase.auth.FirebaseAuth;
@@ -31,7 +29,6 @@ public class HomeActivity extends AppCompatActivity {
 
     private ViewPager homeViewPager;
     private FloatingActionButton fab;
-    private FragmentManager fragmentManager;
     private ViewPagerAdapter viewPagerAdapter;
     private ViewPager.OnPageChangeListener mPageChangeListener;
 
@@ -66,7 +63,7 @@ public class HomeActivity extends AppCompatActivity {
         Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
         toolbar.inflateMenu(R.menu.menu);
-        fragmentManager = getSupportFragmentManager();
+        FragmentManager fragmentManager = getSupportFragmentManager();
 
         // viewPager and tabLayout
         homeViewPager = findViewById(R.id.view_pager);
@@ -132,6 +129,16 @@ public class HomeActivity extends AppCompatActivity {
         }
     }
 
+    private void signOut(){
+        final FirebaseAuth mAuth = FirebaseAuth.getInstance();
+        mAuth.signOut();
+        Intent intent = new Intent(this, LoginActivity.class);
+        intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+        intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK);
+        startActivity(intent);
+        finish();
+    }
+
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.menu, menu);
@@ -142,12 +149,10 @@ public class HomeActivity extends AppCompatActivity {
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case R.id.sign_out:
-                FirebaseHelper.signOut();
-                Intent intent = new Intent(this, LoginActivity.class);
-                intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-                intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK);
-                startActivity(intent);
-                finish();
+             signOut();
+             break;
+            case R.id.action_type:
+                break;
         }
         return super.onOptionsItemSelected(item);
     }

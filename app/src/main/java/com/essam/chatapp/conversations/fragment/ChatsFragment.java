@@ -2,6 +2,7 @@ package com.essam.chatapp.conversations.fragment;
 
 import android.Manifest;
 import android.app.Dialog;
+import android.content.Context;
 import android.content.Intent;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
@@ -52,6 +53,8 @@ public class ChatsFragment extends Fragment implements HomeChatAdapter.ListItemC
     private ChildEventListener onChatAddedEventListener;
     private ValueEventListener checkExistValueEventListener;
 
+    private Context mContext;
+
     private final static String TAG = ChatsFragment.class.getSimpleName();
 
     public ChatsFragment() {
@@ -61,6 +64,12 @@ public class ChatsFragment extends Fragment implements HomeChatAdapter.ListItemC
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+    }
+
+    @Override
+    public void onAttach(@NonNull Context context) {
+        mContext = context;
+        super.onAttach(context);
     }
 
     @Override
@@ -78,7 +87,6 @@ public class ChatsFragment extends Fragment implements HomeChatAdapter.ListItemC
 
     private void initViews(View view) {
         welcomeLl = view.findViewById(R.id.welcome_ll);
-        showLoadingDialog();
 
         // recyclerView
         chatList = new ArrayList<>();
@@ -106,7 +114,7 @@ public class ChatsFragment extends Fragment implements HomeChatAdapter.ListItemC
             public void onChildAdded(@NonNull DataSnapshot dataSnapshot, @Nullable String s) {
                 Chat chat = dataSnapshot.getValue(Chat.class);
                 if (chat != null) {
-                    Log.i(TAG, "new chat added with : " + chat.getUserName());
+                    Log.i(TAG, "new chat added");
                     // if this user name is already saved into my contacts replace user name with this saved name
                     chat.setUserName(ContactsHelper.getContactName(getActivity(), chat.getUserName()));
 
@@ -120,7 +128,7 @@ public class ChatsFragment extends Fragment implements HomeChatAdapter.ListItemC
             public void onChildChanged(@NonNull DataSnapshot dataSnapshot, @Nullable String s) {
                 Chat chat = dataSnapshot.getValue(Chat.class);
                 if (chat != null) {
-                    Log.i(TAG, "new message added to chat with : " + chat.getUserName());
+                    Log.i(TAG, "message Arrived to an existing chat");
 
                     //update this chat with the new data
                     for (int i = 0; i < chatList.size(); i++) {
@@ -165,7 +173,6 @@ public class ChatsFragment extends Fragment implements HomeChatAdapter.ListItemC
 
             @Override
             public void onCancelled(@NonNull DatabaseError databaseError) {
-
             }
         };
     }
@@ -187,6 +194,11 @@ public class ChatsFragment extends Fragment implements HomeChatAdapter.ListItemC
      * This is the main method that is responsible for fetching previous chats AND listen for new messages
      */
     private void getUserChatList() {
+        if(!ProjectUtils.isNetworkConnected(mContext)){
+            ProjectUtils.showToast(getActivity(),"Check your network connection!");
+            return;
+        }
+        showLoadingDialog();
         userChatDb.addChildEventListener(onChatAddedEventListener);
         userChatDb.addListenerForSingleValueEvent(checkExistValueEventListener);
     }
@@ -216,34 +228,38 @@ public class ChatsFragment extends Fragment implements HomeChatAdapter.ListItemC
     }
 
     private void showNotificationDialog(String message) {
-        final Dialog dialog = new Dialog(getContext());
+        final Dialog dialog = new Dialog(mContext);
         dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
-        dialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
+        dialog.setCancelable(true);
 
         dialog.setContentView(R.layout.notification_dialog);
-        dialog.setCancelable(true);
         ((TextView) dialog.findViewById(R.id.notificationText)).setText(message);
+
         dialog.show();
         Window window = dialog.getWindow();
-        window.setLayout(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
+        if(window != null){
+            window.setLayout(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
+            dialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
+        }
     }
 
     private Dialog loadingDialog;
     private void showLoadingDialog() {
-        loadingDialog = new Dialog(getActivity());
+        loadingDialog = new Dialog(mContext);
         loadingDialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
-        loadingDialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
-
         loadingDialog.setContentView(R.layout.loading_dialog);
+        loadingDialog.setCancelable(false);
 
         LottieAnimationView lottieAnimationView = loadingDialog.findViewById(R.id.loading_animation);
         lottieAnimationView.playAnimation();
-        loadingDialog.setCancelable(false);
+
         loadingDialog.show();
         Window window = loadingDialog.getWindow();
-        window.setLayout(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);
+        if (window!=null){
+            loadingDialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
+            window.setLayout(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);
+        }
     }
-
 
     /**
      * onClick method of listItemClickListener interface in chats adapter

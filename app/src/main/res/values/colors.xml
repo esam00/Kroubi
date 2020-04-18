@@ -12,7 +12,7 @@
     <color name="chat_background">#ECE5DD</color>
     <color name="outgoing_chat_bubble">#DCF8C6</color>
 
-    <color name="disabledColor">#8A9B91</color>
+    <color name="disabledColor">#8AE9F3FA</color>
     <color name="white">#fff</color>
     <color name="light_gray">#A79A9A</color>
 

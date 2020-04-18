@@ -4,12 +4,12 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import android.content.Intent;
 import android.os.Bundle;
-import android.os.Handler;
 import android.util.Log;
 
 import com.essam.chatapp.home.activity.HomeActivity;
 import com.essam.chatapp.login.LoginActivity;
-import com.essam.chatapp.utils.firebase.FirebaseHelper;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
 
 public class SplashActivity extends AppCompatActivity {
 
@@ -17,14 +17,14 @@ public class SplashActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
+        // just give it one second to display splash screen
         try {
             Thread.sleep(1000);
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
 
-        if(FirebaseHelper.isUserLoggedIn()){
+        if(isUserLoggedIn()){
             Log.i(TAG, "isUserLoggedIn: YES");
             startActivity(new Intent(SplashActivity.this,HomeActivity.class));
         }
@@ -33,6 +33,13 @@ public class SplashActivity extends AppCompatActivity {
             startActivity(new Intent(SplashActivity.this, LoginActivity.class));
         }
         finish();
+    }
+
+    private boolean isUserLoggedIn(){
+        final FirebaseAuth mAuth = FirebaseAuth.getInstance();
+        final FirebaseUser firebaseUser = mAuth.getCurrentUser();
+        return firebaseUser !=null;
+
     }
 
 }

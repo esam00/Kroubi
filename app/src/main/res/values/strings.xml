@@ -7,5 +7,11 @@
     <string name="cancel">Cancel</string>
     <string name="verify_code">Verify Code</string>
     <string name="no_contacts">Non of your users is using NotWhatsApp</string>
+    <string name="we_will_send_code">We will send a verification code to your phone number</string>
+    <string name="egypt_code">+2</string>
+    <string name="phone_number">Phone number</string>
+    <string name="enter_verification_code">Enter verification code</string>
+    <string name="submit">Submit</string>
+    <string name="login">Login</string>
 
 </resources>
