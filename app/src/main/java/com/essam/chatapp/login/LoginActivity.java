@@ -5,6 +5,7 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
@@ -53,6 +54,8 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
     //vars
     private String mVerificationId;
     private SharedPrefrence preference;
+
+    private static final String TAG = LoginActivity.class.getSimpleName();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -107,6 +110,7 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
             @Override
             public void onVerificationFailed(@NonNull FirebaseException e) {
                 progressBar.setVisibility(View.INVISIBLE);
+                Log.i(TAG, "onVerificationFailed: "+e.toString());
                 Toast.makeText(LoginActivity.this, "Verification Failed", Toast.LENGTH_SHORT).show();
             }
 
