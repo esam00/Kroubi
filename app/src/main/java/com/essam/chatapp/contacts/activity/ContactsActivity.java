@@ -85,7 +85,7 @@ public class ContactsActivity extends AppCompatActivity implements ContactsAdapt
         // this must be added to the phone number because all numbers in firebase database starts with
         // this iso code
         String isoPrefix = getCountryIso();
-        Log.e(TAG, "isoPrefix: " + isoPrefix);
+        Log.i(TAG, "isoPrefix: " + isoPrefix);
 
         // TODO: 4/15/2020 Use CursorLoader for better performance
         Cursor cursor = getContentResolver().query(ContactsContract.CommonDataKinds.Phone.CONTENT_URI,
@@ -195,11 +195,8 @@ public class ContactsActivity extends AppCompatActivity implements ContactsAdapt
 
     @Override
     public void onClick(final int index) {
-        String userUid = users.get(index).getUid();
-        String userName = users.get(index).getName();
         Intent intent = new Intent(ContactsActivity.this, ChatActivity.class);
-        intent.putExtra(Consts.USER_UID,userUid);
-        intent.putExtra(Consts.USER_NAME,userName);
+        intent.putExtra(Consts.USER,users.get(index));
         startActivity(intent);
         finish();
     }

@@ -3,24 +3,29 @@ package com.essam.chatapp.conversations.model;
 public class Chat {
     private String chatId;
     private String userUid;
-    private String userName = "";
+    private String userPhone;
+    private String userPhoto;
     private String message;
     private String createdAt;
-    private int unSeenCount;
     private long timeStamp;
+    private int unSeenCount;
+    private boolean isTyping;
 
     public Chat() {
         // Default constructor required for calls to DataSnapshot.getValue(User.class)
     }
 
-    public Chat(String chatId,String userName, String userUid, String message, String createdAt, int unSeenCount, long timeStamp) {
+    public Chat(String chatId, String userUid, String userPhone, String userPhoto,
+                String message, String createdAt, long timeStamp, int unSeenCount, boolean isTyping) {
         this.chatId = chatId;
         this.userUid = userUid;
-        this.userName = userName;
+        this.userPhone = userPhone;
+        this.userPhoto = userPhoto;
         this.message = message;
         this.createdAt = createdAt;
-        this.unSeenCount = unSeenCount;
         this.timeStamp = timeStamp;
+        this.unSeenCount = unSeenCount;
+        this.isTyping = isTyping;
     }
 
     public String getChatId() {
@@ -31,12 +36,12 @@ public class Chat {
         this.chatId = chatId;
     }
 
-    public String getUserName() {
-        return userName;
+    public String getUserPhone() {
+        return userPhone;
     }
 
-    public void setUserName(String userName) {
-        this.userName = userName;
+    public void setUserPhone(String userPhone) {
+        this.userPhone = userPhone;
     }
 
     public String getMessage() {
@@ -77,5 +82,21 @@ public class Chat {
 
     public void setUserUid(String userUid) {
         this.userUid = userUid;
+    }
+
+    public String getUserPhoto() {
+        return userPhoto;
+    }
+
+    public void setUserPhoto(String userPhoto) {
+        this.userPhoto = userPhoto;
+    }
+
+    public boolean isTyping() {
+        return isTyping;
+    }
+
+    public void setTyping(boolean typing) {
+        isTyping = typing;
     }
 }

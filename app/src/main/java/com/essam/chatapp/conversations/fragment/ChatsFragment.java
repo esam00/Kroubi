@@ -24,6 +24,7 @@ import android.widget.TextView;
 
 import com.airbnb.lottie.LottieAnimationView;
 import com.essam.chatapp.R;
+import com.essam.chatapp.contacts.model.User;
 import com.essam.chatapp.contacts.utils.ContactsHelper;
 import com.essam.chatapp.conversations.adapter.HomeChatAdapter;
 import com.essam.chatapp.utils.ProjectUtils;
@@ -116,7 +117,7 @@ public class ChatsFragment extends Fragment implements HomeChatAdapter.ListItemC
                 if (chat != null) {
                     Log.i(TAG, "new chat added");
                     // if this user name is already saved into my contacts replace user name with this saved name
-                    chat.setUserName(ContactsHelper.getContactName(getActivity(), chat.getUserName()));
+                    chat.setUserPhone(ContactsHelper.getContactName(getActivity(), chat.getUserPhone()));
 
                     chatList.add(chat);
                     homeChatAdapter.setMessagesData(chatList);
@@ -273,11 +274,12 @@ public class ChatsFragment extends Fragment implements HomeChatAdapter.ListItemC
         chatList.get(index).setUnSeenCount(0);
         homeChatAdapter.notifyDataSetChanged();
 
-        Bundle bundle = new Bundle();
-        bundle.putString(Consts.USER_UID, chatList.get(index).getUserUid());
-        bundle.putString(Consts.USER_NAME, chatList.get(index).getUserName());
+        User user = new User(chatList.get(index).getUserUid(),
+                chatList.get(index).getUserPhone(),
+                chatList.get(index).getUserPhone(),
+                "","online");
         Intent intent = new Intent(this.getActivity(), ChatActivity.class);
-        intent.putExtras(bundle);
+        intent.putExtra(Consts.USER,user);
         startActivity(intent);
     }
 

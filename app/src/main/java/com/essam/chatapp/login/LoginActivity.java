@@ -178,7 +178,12 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
     }
 
     private void createNewUser(){
-        User user = new User(mUser.getUid(),mUser.getPhoneNumber(),mUser.getPhoneNumber());
+        User user = new User(mUser.getUid(),
+                mUser.getPhoneNumber(),
+                mUser.getPhoneNumber(),
+                "Hey there , I'm using Kroubi",
+                "",
+                "online");
         mUserDb.setValue(user);
     }
 

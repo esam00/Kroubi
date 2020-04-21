@@ -32,6 +32,7 @@ import com.daimajia.androidanimations.library.YoYo;
 import com.essam.chatapp.R;
 import com.essam.chatapp.chat.adapter.ChatAdapter;
 import com.essam.chatapp.chat.model.Message;
+import com.essam.chatapp.contacts.model.User;
 import com.essam.chatapp.contacts.utils.ContactsHelper;
 import com.essam.chatapp.conversations.model.Chat;
 import com.essam.chatapp.utils.ProjectUtils;
@@ -41,6 +42,7 @@ import com.essam.chatapp.utils.Consts;
 import com.essam.chatapp.network.SocketListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.ChildEventListener;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
@@ -78,9 +80,11 @@ public class ChatActivity extends AppCompatActivity implements View.OnClickListe
     //vars
     private String inputMessage;
     private String otherName, myName;
+    private String myUid, otherUid;
+    private String myPhone, otherPhone,otherPhoto;
+    private String myPhoto = "";
     private String chatID;
     private int otherUnseenCount;
-    private String myUid, otherUid;
     private List<String> mediaUriList;
     private SharedPrefrence prefrence;
     private Uri picUri;
@@ -118,15 +122,13 @@ public class ChatActivity extends AppCompatActivity implements View.OnClickListe
      */
     private void receiveIntents() {
         Intent intent = getIntent();
-        if (intent.hasExtra(Consts.USER_NAME) && intent.getStringExtra(Consts.USER_NAME) != null) {
-            otherName = intent.getStringExtra(Consts.USER_NAME);
-            setTitle(ContactsHelper.getContactName(this,otherName));
-        }else {
-            fetchUserData();
-        }
-
-        if (intent.hasExtra(Consts.USER_UID) && intent.getStringExtra(Consts.USER_UID) != null) {
-            otherUid = intent.getStringExtra(Consts.USER_UID);
+        if ((intent.hasExtra(Consts.USER))){
+            User user = intent.getParcelableExtra(Consts.USER);
+            otherUid = user.getUid();
+            otherPhone = user.getPhone();
+            otherName = user.getName();
+            otherPhoto = user.getImage();
+            setTitle(otherName);
             checkPrevoiusConversations();
         }
     }
@@ -135,12 +137,14 @@ public class ChatActivity extends AppCompatActivity implements View.OnClickListe
         FirebaseAuth mAuth = FirebaseAuth.getInstance();
         FirebaseDatabase mDatabase = FirebaseDatabase.getInstance();
         DatabaseReference mReference = mDatabase.getReference();
+        FirebaseUser firebaseUser = mAuth.getCurrentUser();
 
         myUid = mAuth.getUid();
         appUserDb = mReference.child(Consts.USER);
         appChatDb = mReference.child(Consts.CHAT);
         userChatDb = mReference.child(Consts.USER).child(myUid).child(Consts.CHAT);
         myDb = appUserDb.child(myUid).child(Consts.NAME);
+        if (firebaseUser !=null )myPhone = firebaseUser.getPhoneNumber();
     }
 
     private void initEventListeners() {
@@ -413,11 +417,13 @@ public class ChatActivity extends AppCompatActivity implements View.OnClickListe
         currentFormatDate = ProjectUtils.getDisplayableCurrentDateTime();
 
         DatabaseReference mySideDb = userChatDb.child(chatID);
-        Chat mySideChat = new Chat(chatID, otherName, otherUid, inputMessage, currentFormatDate, 0, System.currentTimeMillis());
+        Chat mySideChat = new Chat(chatID,otherUid, otherPhone,otherPhoto, inputMessage,
+                currentFormatDate, System.currentTimeMillis(), 0,false);
         mySideDb.setValue(mySideChat);
 
         DatabaseReference otherSideDb = appUserDb.child(otherUid).child(Consts.CHAT).child(chatID);
-        Chat otherSideChat = new Chat(chatID, myName, myUid, inputMessage, currentFormatDate, 1, System.currentTimeMillis());
+        Chat otherSideChat = new Chat(chatID, myUid, myPhone, myPhoto, inputMessage,
+                currentFormatDate, System.currentTimeMillis(), 1,false);
         otherSideDb.setValue(otherSideChat);
 
         getLastUnseenCont();
