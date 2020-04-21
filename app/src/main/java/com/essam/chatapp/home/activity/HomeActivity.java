@@ -72,6 +72,9 @@ public class HomeActivity extends AppCompatActivity {
         homeViewPager.setAdapter(viewPagerAdapter);
         homeTabLayout.setupWithViewPager(homeViewPager);
         homeViewPager.addOnPageChangeListener(mPageChangeListener);
+        //By default, ViewPager recreates the fragments when you swipe the page. To prevent this
+        // we specify limit number for pages
+        homeViewPager.setOffscreenPageLimit(3);
 
         // fab button
         fab = findViewById(R.id.fab);
