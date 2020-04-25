@@ -6,9 +6,6 @@
     android:layout_gravity="center">
 
 
-    <RelativeLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content">
         <androidx.cardview.widget.CardView
             android:id="@+id/cardView"
             android:layout_width="match_parent"
@@ -27,21 +24,19 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:adjustViewBounds="true"
-                    android:src="@drawable/kroubi" />
+                    android:src="@drawable/kroubi"
+                    android:contentDescription="@string/notification_image" />
             </LinearLayout>
             <TextView
                 android:id="@+id/notificationText"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:gravity="center"
                 android:layout_gravity="bottom"
                 android:padding="10dp"
                 android:background="#991D255E"
                 android:textColor="@color/white"
-                android:textAlignment="center"
                 android:textSize="19sp" />
         </androidx.cardview.widget.CardView>
-
-    </RelativeLayout>
-
 
 </RelativeLayout>

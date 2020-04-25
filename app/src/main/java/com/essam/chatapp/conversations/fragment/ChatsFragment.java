@@ -55,6 +55,7 @@ public class ChatsFragment extends Fragment implements HomeChatAdapter.ListItemC
     private ValueEventListener checkExistValueEventListener;
 
     private Context mContext;
+    private boolean showNotification;
 
     private final static String TAG = ChatsFragment.class.getSimpleName();
 
@@ -70,6 +71,7 @@ public class ChatsFragment extends Fragment implements HomeChatAdapter.ListItemC
     @Override
     public void onAttach(@NonNull Context context) {
         mContext = context;
+        showNotification = false;
         super.onAttach(context);
     }
 
@@ -225,16 +227,16 @@ public class ChatsFragment extends Fragment implements HomeChatAdapter.ListItemC
     private void hideLoading() {
         Log.i(TAG, "hideLoading: ");
         loadingDialog.dismiss();
-//        showNotificationDialog("إهداء الى قروبي الحبيب ❤️");
+        if (showNotification)showNotificationDialog();
     }
 
-    private void showNotificationDialog(String message) {
+    private void showNotificationDialog() {
         final Dialog dialog = new Dialog(mContext);
         dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
         dialog.setCancelable(true);
 
         dialog.setContentView(R.layout.notification_dialog);
-        ((TextView) dialog.findViewById(R.id.notificationText)).setText(message);
+        ((TextView) dialog.findViewById(R.id.notificationText)).setText("إهداء الى قروبي الحبيب ❤️");
 
         dialog.show();
         Window window = dialog.getWindow();

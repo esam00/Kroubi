@@ -13,5 +13,8 @@
     <string name="enter_verification_code">Enter verification code</string>
     <string name="submit">Submit</string>
     <string name="login">Login</string>
+    <string name="message_image">message image</string>
+    <string name="seen_icon">seen icon</string>
+    <string name="notification_image">notification_image</string>
 
 </resources>

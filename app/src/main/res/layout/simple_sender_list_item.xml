@@ -2,31 +2,38 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_marginStart="10dp"
-    android:layout_marginLeft="10dp"
-    android:layout_marginTop="3dp"
-    android:layout_marginEnd="17dp"
-    android:layout_marginRight="10dp"
+    android:layout_marginEnd="10dp"
     android:gravity="end"
     android:orientation="vertical">
 
     <LinearLayout
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:background="@drawable/simple_sender_bg"
-        android:minWidth="160dp"
+        android:background="@drawable/outgoing_second"
         android:orientation="vertical"
-        android:padding="5dp">
+        android:elevation="1dp"
+        android:layout_marginBottom="3dp"
+        android:padding="6dp">
+
+        <androidx.cardview.widget.CardView
+            android:id="@+id/cardView"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="3dp"
+            app:cardCornerRadius="10dp"
+            app:cardElevation="0dp">
 
         <ImageView
             android:id="@+id/image_message_iv"
             android:layout_width="250dp"
             android:layout_height="250dp"
-            android:paddingBottom="10dp"
             android:src="@drawable/my_picture"
-            android:layout_marginBottom="5dp"
             android:visibility="visible"
             android:scaleType="centerCrop" />
+
+        </androidx.cardview.widget.CardView>
 
         <TextView
             android:id="@+id/tv_message"
@@ -35,6 +42,8 @@
             android:layout_gravity="start"
             android:maxWidth="250dp"
             android:paddingBottom="3dp"
+            android:paddingStart="5dp"
+            android:paddingEnd="5dp"
             android:text="Hello Hello  "
             android:textColor="@android:color/black"
             android:textSize="15sp" />

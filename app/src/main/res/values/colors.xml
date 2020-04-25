@@ -18,5 +18,7 @@
 
     <color name="dark_gray">#5E5757</color>
 
+    <color name="outgoing_background_color">#C4E8FF</color>
+
 
 </resources>

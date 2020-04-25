@@ -31,7 +31,7 @@ public class ContactsAdapter extends RecyclerView.Adapter<ContactsAdapter.ViewHo
     public class ViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
         private TextView contactNameTV, statusTv;
 
-        public ViewHolder(@NonNull View itemView) {
+        ViewHolder(@NonNull View itemView) {
             super(itemView);
             contactNameTV = itemView.findViewById(R.id.tv_contact_name);
             statusTv = itemView.findViewById(R.id.tv_status);
@@ -71,10 +71,4 @@ public class ContactsAdapter extends RecyclerView.Adapter<ContactsAdapter.ViewHo
         }
         return mUsers.size();
     }
-
-    public void setContactsData(List<User> users) {
-        mUsers = users;
-        notifyDataSetChanged();
-    }
-
 }

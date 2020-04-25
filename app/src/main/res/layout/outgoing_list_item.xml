@@ -6,16 +6,17 @@
     android:layout_height="wrap_content"
     android:layout_marginStart="10dp"
     android:layout_marginEnd="10dp"
+    android:gravity="end"
     android:orientation="vertical">
 
     <LinearLayout
         android:id="@+id/ll_message_body"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:background="@drawable/receiving_first"
+        android:background="@drawable/outgoing_first"
         android:elevation="1dp"
         android:orientation="vertical"
-        android:padding="6dp"
+        android:padding="5dp"
         tools:targetApi="lollipop">
 
         <androidx.cardview.widget.CardView
@@ -61,7 +62,7 @@
                 android:id="@+id/tv_small_message"
                 android:layout_width="wrap_content"
                 android:layout_height="match_parent"
-                android:layout_marginStart="3dp"
+                android:layout_marginStart="14dp"
                 android:layout_marginEnd="8dp"
                 android:maxWidth="250dp"
                 android:textColor="@android:color/black"
@@ -75,10 +76,18 @@
                 android:layout_height="match_parent"
                 android:layout_marginStart="2dp"
                 android:layout_marginTop="5dp"
-                android:layout_marginEnd="5dp"
+                android:layout_marginEnd="2dp"
                 android:gravity="bottom"
                 android:textSize="12sp"
                 tools:text="12:15 AM " />
+
+            <ImageView
+                android:id="@+id/iv_message_state"
+                android:layout_width="20dp"
+                android:layout_height="20dp"
+                android:layout_marginTop="5dp"
+                android:contentDescription="@string/seen_icon"
+                android:src="@drawable/ic_sent" />
 
         </LinearLayout>
 
