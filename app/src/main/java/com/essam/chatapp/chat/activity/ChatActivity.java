@@ -2,7 +2,6 @@ package com.essam.chatapp.chat.activity;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.content.FileProvider;
 import androidx.recyclerview.widget.LinearLayoutManager;
@@ -19,7 +18,6 @@ import android.os.Handler;
 import android.provider.MediaStore;
 import android.text.TextUtils;
 import android.util.Log;
-import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.EditText;
@@ -33,13 +31,11 @@ import com.essam.chatapp.R;
 import com.essam.chatapp.chat.adapter.ChatAdapter;
 import com.essam.chatapp.chat.model.Message;
 import com.essam.chatapp.contacts.model.User;
-import com.essam.chatapp.contacts.utils.ContactsHelper;
 import com.essam.chatapp.conversations.model.Chat;
 import com.essam.chatapp.utils.ProjectUtils;
 import com.essam.chatapp.utils.SharedPrefrence;
 import com.essam.chatapp.photoEditor.PhotoEditorActivity;
 import com.essam.chatapp.utils.Consts;
-import com.essam.chatapp.network.SocketListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
@@ -52,7 +48,6 @@ import com.google.firebase.database.ValueEventListener;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 import com.google.firebase.storage.UploadTask;
-import com.google.gson.Gson;
 
 import java.io.File;
 import java.io.IOException;
@@ -61,28 +56,20 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
-import okhttp3.OkHttpClient;
-import okhttp3.Request;
-
-import okhttp3.WebSocket;
-
 public class ChatActivity extends AppCompatActivity implements View.OnClickListener {
 
     //views
     private RecyclerView recyclerView;
     private EditText messageEt;
     private LinearLayout filePickerLl, emptyLayout;
-
     private ChatAdapter adapter;
     private List<Message> listMessages;
     private List<View> onClickViews;
 
     //vars
     private String inputMessage;
-    private String otherName, myName;
     private String myUid, otherUid;
     private String myPhone, otherPhone,otherPhoto;
-    private String myPhoto = "";
     private String chatID;
     private int otherUnseenCount;
     private List<String> mediaUriList;
@@ -92,15 +79,12 @@ public class ChatActivity extends AppCompatActivity implements View.OnClickListe
     private boolean isFirstTime = true;
     private List<String> messageIdList;
     private int mediaUploaded;
+    private String messageId;
 
     //firebase
-    private DatabaseReference appChatDb, appUserDb,userChatDb, mChatDb, otherSideUnseenChildDb, myDb, otherDb;
+    private DatabaseReference appChatDb, appUserDb,userChatDb, mChatDb, otherSideUnseenChildDb;
     private ChildEventListener childEventListener;
-    private ValueEventListener checkSeenEventListener, userInfoListener, myInfoListener, checkPreviousConversations;
-
-    //web Socket
-    private WebSocket webSocket;
-    private String messageId;
+    private ValueEventListener checkSeenEventListener, checkPreviousConversations;
 
     private final static String TAG = ChatActivity.class.getSimpleName();
 
@@ -126,7 +110,7 @@ public class ChatActivity extends AppCompatActivity implements View.OnClickListe
             User user = intent.getParcelableExtra(Consts.USER);
             otherUid = user.getUid();
             otherPhone = user.getPhone();
-            otherName = user.getName();
+            String otherName = user.getName();
             otherPhoto = user.getImage();
             setTitle(otherName);
             checkPrevoiusConversations();
@@ -143,7 +127,6 @@ public class ChatActivity extends AppCompatActivity implements View.OnClickListe
         appUserDb = mReference.child(Consts.USER);
         appChatDb = mReference.child(Consts.CHAT);
         userChatDb = mReference.child(Consts.USER).child(myUid).child(Consts.CHAT);
-        myDb = appUserDb.child(myUid).child(Consts.NAME);
         if (firebaseUser !=null )myPhone = firebaseUser.getPhoneNumber();
     }
 
@@ -222,7 +205,7 @@ public class ChatActivity extends AppCompatActivity implements View.OnClickListe
         checkSeenEventListener = new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                if (dataSnapshot.exists())
+                if (dataSnapshot.exists() && dataSnapshot.getValue() != null)
                     otherUnseenCount = Integer.parseInt(dataSnapshot.getValue().toString());
             }
 
@@ -230,35 +213,6 @@ public class ChatActivity extends AppCompatActivity implements View.OnClickListe
             public void onCancelled(@NonNull DatabaseError databaseError) {
             }
         };
-
-        userInfoListener = new ValueEventListener() {
-            @Override
-            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                if (dataSnapshot.exists()) {
-                    Log.i(TAG, "onDataChange: "+dataSnapshot);
-                    otherName = dataSnapshot.getValue().toString();
-                    setTitle(ContactsHelper.getContactName(ChatActivity.this, otherName));
-                }
-            }
-
-            @Override
-            public void onCancelled(@NonNull DatabaseError databaseError) {
-
-            }
-        };
-
-        myInfoListener = new ValueEventListener() {
-            @Override
-            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                if (dataSnapshot.exists())
-                    myName = dataSnapshot.getValue().toString();
-            }
-            @Override
-            public void onCancelled(@NonNull DatabaseError databaseError) {
-            }
-        };
-        myDb.addValueEventListener(myInfoListener);
-
     }
 
     private void initViews() {
@@ -305,16 +259,6 @@ public class ChatActivity extends AppCompatActivity implements View.OnClickListe
         userChatDb.addListenerForSingleValueEvent(checkPreviousConversations);
     }
 
-    /**
-     * Fetching data of the other user which this conversation is with
-     * We can get only public data like name, image , online state and so on..
-     */
-    private void fetchUserData() {
-        //get user name and update actionBar title with this name
-        otherDb = appUserDb.child(otherUid).child(Consts.NAME);
-        otherDb.addValueEventListener(userInfoListener);
-    }
-
     private void getMessages() {
         if (mChatDb == null) return;
 
@@ -345,16 +289,17 @@ public class ChatActivity extends AppCompatActivity implements View.OnClickListe
     }
 
     private void sendFirstMessage() {
-
         // this is the first message between these two users
-        // create new chat item in both current user and other user
-        // update chatID
         chatID = appChatDb.push().getKey();
-        mChatDb = appChatDb.child(chatID);
-        adapter.setChatDp(mChatDb);
-        getMessages();
-        pushNewMessage();
-        pushNewChat();
+        if (chatID != null) {
+            mChatDb = appChatDb.child(chatID);
+            // update chatID
+            adapter.setChatDp(mChatDb);
+            getMessages();
+            // create new chat item in both current user and other user
+            pushNewMessage();
+            pushNewChat();
+        }
     }
 
     private void pushNewMessage() {
@@ -363,12 +308,14 @@ public class ChatActivity extends AppCompatActivity implements View.OnClickListe
         } else {
             currentFormatDate = ProjectUtils.getDisplayableCurrentDateTime();
             messageId = mChatDb.push().getKey();
-            DatabaseReference newMessageDb = mChatDb.child(messageId);
+            if(messageId != null) {
+                DatabaseReference newMessageDb = mChatDb.child(messageId);
 
-            Message message = new Message(messageId, inputMessage, myUid, currentFormatDate, false);
-            newMessageDb.setValue(message);
+                Message message = new Message(messageId, inputMessage, myUid, currentFormatDate, false);
+                newMessageDb.setValue(message);
 
-            if (!isFirstTime) updateLastMessage();
+                if (!isFirstTime) updateLastMessage();
+            }
         }
 
     }
@@ -422,6 +369,7 @@ public class ChatActivity extends AppCompatActivity implements View.OnClickListe
         mySideDb.setValue(mySideChat);
 
         DatabaseReference otherSideDb = appUserDb.child(otherUid).child(Consts.CHAT).child(chatID);
+        String myPhoto = "";
         Chat otherSideChat = new Chat(chatID, myUid, myPhone, myPhoto, inputMessage,
                 currentFormatDate, System.currentTimeMillis(), 1,false);
         otherSideDb.setValue(otherSideChat);
@@ -466,7 +414,9 @@ public class ChatActivity extends AppCompatActivity implements View.OnClickListe
             Intent intent = new Intent();
             intent.setType("image/*");
             intent.setAction(Intent.ACTION_GET_CONTENT);
-            intent.putExtra(Intent.EXTRA_ALLOW_MULTIPLE, true);
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN_MR2) {
+                intent.putExtra(Intent.EXTRA_ALLOW_MULTIPLE, true);
+            }
             startActivityForResult(intent, Consts.PICK_IMAGES_REQUEST);
         }
     }
@@ -477,8 +427,9 @@ public class ChatActivity extends AppCompatActivity implements View.OnClickListe
     private void openCamera() {
         if (ProjectUtils.hasPermissionInManifest(this, Consts.CAPTURE_IMAGE_REQUEST, Manifest.permission.CAMERA)) {
             try {
+                // TODO: 4/26/2020 please handle camera the right way
                 Intent intent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
-                File file = getOutputMediaFile(1);
+                File file = getOutputMediaFile();
                 if (!file.exists()) {
                     try {
                         ProjectUtils.pauseProgressDialog();
@@ -503,7 +454,7 @@ public class ChatActivity extends AppCompatActivity implements View.OnClickListe
         }
     }
 
-    private File getOutputMediaFile(int type) {
+    private File getOutputMediaFile() {
         String root = this.getExternalFilesDir(Environment.DIRECTORY_PICTURES).toString();
         File mediaStorageDir = new File(root, Consts.APP_NAME);
         if (!mediaStorageDir.exists()) {
@@ -514,14 +465,10 @@ public class ChatActivity extends AppCompatActivity implements View.OnClickListe
 
         String timeStamp = new SimpleDateFormat("yyyyMMdd_HHmmss").format(new Date());
         File mediaFile;
-        if (type == 1) {
-            mediaFile = new File(mediaStorageDir.getPath() + File.separator +
-                    Consts.APP_NAME + timeStamp + ".png");
+        mediaFile = new File(mediaStorageDir.getPath() + File.separator +
+                Consts.APP_NAME + timeStamp + ".png");
 
-            String imageName = Consts.APP_NAME + timeStamp + ".png";
-        } else {
-            return null;
-        }
+        String imageName = Consts.APP_NAME + timeStamp + ".png";
         return mediaFile;
     }
 
@@ -606,7 +553,7 @@ public class ChatActivity extends AppCompatActivity implements View.OnClickListe
                     } else {
                         Log.i(TAG, "onActivityResult: no Image was retrived ");
                         mediaUriList.clear();
-                        if (data.getIntExtra("requestCode", -1) == Consts.PICK_IMAGES_REQUEST)
+                        if (data!=null && data.getIntExtra("requestCode", -1) == Consts.PICK_IMAGES_REQUEST)
                             openGalleryChooser();
                     }
 
@@ -648,12 +595,6 @@ public class ChatActivity extends AppCompatActivity implements View.OnClickListe
 
         if (otherSideUnseenChildDb != null)
             otherSideUnseenChildDb.removeEventListener(checkSeenEventListener);
-
-        if (otherDb != null)
-            otherDb.removeEventListener(userInfoListener);
-
-        if (myDb != null)
-            myDb.removeEventListener(myInfoListener);
     }
 
     @Override
@@ -696,47 +637,48 @@ public class ChatActivity extends AppCompatActivity implements View.OnClickListe
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        switch (item.getItemId()) {
-            case android.R.id.home:
-                onBackPressed(); // make up button behave like back button
-                return true;
+        if(item.getItemId() == android.R.id.home) {
+            onBackPressed(); // make up button behave like back button
+            return true;
         }
         return super.onOptionsItemSelected(item);
     }
 
-    private void openFilePickerDialog() {
-        // TODO: 2/17/2020 make a custom dialog to present filePiker layout with nice animation
-        AlertDialog.Builder builder = new AlertDialog.Builder(this);
-        // Get the layout inflater
-        LayoutInflater inflater = getLayoutInflater();
-        View filePicker = inflater.inflate(R.layout.file_picker, null);
-
-
-        // Inflate and set the layout for the dialog
-        // Pass null as the parent view because its going in the
-        // dialog layout
-        builder.setView(inflater.inflate(R.layout.file_picker, null));
-
-        builder.create();
-        builder.show();
-
-        YoYo.with(Techniques.Pulse)
-                .duration(200)
-                .playOn(filePicker);
-    }
-
-    private void instantiateWebSocket() {
-        OkHttpClient client = new OkHttpClient();
-        Request request = new Request.Builder().url("ws://192.168.0.103:6001").build();
-        SocketListener socketListener = new SocketListener(this);
-        webSocket = client.newWebSocket(request, socketListener);
-
-    }
-
-    private void sendUsingWebSocket(Message message) {
-        //convert message object into json string
-        String jsonString = new Gson().toJson(message);
-        webSocket.send(jsonString);
-    }
+//    //web Socket
+//    private WebSocket webSocket;
+//    private void openFilePickerDialog() {
+//        // TODO: 2/17/2020 make a custom dialog to present filePiker layout with nice animation
+//        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+//        // Get the layout inflater
+//        LayoutInflater inflater = getLayoutInflater();
+//        View filePicker = inflater.inflate(R.layout.file_picker, null);
+//
+//
+//        // Inflate and set the layout for the dialog
+//        // Pass null as the parent view because its going in the
+//        // dialog layout
+//        builder.setView(inflater.inflate(R.layout.file_picker, null));
+//
+//        builder.create();
+//        builder.show();
+//
+//        YoYo.with(Techniques.Pulse)
+//                .duration(200)
+//                .playOn(filePicker);
+//    }
+//
+//    private void instantiateWebSocket() {
+//        OkHttpClient client = new OkHttpClient();
+//        Request request = new Request.Builder().url("ws://192.168.0.103:6001").build();
+//        SocketListener socketListener = new SocketListener(this);
+//        webSocket = client.newWebSocket(request, socketListener);
+//
+//    }
+//
+//    private void sendUsingWebSocket(Message message) {
+//        //convert message object into json string
+//        String jsonString = new Gson().toJson(message);
+//        webSocket.send(jsonString);
+//    }
 
 }
