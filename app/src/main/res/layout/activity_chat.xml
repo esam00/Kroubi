@@ -7,7 +7,6 @@
     tools:context=".chat.activity.ChatActivity">
 
     <androidx.recyclerview.widget.RecyclerView
-        android:background="@color/chat_background"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:paddingBottom="8dp"
@@ -216,7 +215,6 @@
         android:paddingEnd="5dp"
         android:paddingTop="4dp"
         android:paddingBottom="4dp"
-        android:background="@color/chat_background"
         android:layout_alignParentBottom="true">
 
         <LinearLayout

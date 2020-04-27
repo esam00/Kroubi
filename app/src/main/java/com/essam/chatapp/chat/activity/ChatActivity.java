@@ -108,6 +108,7 @@ public class ChatActivity extends AppCompatActivity implements View.OnClickListe
         Intent intent = getIntent();
         if ((intent.hasExtra(Consts.USER))){
             User user = intent.getParcelableExtra(Consts.USER);
+            assert user != null;
             otherUid = user.getUid();
             otherPhone = user.getPhone();
             String otherName = user.getName();

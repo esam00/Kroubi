@@ -15,11 +15,11 @@
       },
       "oauth_client": [
         {
-          "client_id": "818002168553-qba7i9hq4obhlqg1vq82mlpsbsc4l8va.apps.googleusercontent.com",
+          "client_id": "818002168553-cer8cpmo9i37ml2g9skhal67f9pf280v.apps.googleusercontent.com",
           "client_type": 1,
           "android_info": {
             "package_name": "com.essam.chatapp",
-            "certificate_hash": "fc346022eba8a307ffe0226cf69db5ec963723bc"
+            "certificate_hash": "7aa6972f7c653468c072054505af20e9c8f0a55d"
           }
         },
         {
