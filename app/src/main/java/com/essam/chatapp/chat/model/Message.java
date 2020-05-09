@@ -15,20 +15,22 @@ public class Message {
         // Default constructor required for calls to DataSnapshot.getValue(User.class)
     }
 
-    public Message(String messageId, String message, String creatorId, String createdAt, boolean seen) {
+    public Message(String messageId, String message, String creatorId, String createdAt, long timeStamp, boolean seen) {
         this.messageId = messageId;
         this.message = message;
         this.creatorId = creatorId;
         this.createdAt = createdAt;
+        this.timeStamp = timeStamp;
         this.seen = seen;
     }
 
-    public Message(String messageId, String message, String creatorId, String createdAt, String media, boolean seen) {
+    public Message(String messageId, String message, String creatorId, String createdAt, String media,long timeStamp, boolean seen) {
         this.messageId = messageId;
         this.message = message;
         this.creatorId = creatorId;
         this.createdAt = createdAt;
         this.media = media;
+        this.timeStamp = timeStamp;
         this.seen = seen;
     }
 

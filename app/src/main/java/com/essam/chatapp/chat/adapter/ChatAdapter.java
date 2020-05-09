@@ -28,6 +28,7 @@ import com.bumptech.glide.load.engine.DiskCacheStrategy;
 import com.essam.chatapp.R;
 import com.essam.chatapp.chat.model.Message;
 import com.essam.chatapp.utils.Consts;
+import com.essam.chatapp.utils.DateTimeUtils;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DatabaseReference;
 
@@ -120,7 +121,7 @@ public class ChatAdapter extends RecyclerView.Adapter {
             setItemLayoutBackground(position);
 
             //bind message sent time
-            sentAtTextView.setText(message.getCreatedAt().split("\\s+")[1] + " " + message.getCreatedAt().split("\\s+")[2]);
+            sentAtTextView.setText(DateTimeUtils.getDisplayableDateOfGivenTimeStamp(message.getTimeStamp(),true));
 
             //bind message text
             bindMessageText(message);
@@ -223,7 +224,7 @@ public class ChatAdapter extends RecyclerView.Adapter {
             setItemLayoutBackground(position);
 
             //bind message time
-            sentAtTextView.setText(message.getCreatedAt().split("\\s+")[1] + " " + message.getCreatedAt().split("\\s+")[2]);
+            sentAtTextView.setText(DateTimeUtils.getDisplayableDateOfGivenTimeStamp(message.getTimeStamp(),true));
 
             //update message seen = true
             updateSeenLogic(message);

@@ -11,12 +11,13 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.essam.chatapp.R;
 import com.essam.chatapp.conversations.model.Chat;
+import com.essam.chatapp.utils.DateTimeUtils;
 
-import java.text.ParsePosition;
-import java.text.SimpleDateFormat;
-import java.util.Calendar;
 import java.util.List;
-import java.util.Locale;
+
+/*
+  Created by esammosbah1@gmail.com on 01/10/19.
+ */
 
 public class HomeChatAdapter extends RecyclerView.Adapter<HomeChatAdapter.ViewHolder> {
 
@@ -53,7 +54,7 @@ public class HomeChatAdapter extends RecyclerView.Adapter<HomeChatAdapter.ViewHo
             // update ui [name, message text, date
             senderNameTV.setText(chat.getUserPhone());
             lastMessageTv.setText(chat.getMessage());
-            dateTv.setText(getDisplayedDate(chat.getCreatedAt()));
+            dateTv.setText(DateTimeUtils.getDisplayableDateOfGivenTimeStamp(chat.getTimeStamp(),false));
 
             //colors
             if(chat.getUnSeenCount()>0){
@@ -70,26 +71,6 @@ public class HomeChatAdapter extends RecyclerView.Adapter<HomeChatAdapter.ViewHo
                 separator.setVisibility(View.GONE);
             else
                 separator.setVisibility(View.VISIBLE);
-        }
-
-        String getDisplayedDate(String dateString){
-            String date = dateString.split("\\s+")[0];
-
-            String time = dateString.split("\\s+")[1]+" "+dateString.split("\\s+")[2];
-
-            ParsePosition pos = new ParsePosition(0);
-            Calendar cal = Calendar.getInstance();
-            SimpleDateFormat formatter = new SimpleDateFormat("dd/MM/yyyy", Locale.getDefault());
-            cal.setTime(formatter.parse(dateString,pos));
-
-            Calendar rightNow = Calendar.getInstance();
-            if (rightNow.get(Calendar.DAY_OF_WEEK) == cal.get(Calendar.DAY_OF_WEEK)){
-                return time;
-            }
-            if (rightNow.get(Calendar.DAY_OF_WEEK)-cal.get(Calendar.DAY_OF_WEEK)==1){
-                return "yesterday";
-            }
-            return date;
         }
 
         @Override

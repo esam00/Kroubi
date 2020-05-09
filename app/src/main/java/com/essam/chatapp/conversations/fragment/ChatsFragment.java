@@ -138,6 +138,7 @@ public class ChatsFragment extends Fragment implements HomeChatAdapter.ListItemC
                         if (chatList.get(i).getChatId().equals(chat.getChatId())) {
                             chatList.get(i).setMessage(chat.getMessage());
                             chatList.get(i).setCreatedAt(chat.getCreatedAt());
+                            chatList.get(i).setTimeStamp(chat.getTimeStamp());
                             chatList.get(i).setUnSeenCount(chat.getUnSeenCount());
                             homeChatAdapter.notifyDataSetChanged();
                         }

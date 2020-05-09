@@ -34,6 +34,7 @@ import com.essam.chatapp.R;
 import java.net.URL;
 import java.sql.Timestamp;
 import java.text.ParseException;
+import java.text.ParsePosition;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
@@ -41,6 +42,13 @@ import java.util.Locale;
 import java.util.StringTokenizer;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+
+import static java.util.Calendar.YEAR;
+import static java.util.Calendar.MONTH ;
+import static java.util.Calendar.DAY_OF_MONTH;
+import static java.util.Calendar.HOUR_OF_DAY;
+import static java.util.Calendar.AM_PM ;
+import static java.util.Calendar.HOUR;
 
 
 public class ProjectUtils {
@@ -656,6 +664,24 @@ public class ProjectUtils {
         return formatter.format(new Date());
     }
 
+    public static String getDisplayableCurrentDateTime(long timeStamp){
+        Date date = new Date(timeStamp);
+        String dateString = new SimpleDateFormat("dd/MM/yyyy", Locale.getDefault()).format(date);
+        String timeString = new SimpleDateFormat("hh:mm a", Locale.getDefault()).format(date);
+
+        ParsePosition pos = new ParsePosition(0);
+        Calendar cal = Calendar.getInstance();
+        cal.setTime(date);
+
+        Calendar rightNow = Calendar.getInstance();
+        if (rightNow.get(Calendar.DAY_OF_WEEK) == cal.get(Calendar.DAY_OF_WEEK)){
+            return timeString;
+        }
+        if (rightNow.get(Calendar.DAY_OF_WEEK)-cal.get(Calendar.DAY_OF_WEEK)==1){
+            return "yesterday";
+        }
+        return dateString;
+    }
 
 
 

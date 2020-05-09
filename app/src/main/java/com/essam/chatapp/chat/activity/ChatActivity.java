@@ -312,7 +312,7 @@ public class ChatActivity extends AppCompatActivity implements View.OnClickListe
             if(messageId != null) {
                 DatabaseReference newMessageDb = mChatDb.child(messageId);
 
-                Message message = new Message(messageId, inputMessage, myUid, currentFormatDate, false);
+                Message message = new Message(messageId, inputMessage, myUid, currentFormatDate,System.currentTimeMillis(), false);
                 newMessageDb.setValue(message);
 
                 if (!isFirstTime) updateLastMessage();
@@ -339,7 +339,7 @@ public class ChatActivity extends AppCompatActivity implements View.OnClickListe
                         public void onSuccess(Uri uri) {
 
                             currentFormatDate = ProjectUtils.getDisplayableCurrentDateTime();
-                            Message message = new Message(messageIdList.get(mediaUploaded), inputMessage, myUid, currentFormatDate, uri.toString(), false);
+                            Message message = new Message(messageIdList.get(mediaUploaded), inputMessage, myUid, currentFormatDate, uri.toString(),System.currentTimeMillis(), false);
                             DatabaseReference newMessageDb = mChatDb.child(messageIdList.get(mediaUploaded));
                             newMessageDb.setValue(message);
                             if (!isFirstTime) updateLastMessage();
@@ -353,12 +353,6 @@ public class ChatActivity extends AppCompatActivity implements View.OnClickListe
                 }
             });
         }
-    }
-
-    public void updateUi(Message message) {
-        listMessages.add(message);
-        adapter.setMessagesData(listMessages);
-        recyclerView.smoothScrollToPosition(adapter.getItemCount() - 1);
     }
 
     private void pushNewChat() {
@@ -389,10 +383,12 @@ public class ChatActivity extends AppCompatActivity implements View.OnClickListe
         DatabaseReference mySideDb = userChatDb.child(chatID);
         mySideDb.child(Consts.MESSAGE).setValue(inputMessage);
         mySideDb.child(Consts.CREATED_AT).setValue(currentFormatDate);
+        mySideDb.child(Consts.TIME_STAMP).setValue(System.currentTimeMillis());
 
         DatabaseReference otherSideDb = appUserDb.child(otherUid).child(Consts.CHAT).child(chatID);
         otherSideDb.child(Consts.MESSAGE).setValue(inputMessage);
         otherSideDb.child(Consts.CREATED_AT).setValue(currentFormatDate);
+        otherSideDb.child(Consts.TIME_STAMP).setValue(System.currentTimeMillis());
         otherSideDb.child(Consts.UNSEEN_COUNT).setValue(otherUnseenCount + 1);
     }
 
@@ -404,6 +400,12 @@ public class ChatActivity extends AppCompatActivity implements View.OnClickListe
     private void getLastUnseenCont() {
         otherSideUnseenChildDb = appUserDb.child(otherUid).child(Consts.CHAT).child(chatID).child(Consts.UNSEEN_COUNT);
         otherSideUnseenChildDb.addValueEventListener(checkSeenEventListener);
+    }
+
+    public void updateUi(Message message) {
+        listMessages.add(message);
+        adapter.setMessagesData(listMessages);
+        recyclerView.smoothScrollToPosition(adapter.getItemCount() - 1);
     }
 
     /**
