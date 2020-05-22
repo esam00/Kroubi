@@ -94,11 +94,10 @@ public class ChatsFragment extends Fragment implements HomeChatAdapter.ListItemC
         // recyclerView
         chatList = new ArrayList<>();
         homeChatRv = view.findViewById(R.id.my_messages_rv);
-        homeChatAdapter = new HomeChatAdapter(this, this.getContext());
+        homeChatAdapter = new HomeChatAdapter(this,this, this.getContext());
         homeChatRv.setAdapter(homeChatAdapter);
         LinearLayoutManager layoutManager = new LinearLayoutManager(this.getContext());
         homeChatRv.setLayoutManager(layoutManager);
-        homeChatAdapter.setMessagesData(chatList);
     }
 
     private void initFirebase(){
@@ -122,7 +121,7 @@ public class ChatsFragment extends Fragment implements HomeChatAdapter.ListItemC
                     chat.setUserPhone(ContactsHelper.getContactName(getActivity(), chat.getUserPhone()));
 
                     chatList.add(chat);
-                    homeChatAdapter.setMessagesData(chatList);
+                    homeChatAdapter.addAll(chatList);
                     displayChatList();
                 }
             }
@@ -131,19 +130,9 @@ public class ChatsFragment extends Fragment implements HomeChatAdapter.ListItemC
             public void onChildChanged(@NonNull DataSnapshot dataSnapshot, @Nullable String s) {
                 Chat chat = dataSnapshot.getValue(Chat.class);
                 if (chat != null) {
-                    Log.i(TAG, "message Arrived to an existing chat");
-
+                    Log.i(TAG, " new message Arrived to an existing chat");
                     //update this chat with the new data
-                    for (int i = 0; i < chatList.size(); i++) {
-                        if (chatList.get(i).getChatId().equals(chat.getChatId())) {
-                            chatList.get(i).setMessage(chat.getMessage());
-                            chatList.get(i).setCreatedAt(chat.getCreatedAt());
-                            chatList.get(i).setTimeStamp(chat.getTimeStamp());
-                            chatList.get(i).setUnSeenCount(chat.getUnSeenCount());
-                            homeChatAdapter.notifyDataSetChanged();
-                        }
-                    }
-
+                    homeChatAdapter.updateItem(chat);
                 }
             }
 
@@ -167,10 +156,8 @@ public class ChatsFragment extends Fragment implements HomeChatAdapter.ListItemC
         checkExistValueEventListener = new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                if (dataSnapshot.exists()) {
-                    Log.i(TAG, "onDataChange: Exist");
-                } else {
-                    Log.i(TAG, "onDataChange: not exist");
+                if (!dataSnapshot.exists()) {
+                    // no conversations yet
                     hideChatListAndDisplayWelcomeAnimation();
                 }
             }
@@ -269,17 +256,17 @@ public class ChatsFragment extends Fragment implements HomeChatAdapter.ListItemC
      * onClick method of listItemClickListener interface in chats adapter
      * if a chat is clicked this listener will be triggered and it will  return the index of the item that was clicked
      *
-     * @param index of selected item
+     * @param chat : selected item
      */
     @Override
-    public void onClick(int index) {
+    public void onClick(Chat chat, int adapterPosition) {
         // clear un seen count for this conversation
-        chatList.get(index).setUnSeenCount(0);
-        homeChatAdapter.notifyDataSetChanged();
+        homeChatAdapter.clearUnSeenCount(chat,adapterPosition);
 
-        User user = new User(chatList.get(index).getUserUid(),
-                chatList.get(index).getUserPhone(),
-                chatList.get(index).getUserPhone(),
+        //Chat Activity only accepts User object as extras..
+        User user = new User(chat.getUserUid(),
+                chat.getUserPhone(),
+                chat.getUserPhone(),
                 "","online");
         Intent intent = new Intent(this.getActivity(), ChatActivity.class);
         intent.putExtra(Consts.USER,user);

@@ -1,6 +1,7 @@
 package com.essam.chatapp.conversations.adapter;
 
 import android.content.Context;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -8,8 +9,12 @@ import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
+import androidx.recyclerview.widget.SortedList;
+import androidx.recyclerview.widget.SortedListAdapterCallback;
 
 import com.essam.chatapp.R;
+import com.essam.chatapp.contacts.utils.ContactsHelper;
+import com.essam.chatapp.conversations.fragment.ChatsFragment;
 import com.essam.chatapp.conversations.model.Chat;
 import com.essam.chatapp.utils.DateTimeUtils;
 
@@ -21,17 +26,60 @@ import java.util.List;
 
 public class HomeChatAdapter extends RecyclerView.Adapter<HomeChatAdapter.ViewHolder> {
 
-    private List<Chat> mChatList;
     private Context context;
     private ListItemClickListener listItemClickListener;
+    private SortedList<Chat> mChatList;
+    private ChatsFragment chatsFragment;
 
     public interface ListItemClickListener {
-        void onClick(int index);
+        void onClick(Chat chat,int adapterPosition);
     }
 
-    public HomeChatAdapter(ListItemClickListener listener,Context context) {
+    public HomeChatAdapter(ChatsFragment chatsFragment,ListItemClickListener listener, Context context) {
         this.listItemClickListener = listener;
         this.context = context;
+        this.chatsFragment = chatsFragment;
+        sort();
+    }
+
+    private void sort() {
+        mChatList = new SortedList<>(Chat.class, new SortedListAdapterCallback<Chat>(this) {
+            @Override
+            public int compare(Chat o1, Chat o2) {
+                // we want to sort conversations by the newest
+                return o2.getTimeStamp().compareTo(o1.getTimeStamp());
+            }
+
+            @Override
+            public boolean areContentsTheSame(Chat oldItem, Chat newItem) {
+                return oldItem.getTimeStamp().equals(newItem.getTimeStamp());
+            }
+
+            @Override
+            public boolean areItemsTheSame(Chat item1, Chat item2) {
+                return item1.getChatId().equals(item2.getChatId());
+            }
+
+            @Override
+            public void onChanged(int position, int count) {
+                notifyItemRangeChanged(position, count);
+            }
+
+            @Override
+            public void onInserted(int position, int count) {
+                notifyItemRangeInserted(position, count);
+            }
+
+            @Override
+            public void onRemoved(int position, int count) {
+                notifyItemRangeRemoved(position, count);
+            }
+
+            @Override
+            public void onMoved(int fromPosition, int toPosition) {
+                notifyItemMoved(fromPosition, toPosition);
+            }
+        });
     }
 
     public class ViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
@@ -50,24 +98,24 @@ public class HomeChatAdapter extends RecyclerView.Adapter<HomeChatAdapter.ViewHo
 
         }
 
-        void bind (Chat chat, int position){
+        void bind(Chat chat, int position) {
             // update ui [name, message text, date
             senderNameTV.setText(chat.getUserPhone());
             lastMessageTv.setText(chat.getMessage());
-            dateTv.setText(DateTimeUtils.getDisplayableDateOfGivenTimeStamp(chat.getTimeStamp(),false));
+            dateTv.setText(DateTimeUtils.getDisplayableDateOfGivenTimeStamp(chat.getTimeStamp(), false));
 
             //colors
-            if(chat.getUnSeenCount()>0){
+            if (chat.getUnSeenCount() > 0) {
                 counterTv.setVisibility(View.VISIBLE);
                 dateTv.setTextColor(context.getResources().getColor(R.color.colorAccent));
                 counterTv.setText(String.valueOf(chat.getUnSeenCount()));
-            }else {
+            } else {
                 counterTv.setVisibility(View.INVISIBLE);
                 dateTv.setTextColor(context.getResources().getColor(R.color.dark_gray));
             }
 
             // hide separator for last item in the list
-            if(isLastItem(position))
+            if (isLastItem(position))
                 separator.setVisibility(View.GONE);
             else
                 separator.setVisibility(View.VISIBLE);
@@ -75,7 +123,7 @@ public class HomeChatAdapter extends RecyclerView.Adapter<HomeChatAdapter.ViewHo
 
         @Override
         public void onClick(View view) {
-            listItemClickListener.onClick(getAdapterPosition());
+            listItemClickListener.onClick(mChatList.get(getAdapterPosition()),getAdapterPosition());
         }
     }
 
@@ -90,24 +138,43 @@ public class HomeChatAdapter extends RecyclerView.Adapter<HomeChatAdapter.ViewHo
     @Override
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
         Chat chat = mChatList.get(position);
-        holder.bind(chat,position);
+        holder.bind(chat, position);
     }
 
     @Override
     public int getItemCount() {
-        if(null== mChatList){
+        if (null == mChatList) {
             return 0;
         }
         return mChatList.size();
     }
 
-    public void setMessagesData(List<Chat> chatList) {
-        mChatList = chatList;
-        notifyDataSetChanged();
+    public void addAll(List<Chat> chats) {
+        mChatList.beginBatchedUpdates();
+        for(Chat chat : chats){
+            mChatList.add(chat);
+        }
+        mChatList.endBatchedUpdates();
     }
 
-    private boolean isLastItem(int position){
-        return position == getItemCount()-1;
+    public void updateItem(Chat chat) {
+        mChatList.beginBatchedUpdates();
+        for (int i = 0; i < mChatList.size(); i++) {
+            if (mChatList.get(i).getChatId().equals(chat.getChatId())) {
+                chat.setUserPhone(ContactsHelper.getContactName(chatsFragment.getActivity(), chat.getUserPhone()));
+                mChatList.updateItemAt(i,chat);
+            }
+        }
+        mChatList.endBatchedUpdates();
+    }
+
+    public void clearUnSeenCount(Chat chat,int adapterPosition){
+        chat.setUnSeenCount(0);
+        mChatList.updateItemAt(adapterPosition,chat);
+    }
+
+    private boolean isLastItem(int position) {
+        return position == getItemCount() - 1;
     }
 
 }

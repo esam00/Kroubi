@@ -664,27 +664,6 @@ public class ProjectUtils {
         return formatter.format(new Date());
     }
 
-    public static String getDisplayableCurrentDateTime(long timeStamp){
-        Date date = new Date(timeStamp);
-        String dateString = new SimpleDateFormat("dd/MM/yyyy", Locale.getDefault()).format(date);
-        String timeString = new SimpleDateFormat("hh:mm a", Locale.getDefault()).format(date);
-
-        ParsePosition pos = new ParsePosition(0);
-        Calendar cal = Calendar.getInstance();
-        cal.setTime(date);
-
-        Calendar rightNow = Calendar.getInstance();
-        if (rightNow.get(Calendar.DAY_OF_WEEK) == cal.get(Calendar.DAY_OF_WEEK)){
-            return timeString;
-        }
-        if (rightNow.get(Calendar.DAY_OF_WEEK)-cal.get(Calendar.DAY_OF_WEEK)==1){
-            return "yesterday";
-        }
-        return dateString;
-    }
-
-
-
     public static long correctTimestamp(long timestampInMessage) {
         long correctedTimestamp = timestampInMessage;
 

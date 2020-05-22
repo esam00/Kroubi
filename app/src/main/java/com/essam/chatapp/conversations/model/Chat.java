@@ -7,12 +7,12 @@ public class Chat {
     private String userPhoto;
     private String message;
     private String createdAt;
-    private long timeStamp;
+    private Long timeStamp;
     private int unSeenCount;
     private boolean isTyping;
 
     public Chat() {
-        // Default constructor required for calls to DataSnapshot.getValue(User.class)
+        // Default constructor required for calls to DataSnapshot.getValue(Chat.class)
     }
 
     public Chat(String chatId, String userUid, String userPhone, String userPhoto,
@@ -68,11 +68,11 @@ public class Chat {
         this.unSeenCount = unSeenCount;
     }
 
-    public long getTimeStamp() {
+    public Long getTimeStamp() {
         return timeStamp;
     }
 
-    public void setTimeStamp(long timeStamp) {
+    public void setTimeStamp(Long timeStamp) {
         this.timeStamp = timeStamp;
     }
 

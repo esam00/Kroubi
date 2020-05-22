@@ -18,11 +18,11 @@
 
         <de.hdodenhof.circleimageview.CircleImageView
             android:id="@+id/contact_img"
-            android:layout_width="60dp"
-            android:layout_height="60dp"
+            android:layout_width="54dp"
+            android:layout_height="54dp"
             android:layout_marginStart="0dp"
             android:layout_marginEnd="12dp"
-            android:src="@drawable/user" />
+            android:src="@drawable/user_placeholder" />
 
         <LinearLayout
             android:layout_width="wrap_content"
@@ -36,10 +36,10 @@
                 android:id="@+id/tv_sender_name"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:textAppearance="@android:style/TextAppearance.DeviceDefault.Large"
                 android:textColor="@android:color/primary_text_light"
-                android:textSize="18sp"
-                tools:text="Ahmed Rashed"/>
+                android:textSize="16sp"
+                android:textStyle="bold"
+                tools:text="Ahmed Rashed" />
 
             <TextView
                 android:id="@+id/tv_sender_last_message"
@@ -48,7 +48,7 @@
                 android:maxLines="1"
                 android:textColor="@color/dark_gray"
                 android:textSize="15sp"
-                tools:text="خلاص هقوم اخد قيلولة"/>
+                tools:text="خلاص هقوم اخد قيلولة" />
 
         </LinearLayout>
 
@@ -57,7 +57,6 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_alignParentEnd="true"
-            android:layout_alignParentRight="true"
             android:layout_centerVertical="true"
             android:gravity="end"
             android:orientation="vertical">
@@ -67,9 +66,9 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginBottom="5dp"
-                android:text="Yesterday"
                 android:textColor="@color/colorAccent"
-                android:textSize="12sp"/>
+                android:textSize="12sp"
+                tools:text="Yesterday" />
 
             <TextView
                 android:id="@+id/tv_unseen_count"
@@ -77,9 +76,9 @@
                 android:layout_height="wrap_content"
                 android:background="@drawable/oval_shape_messages_count_bg"
                 android:gravity="center"
-                android:text="3"
                 android:textColor="@color/white"
-                android:textSize="12sp"/>
+                android:textSize="12sp"
+                tools:text="3" />
         </LinearLayout>
     </RelativeLayout>
 

@@ -25,7 +25,7 @@ import com.google.firebase.database.DatabaseReference;
 import java.util.ArrayList;
 import java.util.List;
 
-public class CallsFragment extends Fragment implements HomeChatAdapter.ListItemClickListener {
+public class CallsFragment extends Fragment {
 
     private RecyclerView homeChatRv;
     private HomeChatAdapter homeChatAdapter;
@@ -64,23 +64,9 @@ public class CallsFragment extends Fragment implements HomeChatAdapter.ListItemC
 
         chatList = new ArrayList<>();
         homeChatRv = view.findViewById(R.id.my_messages_rv);
-        homeChatAdapter = new HomeChatAdapter(this,this.getContext());
         homeChatRv.setAdapter(homeChatAdapter);
         LinearLayoutManager layoutManager = new LinearLayoutManager(this.getContext());
         homeChatRv.setLayoutManager(layoutManager);
-        homeChatAdapter.setMessagesData(chatList);
         homeChatRv.setVisibility(View.INVISIBLE);
-    }
-
-    @Override
-    public void onClick(int index) {
-        chatList.get(index).setUnSeenCount(0);
-        homeChatAdapter.notifyDataSetChanged();
-
-        Bundle bundle = new Bundle();
-        bundle.putString(Consts.CHAT_ID,chatList.get(index).getChatId());
-        Intent intent = new Intent(this.getActivity(), ChatActivity.class);
-        intent.putExtras(bundle);
-        startActivity(intent);
     }
 }
