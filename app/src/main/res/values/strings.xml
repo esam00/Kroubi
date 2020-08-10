@@ -6,7 +6,6 @@
     <string name="ok">OK</string>
     <string name="cancel">Cancel</string>
     <string name="verify_code">Verify Code</string>
-    <string name="no_contacts">Non of your users is using NotWhatsApp</string>
     <string name="we_will_send_code">We will send a verification code to your phone number</string>
     <string name="egypt_code">+2</string>
     <string name="phone_number">Phone number</string>
@@ -16,5 +15,22 @@
     <string name="message_image">message image</string>
     <string name="seen_icon">seen icon</string>
     <string name="notification_image">notification_image</string>
+    <string name="no_contacts">Non of your contacts is using kroubi</string>
+    <string name="sign_out">Sign out</string>
+    <string name="msg_login_success">Login Successful</string>
+    <string name="verify_phone_number">Please enter your phone number!</string>
+    <string name="verify_sign_in_code">please enter verification Code</string>
+    <string name="verification_failed">Verification Failed</string>
+    <string name="chats">CHATS</string>
+    <string name="status">STATUS</string>
+    <string name="calls">CALLS</string>
+    <string name="msg_no_chat_yet">No chats here yet, send a message now to start conversation</string>
+    <string name="type_a_message">Type a message</string>
+    <string name="document">Document</string>
+    <string name="gallery">Gallery</string>
+    <string name="contact">Contact</string>
+    <string name="camera">Camera</string>
+    <string name="location">Location</string>
+    <string name="audio">Audio</string>
 
 </resources>

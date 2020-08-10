@@ -111,7 +111,7 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
             public void onVerificationFailed(@NonNull FirebaseException e) {
                 progressBar.setVisibility(View.INVISIBLE);
                 Log.i(TAG, "onVerificationFailed: "+e.toString());
-                Toast.makeText(LoginActivity.this, "Verification Failed", Toast.LENGTH_SHORT).show();
+                Toast.makeText(LoginActivity.this, R.string.verification_failed, Toast.LENGTH_SHORT).show();
             }
 
             @Override
@@ -147,7 +147,7 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
      */
     private void verifyPhoneNumberWithCode(String enteredCode) {
         if (enteredCode.isEmpty()) {
-            Toast.makeText(this, "please enter verification Code", Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, R.string.verify_sign_in_code, Toast.LENGTH_SHORT).show();
             return;
         }
         progressBar.setVisibility(View.VISIBLE);
@@ -188,7 +188,7 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
     }
 
     private void userLoggedIn() {
-        Toast.makeText(LoginActivity.this, "Login Successful", Toast.LENGTH_SHORT).show();
+        Toast.makeText(LoginActivity.this, R.string.msg_login_success, Toast.LENGTH_SHORT).show();
         startActivity(new Intent(this, HomeActivity.class));
         finish();
     }
@@ -196,7 +196,7 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
     private void startPhoneNumberVerification() {
         String phoneNumber = phoneNumberEditText.getText().toString();
         if (phoneNumber.isEmpty()) {
-            Toast.makeText(this, "Please enter your phone number!", Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, R.string.verify_phone_number, Toast.LENGTH_SHORT).show();
             return;
         }
 

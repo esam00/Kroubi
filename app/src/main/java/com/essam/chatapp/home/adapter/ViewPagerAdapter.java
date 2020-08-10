@@ -1,19 +1,24 @@
 package com.essam.chatapp.home.adapter;
 
+import android.content.Context;
+
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentStatePagerAdapter;
 
+import com.essam.chatapp.R;
 import com.essam.chatapp.calls.fragment.CallsFragment;
 import com.essam.chatapp.conversations.fragment.ChatsFragment;
 import com.essam.chatapp.status.fragment.StatusFragment;
 
 public class ViewPagerAdapter extends FragmentStatePagerAdapter {
 
-    public ViewPagerAdapter(@NonNull FragmentManager fm, int behavior) {
+    private Context mContext;
+    public ViewPagerAdapter(@NonNull FragmentManager fm, int behavior,Context context) {
         super(fm, behavior);
+        mContext = context;
     }
 
     @NonNull
@@ -36,11 +41,11 @@ public class ViewPagerAdapter extends FragmentStatePagerAdapter {
     public CharSequence getPageTitle(int position) {
         switch (position){
         case 0:
-            return "CHATS";
+            return mContext.getString(R.string.chats).toUpperCase();
         case 1 :
-            return "STATUS";
+            return mContext.getString(R.string.status).toUpperCase();
         case 2 :
-            return "CALLS";
+            return mContext.getString(R.string.calls).toUpperCase();
     }
         return super.getPageTitle(position);
     }

@@ -2,33 +2,33 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto">
 
-<!--    <item-->
-<!--        android:id="@+id/new_group"-->
-<!--        android:title="New group" />-->
+    <!--    <item-->
+    <!--        android:id="@+id/new_group"-->
+    <!--        android:title="New group" />-->
 
-<!--    <item-->
-<!--        android:id="@+id/new_broadcast"-->
-<!--        android:title="New broadcast" />-->
+    <!--    <item-->
+    <!--        android:id="@+id/new_broadcast"-->
+    <!--        android:title="New broadcast" />-->
 
-<!--    <item-->
-<!--        android:id="@+id/whatsapp_web"-->
-<!--        android:title="Whatsapp Web" />-->
+    <!--    <item-->
+    <!--        android:id="@+id/whatsapp_web"-->
+    <!--        android:title="Whatsapp Web" />-->
 
-<!--    <item-->
-<!--        android:id="@+id/starred_messages"-->
-<!--        android:title="Starred messages" />-->
-<!--    <item-->
-<!--        android:id="@+id/settings"-->
-<!--        android:title="Settings" />-->
+    <!--    <item-->
+    <!--        android:id="@+id/starred_messages"-->
+    <!--        android:title="Starred messages" />-->
+    <!--    <item-->
+    <!--        android:id="@+id/settings"-->
+    <!--        android:title="Settings" />-->
 
     <item
         android:id="@+id/sign_out"
-        android:title="Sign out" />
+        android:title="@string/sign_out" />
 
-    <item android:title="search"
+    <item
         android:id="@+id/search"
-        app:showAsAction="always"
         android:icon="@drawable/ic_search"
-        />
+        android:title="search"
+        app:showAsAction="always" />
 
 </menu>

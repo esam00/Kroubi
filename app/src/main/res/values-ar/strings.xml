@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">قروبي</string>
+    <string name="home_activity_title">قروبي</string>
+    <string name="login">تسجيل الدخول</string>
+    <string name="submit">تأكيد</string>
+    <string name="enter_verification_code">أدخل الرمز التأكيدي</string>
+    <string name="phone_number">رقم الهاتف</string>
+    <string name="we_will_send_code">سوف نقوم بإرسال رمز تأكيدي الى رقم الهاتف الخاص بك</string>
+    <string name="verify_code">تأكيد الرمز</string>
+    <string name="cancel">الغاء</string>
+    <string name="ok">حسنا</string>
+    <string name="please_wait">برجاء الانتظار..</string>
+    <string name="no_contacts">"لا يوجد مستخدمين في قائمة الاتصال الخاصة بك "</string>
+    <string name="sign_out">تسجيل الخروج</string>
+    <string name="msg_login_success">تم تسجيل الدخول بنجاح</string>
+    <string name="verify_phone_number">من فضلك أدخل رقم الهاتف!</string>
+    <string name="verify_sign_in_code">من فضلك أدخل الرمز التأكيدي</string>
+    <string name="verification_failed">رقم الهاتف غير صحيح</string>
+    <string name="chats">الدردشات</string>
+    <string name="status">الحالة</string>
+    <string name="calls">المكالمات</string>
+    <string name="msg_no_chat_yet">لا يوجد محادثات سابقة ، قم بارسال رسالة الآن لبدئ المحادثة</string>
+    <string name="type_a_message">اكتب رسالة</string>
+    <string name="document">مستند</string>
+    <string name="gallery">المعرض</string>
+    <string name="contact">جهة اتصال</string>
+    <string name="camera">كاميرا</string>
+    <string name="location">الموقع</string>
+    <string name="audio">مقطع صوتي</string>
+</resources>

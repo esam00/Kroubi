@@ -68,7 +68,7 @@ public class HomeActivity extends AppCompatActivity {
         // viewPager and tabLayout
         homeViewPager = findViewById(R.id.view_pager);
         TabLayout homeTabLayout = findViewById(R.id.tabLayout);
-        viewPagerAdapter = new ViewPagerAdapter(fragmentManager, 1);
+        viewPagerAdapter = new ViewPagerAdapter(fragmentManager, 1,this);
         homeViewPager.setAdapter(viewPagerAdapter);
         homeTabLayout.setupWithViewPager(homeViewPager);
         homeViewPager.addOnPageChangeListener(mPageChangeListener);
