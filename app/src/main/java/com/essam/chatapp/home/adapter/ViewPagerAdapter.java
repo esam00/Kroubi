@@ -1,32 +1,34 @@
 package com.essam.chatapp.home.adapter;
 
-import android.content.Context;
-
 import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
-import androidx.fragment.app.FragmentManager;
-import androidx.fragment.app.FragmentStatePagerAdapter;
+import androidx.fragment.app.FragmentActivity;
+import androidx.viewpager2.adapter.FragmentStateAdapter;
 
-import com.essam.chatapp.R;
 import com.essam.chatapp.calls.fragment.CallsFragment;
+import com.essam.chatapp.conversations.FragmentObserver;
 import com.essam.chatapp.conversations.fragment.ChatsFragment;
 import com.essam.chatapp.status.fragment.StatusFragment;
 
-public class ViewPagerAdapter extends FragmentStatePagerAdapter {
+import java.util.Observable;
+import java.util.Observer;
 
-    private Context mContext;
-    public ViewPagerAdapter(@NonNull FragmentManager fm, int behavior,Context context) {
-        super(fm, behavior);
-        mContext = context;
+public class ViewPagerAdapter extends FragmentStateAdapter {
+    private Observable mObservers = new FragmentObserver();
+
+    public ViewPagerAdapter(@NonNull FragmentActivity fragmentActivity) {
+        super(fragmentActivity);
     }
 
     @NonNull
     @Override
-    public Fragment getItem(int position) {
-        switch (position){
+    public Fragment createFragment(int position) {
+        switch (position) {
             case 0:
-                return new ChatsFragment();
+                mObservers.deleteObservers(); // Clear existing observers.
+                Fragment chatFragment = new ChatsFragment();
+                mObservers.addObserver((Observer) chatFragment);
+                return chatFragment;
             case 1:
                 return new StatusFragment();
             case 2:
@@ -36,28 +38,12 @@ public class ViewPagerAdapter extends FragmentStatePagerAdapter {
         return new CallsFragment();
     }
 
-    @Nullable
     @Override
-    public CharSequence getPageTitle(int position) {
-        switch (position){
-        case 0:
-            return mContext.getString(R.string.chats).toUpperCase();
-        case 1 :
-            return mContext.getString(R.string.status).toUpperCase();
-        case 2 :
-            return mContext.getString(R.string.calls).toUpperCase();
-    }
-        return super.getPageTitle(position);
-    }
-
-    @Override
-    public int getCount() {
+    public int getItemCount() {
         return 3;
     }
 
-    @Override
-    public int getItemPosition(@NonNull Object object) {
-        //used to reload chats fragment i don't know why but will search more about it
-        return POSITION_NONE;
+    public void updateFragments() {
+        mObservers.notifyObservers();
     }
 }

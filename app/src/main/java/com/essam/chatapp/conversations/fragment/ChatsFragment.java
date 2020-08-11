@@ -41,8 +41,10 @@ import com.google.firebase.database.ValueEventListener;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Observable;
+import java.util.Observer;
 
-public class ChatsFragment extends Fragment implements HomeChatAdapter.ListItemClickListener {
+public class ChatsFragment extends Fragment implements HomeChatAdapter.ListItemClickListener, Observer {
 
     private RecyclerView homeChatRv;
     private HomeChatAdapter homeChatAdapter;
@@ -50,7 +52,7 @@ public class ChatsFragment extends Fragment implements HomeChatAdapter.ListItemC
     private List<Chat> chatList = new ArrayList<>();
 
     //firebase
-    private  DatabaseReference userChatDb;
+    private DatabaseReference userChatDb;
     private ChildEventListener onChatAddedEventListener;
     private ValueEventListener checkExistValueEventListener;
 
@@ -94,19 +96,20 @@ public class ChatsFragment extends Fragment implements HomeChatAdapter.ListItemC
         // recyclerView
         chatList = new ArrayList<>();
         homeChatRv = view.findViewById(R.id.my_messages_rv);
-        homeChatAdapter = new HomeChatAdapter(this,this, this.getContext());
+        homeChatAdapter = new HomeChatAdapter(this, this, this.getContext());
         homeChatRv.setAdapter(homeChatAdapter);
         LinearLayoutManager layoutManager = new LinearLayoutManager(this.getContext());
         homeChatRv.setLayoutManager(layoutManager);
     }
 
-    private void initFirebase(){
+    private void initFirebase() {
         FirebaseAuth mAuth = FirebaseAuth.getInstance();
         FirebaseDatabase mDatabase = FirebaseDatabase.getInstance();
         DatabaseReference mReference = mDatabase.getReference();
 
         String userUid = mAuth.getUid();
-        if(userUid!=null) userChatDb = mReference.child(Consts.USER).child(userUid).child(Consts.CHAT);
+        if (userUid != null)
+            userChatDb = mReference.child(Consts.USER).child(userUid).child(Consts.CHAT);
     }
 
     private void initEventListener() {
@@ -185,8 +188,8 @@ public class ChatsFragment extends Fragment implements HomeChatAdapter.ListItemC
      * This is the main method that is responsible for fetching previous chats AND listen for new messages
      */
     private void getUserChatList() {
-        if(!ProjectUtils.isNetworkConnected(mContext)){
-            ProjectUtils.showToast(getActivity(),"Check your network connection!");
+        if (!ProjectUtils.isNetworkConnected(mContext)) {
+            ProjectUtils.showToast(getActivity(), "Check your network connection!");
             return;
         }
         showLoadingDialog();
@@ -215,7 +218,7 @@ public class ChatsFragment extends Fragment implements HomeChatAdapter.ListItemC
     private void hideLoading() {
         Log.i(TAG, "hideLoading: ");
         loadingDialog.dismiss();
-        if (showNotification)showNotificationDialog();
+        if (showNotification) showNotificationDialog();
     }
 
     private void showNotificationDialog() {
@@ -228,13 +231,14 @@ public class ChatsFragment extends Fragment implements HomeChatAdapter.ListItemC
 
         dialog.show();
         Window window = dialog.getWindow();
-        if(window != null){
+        if (window != null) {
             window.setLayout(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
             dialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
         }
     }
 
     private Dialog loadingDialog;
+
     private void showLoadingDialog() {
         loadingDialog = new Dialog(mContext);
         loadingDialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
@@ -246,7 +250,7 @@ public class ChatsFragment extends Fragment implements HomeChatAdapter.ListItemC
 
         loadingDialog.show();
         Window window = loadingDialog.getWindow();
-        if (window!=null){
+        if (window != null) {
             loadingDialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
             window.setLayout(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);
         }
@@ -261,15 +265,15 @@ public class ChatsFragment extends Fragment implements HomeChatAdapter.ListItemC
     @Override
     public void onClick(Chat chat, int adapterPosition) {
         // clear un seen count for this conversation
-        homeChatAdapter.clearUnSeenCount(chat,adapterPosition);
+        homeChatAdapter.clearUnSeenCount(chat, adapterPosition);
 
         //Chat Activity only accepts User object as extras..
         User user = new User(chat.getUserUid(),
                 chat.getUserPhone(),
                 chat.getUserPhone(),
-                "","online");
+                "", "online");
         Intent intent = new Intent(this.getActivity(), ChatActivity.class);
-        intent.putExtra(Consts.USER,user);
+        intent.putExtra(Consts.USER, user);
         startActivity(intent);
     }
 
@@ -284,5 +288,10 @@ public class ChatsFragment extends Fragment implements HomeChatAdapter.ListItemC
     public void onResume() {
         initEventListener();
         super.onResume();
+    }
+
+    @Override
+    public void update(Observable o, Object arg) {
+        getUserChatList();
     }
 }

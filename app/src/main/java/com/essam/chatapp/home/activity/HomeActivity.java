@@ -12,8 +12,7 @@ import android.view.View;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
-import androidx.fragment.app.FragmentManager;
-import androidx.viewpager.widget.ViewPager;
+import androidx.viewpager2.widget.ViewPager2;
 
 import com.essam.chatapp.R;
 import com.essam.chatapp.contacts.activity.ContactsActivity;
@@ -23,14 +22,14 @@ import com.essam.chatapp.utils.Consts;
 import com.essam.chatapp.utils.ProjectUtils;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.android.material.tabs.TabLayout;
+import com.google.android.material.tabs.TabLayoutMediator;
 import com.google.firebase.auth.FirebaseAuth;
 
 public class HomeActivity extends AppCompatActivity {
 
-    private ViewPager homeViewPager;
+    private ViewPager2 mViewPager2;
     private FloatingActionButton fab;
     private ViewPagerAdapter viewPagerAdapter;
-    private ViewPager.OnPageChangeListener mPageChangeListener;
 
     private final static String TAG = HomeActivity.class.getSimpleName();
 
@@ -39,22 +38,6 @@ public class HomeActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_home);
 
-        mPageChangeListener = new ViewPager.OnPageChangeListener() {
-            @Override
-            public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
-                changeFabIcon(position);
-            }
-
-            @Override
-            public void onPageSelected(int position) {
-
-            }
-
-            @Override
-            public void onPageScrollStateChanged(int state) {
-
-            }
-        };
         initViews();
     }
 
@@ -63,18 +46,42 @@ public class HomeActivity extends AppCompatActivity {
         Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
         toolbar.inflateMenu(R.menu.menu);
-        FragmentManager fragmentManager = getSupportFragmentManager();
 
         // viewPager and tabLayout
-        homeViewPager = findViewById(R.id.view_pager);
-        TabLayout homeTabLayout = findViewById(R.id.tabLayout);
-        viewPagerAdapter = new ViewPagerAdapter(fragmentManager, 1,this);
-        homeViewPager.setAdapter(viewPagerAdapter);
-        homeTabLayout.setupWithViewPager(homeViewPager);
-        homeViewPager.addOnPageChangeListener(mPageChangeListener);
-        //By default, ViewPager recreates the fragments when you swipe the page. To prevent this
-        // we specify limit number for pages
-        homeViewPager.setOffscreenPageLimit(3);
+        mViewPager2 = findViewById(R.id.view_pager);
+        TabLayout tabLayout = findViewById(R.id.tabLayout);
+
+        ViewPager2.OnPageChangeCallback pageChangeListener = new ViewPager2.OnPageChangeCallback() {
+            @Override
+            public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
+                super.onPageScrolled(position, positionOffset, positionOffsetPixels);
+                changeFabIcon(position);
+            }
+        };
+
+        viewPagerAdapter = new ViewPagerAdapter(this);
+        mViewPager2.setAdapter(viewPagerAdapter);
+        mViewPager2.setOffscreenPageLimit(ViewPager2.OFFSCREEN_PAGE_LIMIT_DEFAULT);
+
+        // set tabs text using TabLayoutMediator
+        new TabLayoutMediator(tabLayout, mViewPager2, new TabLayoutMediator.TabConfigurationStrategy() {
+            @Override
+            public void onConfigureTab(@NonNull TabLayout.Tab tab, int position) {
+                switch (position) {
+                    case 0:
+                        tab.setText(getString(R.string.chats).toUpperCase());
+                        break;
+                    case 1:
+                        tab.setText(getString(R.string.status).toUpperCase());
+                        break;
+                    case 2:
+                        tab.setText(getString(R.string.calls).toUpperCase());
+                        break;
+                }
+            }
+        }).attach();
+
+        mViewPager2.registerOnPageChangeCallback(pageChangeListener);
 
         // fab button
         fab = findViewById(R.id.fab);
@@ -87,7 +94,7 @@ public class HomeActivity extends AppCompatActivity {
     }
 
     private void onFabClicked() {
-        switch (homeViewPager.getCurrentItem()) {
+        switch (mViewPager2.getCurrentItem()) {
             case 0:
                 openContactsActivity();
                 break;
@@ -128,11 +135,11 @@ public class HomeActivity extends AppCompatActivity {
     private void refreshChatsFragment() {
         if (!(viewPagerAdapter == null)) {
             Log.i(TAG, "refreshChatsFragment..");
-            viewPagerAdapter.notifyDataSetChanged();
+            viewPagerAdapter.updateFragments();
         }
     }
 
-    private void signOut(){
+    private void signOut() {
         final FirebaseAuth mAuth = FirebaseAuth.getInstance();
         mAuth.signOut();
         Intent intent = new Intent(this, LoginActivity.class);
@@ -152,8 +159,8 @@ public class HomeActivity extends AppCompatActivity {
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case R.id.sign_out:
-             signOut();
-             break;
+                signOut();
+                break;
             case R.id.action_type:
                 break;
         }
@@ -162,13 +169,13 @@ public class HomeActivity extends AppCompatActivity {
 
     @Override
     public void onBackPressed() {
-        if (homeViewPager.getCurrentItem() == 0) {
+        if (mViewPager2.getCurrentItem() == 0) {
             // If the user is currently looking at the first step, allow the system to handle the
             // Back button. This calls finish() on this activity and pops the back stack.
             super.onBackPressed();
         } else {
             // Otherwise, select the previous step.
-            homeViewPager.setCurrentItem(0);
+            mViewPager2.setCurrentItem(0);
         }
     }
 
@@ -176,27 +183,27 @@ public class HomeActivity extends AppCompatActivity {
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
 
-        switch (requestCode){
+        switch (requestCode) {
             // just want to refresh home chats and need permission to fetch contacts data {name} to be displayed
             case Consts.READ_CONTACTS_REQUEST:
                 if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                        Log.i("TAG", "onRequestPermissionsResult: Granted");
-                        // refresh chats fragment
-                        refreshChatsFragment();
+                    Log.i("TAG", "onRequestPermissionsResult: Granted");
+                    // refresh chats fragment
+                    refreshChatsFragment();
                 } else {
                     Log.i("TAG", "onRequestPermissionsResult: denied");
                 }
 
                 break;
-                // permission to access user's contacts data to be displayed in contacts activity
-                case Consts.DISPLAY_CONTACTS_ACTIVITY:
-                    if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                            Log.i("TAG", "onRequestPermissionsResult: Granted");
-                            // refresh chats fragment
-                            startActivity(new Intent(HomeActivity.this, ContactsActivity.class));
-                    } else {
-                        Log.i("TAG", "onRequestPermissionsResult: denied");
-                    }
+            // permission to access user's contacts data to be displayed in contacts activity
+            case Consts.DISPLAY_CONTACTS_ACTIVITY:
+                if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                    Log.i("TAG", "onRequestPermissionsResult: Granted");
+                    // refresh chats fragment
+                    startActivity(new Intent(HomeActivity.this, ContactsActivity.class));
+                } else {
+                    Log.i("TAG", "onRequestPermissionsResult: denied");
+                }
         }
 
     }
