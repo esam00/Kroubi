@@ -21,6 +21,7 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
+import androidx.core.content.res.ResourcesCompat;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.Glide;
@@ -34,7 +35,7 @@ import com.google.firebase.database.DatabaseReference;
 
 import java.util.List;
 
-public class ChatAdapter extends RecyclerView.Adapter {
+public class ChatAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
 
     private List<Message> mMessages;
     private Context mContext;
@@ -189,13 +190,13 @@ public class ChatAdapter extends RecyclerView.Adapter {
             if (prevMessage != null && !isPreviousMessageReceivingType) {
                 params.setMargins(3, 5, 3, 8);
                 llMessageBody.setLayoutParams(params);
-                llMessageBody.setBackground(mContext.getResources().getDrawable(R.drawable.outgoing_second));
+                llMessageBody.setBackground(ResourcesCompat.getDrawable(mContext.getResources(),R.drawable.outgoing_second, null));
 
             } else {
                 // If some other user sent the message
                 params.setMargins(3, 25, 3, 8);
                 llMessageBody.setLayoutParams(params);
-                llMessageBody.setBackground(mContext.getResources().getDrawable(R.drawable.outgoing_first));
+                llMessageBody.setBackground(ResourcesCompat.getDrawable(mContext.getResources(),R.drawable.outgoing_first, null));
             }
         }
     }
@@ -253,13 +254,13 @@ public class ChatAdapter extends RecyclerView.Adapter {
             if (prevMessage != null && isPreviousMessageReceivingType) {
                 params.setMargins(3, 5, 3, 8);
                 llMessageBody.setLayoutParams(params);
-                llMessageBody.setBackground(mContext.getResources().getDrawable(R.drawable.receiving_second));
+                llMessageBody.setBackground(ResourcesCompat.getDrawable(mContext.getResources(),R.drawable.receiving_second, null));
 
             } else {
                 // If some other user sent the message
                 params.setMargins(3, 25, 3, 8);
                 llMessageBody.setLayoutParams(params);
-                llMessageBody.setBackground(mContext.getResources().getDrawable(R.drawable.receiving_first));
+                llMessageBody.setBackground(ResourcesCompat.getDrawable(mContext.getResources(),R.drawable.receiving_first, null));
             }
         }
 
