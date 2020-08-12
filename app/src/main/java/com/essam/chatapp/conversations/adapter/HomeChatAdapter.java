@@ -17,6 +17,7 @@ import com.essam.chatapp.conversations.fragment.ChatsFragment;
 import com.essam.chatapp.conversations.model.Chat;
 import com.essam.chatapp.utils.DateTimeUtils;
 
+import java.text.NumberFormat;
 import java.util.List;
 
 /*
@@ -101,13 +102,13 @@ public class HomeChatAdapter extends RecyclerView.Adapter<HomeChatAdapter.ViewHo
             // update ui [name, message text, date
             senderNameTV.setText(chat.getUserPhone());
             lastMessageTv.setText(chat.getMessage());
-            dateTv.setText(DateTimeUtils.getDisplayableDateOfGivenTimeStamp(chat.getTimeStamp(), false));
+            dateTv.setText(DateTimeUtils.getDisplayableDateOfGivenTimeStamp(context,chat.getTimeStamp(), false));
 
             //colors
             if (chat.getUnSeenCount() > 0) {
                 counterTv.setVisibility(View.VISIBLE);
                 dateTv.setTextColor(context.getResources().getColor(R.color.colorAccent));
-                counterTv.setText(String.valueOf(chat.getUnSeenCount()));
+                counterTv.setText((NumberFormat.getInstance().format(chat.getUnSeenCount())));
             } else {
                 counterTv.setVisibility(View.INVISIBLE);
                 dateTv.setTextColor(context.getResources().getColor(R.color.dark_gray));

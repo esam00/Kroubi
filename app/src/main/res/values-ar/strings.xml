@@ -28,4 +28,6 @@
     <string name="camera">كاميرا</string>
     <string name="location">الموقع</string>
     <string name="audio">مقطع صوتي</string>
+    <string name="select_contact">تحديد جهة اتصال</string>
+    <string name="yesterday">أمس</string>
 </resources>

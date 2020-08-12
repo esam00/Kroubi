@@ -40,7 +40,7 @@
         </activity>
         <activity
             android:name=".contacts.activity.ContactsActivity"
-            android:label="Contacts"
+            android:label="@string/select_contact"
             android:parentActivityName=".home.activity.HomeActivity">
         </activity>
         <activity

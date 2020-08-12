@@ -121,7 +121,7 @@ public class ChatAdapter extends RecyclerView.Adapter {
             setItemLayoutBackground(position);
 
             //bind message sent time
-            sentAtTextView.setText(DateTimeUtils.getDisplayableDateOfGivenTimeStamp(message.getTimeStamp(),true));
+            sentAtTextView.setText(DateTimeUtils.getDisplayableDateOfGivenTimeStamp(mContext,message.getTimeStamp(),true));
 
             //bind message text
             bindMessageText(message);
@@ -224,7 +224,7 @@ public class ChatAdapter extends RecyclerView.Adapter {
             setItemLayoutBackground(position);
 
             //bind message time
-            sentAtTextView.setText(DateTimeUtils.getDisplayableDateOfGivenTimeStamp(message.getTimeStamp(),true));
+            sentAtTextView.setText(DateTimeUtils.getDisplayableDateOfGivenTimeStamp(mContext,message.getTimeStamp(),true));
 
             //update message seen = true
             updateSeenLogic(message);

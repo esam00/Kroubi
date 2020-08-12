@@ -1,5 +1,9 @@
 package com.essam.chatapp.utils;
 
+import android.content.Context;
+
+import com.essam.chatapp.R;
+
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
@@ -11,7 +15,7 @@ import java.util.Locale;
 
 public class DateTimeUtils {
 
-    public static String getDisplayableDateOfGivenTimeStamp(long timeStamp, boolean timeOnly ){
+    public static String getDisplayableDateOfGivenTimeStamp(Context context, long timeStamp, boolean timeOnly ){
         boolean thisDay,yesterday;
         Date date = new Date(timeStamp);
 
@@ -32,7 +36,7 @@ public class DateTimeUtils {
             return timeString;
         }
         if (yesterday){
-            return "yesterday";
+            return context.getString(R.string.yesterday);
         }
 
         // if more than yesterday

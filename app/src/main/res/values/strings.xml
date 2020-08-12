@@ -32,5 +32,7 @@
     <string name="camera">Camera</string>
     <string name="location">Location</string>
     <string name="audio">Audio</string>
+    <string name="select_contact">Select contact</string>
+    <string name="yesterday">yesterday</string>
 
 </resources>
