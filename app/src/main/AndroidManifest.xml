@@ -54,8 +54,7 @@
         </activity>
         <activity
             android:name=".chat.activity.ChatActivity"
-            android:parentActivityName=".home.activity.HomeActivity"
-            android:theme="@style/ChatTheme">
+            android:parentActivityName=".home.activity.HomeActivity">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value=".home.activity.HomeActivity" />
