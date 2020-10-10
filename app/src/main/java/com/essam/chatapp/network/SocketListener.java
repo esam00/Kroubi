@@ -5,8 +5,8 @@ import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 
-import com.essam.chatapp.chat.model.Message;
-import com.essam.chatapp.chat.activity.ChatActivity;
+import com.essam.chatapp.ui.chat.model.Message;
+import com.essam.chatapp.ui.chat.activity.ChatActivity;
 import com.google.gson.Gson;
 
 import okhttp3.Response;

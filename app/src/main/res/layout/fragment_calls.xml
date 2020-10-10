@@ -5,7 +5,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     app:layout_behavior="@string/appbar_scrolling_view_behavior"
-    tools:context=".status.fragment.StatusFragment">
+    tools:context=".ui.status.fragment.StatusFragment">
 
     <androidx.recyclerview.widget.RecyclerView
         android:layout_width="match_parent"

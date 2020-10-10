@@ -30,4 +30,7 @@
     <string name="audio">مقطع صوتي</string>
     <string name="select_contact">تحديد جهة اتصال</string>
     <string name="yesterday">أمس</string>
+    <string name="settings">الاعدادات</string>
+    <string name="profile">Profile</string>
+    <string name="profile_transition">share_profile_transition</string>
 </resources>

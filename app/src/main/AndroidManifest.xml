@@ -23,41 +23,58 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-        <activity android:name=".SplashActivity"
+        <activity
+            android:name=".ui.settings.SettingsActivity"
+            android:label="@string/settings"
+            android:parentActivityName=".ui.home.activity.HomeActivity">
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value=".ui.home.activity.HomeActivity" />
+        </activity>
+        <activity
+            android:name=".ui.profile.UserProfileActivity"
+            android:theme="@style/AppTheme.NoActionBar" />
+        <activity
+            android:name=".ui.profile.MyProfileActivity"
+            android:label="@string/profile"
+            android:parentActivityName=".ui.settings.SettingsActivity">
+
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value=".ui.settings.SettingsActivity"/>
+        </activity>
+        <activity
+            android:name=".SplashActivity"
             android:theme="@style/SplashTheme">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <action android:name="android.intent.action.VIEW" />
-
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
         <activity
-            android:name=".photoEditor.PhotoEditorActivity"
+            android:name=".ui.photoEditor.PhotoEditorActivity"
             android:label="@string/title_activity_image_presenter"
             android:theme="@style/ImagePresenterTheme"
-            android:windowSoftInputMode="stateHidden|adjustResize">
-        </activity>
+            android:windowSoftInputMode="stateHidden|adjustResize" />
         <activity
-            android:name=".contacts.activity.ContactsActivity"
+            android:name=".ui.contacts.activity.ContactsActivity"
             android:label="@string/select_contact"
-            android:parentActivityName=".home.activity.HomeActivity">
-        </activity>
+            android:parentActivityName=".ui.home.activity.HomeActivity" />
         <activity
-            android:name=".login.LoginActivity"
-            android:theme="@style/LoginTheme">
-        </activity>
+            android:name=".ui.login.LoginActivity"
+            android:theme="@style/LoginTheme" />
         <activity
-            android:name=".home.activity.HomeActivity"
+            android:name=".ui.home.activity.HomeActivity"
             android:label="@string/home_activity_title"
-            android:theme="@style/AppTheme.NoActionBar">
-        </activity>
+            android:theme="@style/AppTheme.NoActionBar" />
         <activity
-            android:name=".chat.activity.ChatActivity"
-            android:parentActivityName=".home.activity.HomeActivity">
+            android:name=".ui.chat.activity.ChatActivity"
+            android:parentActivityName=".ui.home.activity.HomeActivity"
+            android:theme="@style/AppTheme.NoActionBar">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
-                android:value=".home.activity.HomeActivity" />
+                android:value=".ui.home.activity.HomeActivity" />
         </activity>
 
         <provider

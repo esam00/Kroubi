@@ -6,8 +6,8 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
 
-import com.essam.chatapp.home.activity.HomeActivity;
-import com.essam.chatapp.login.LoginActivity;
+import com.essam.chatapp.ui.home.activity.HomeActivity;
+import com.essam.chatapp.ui.login.LoginActivity;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 
