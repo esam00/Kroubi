@@ -6,12 +6,12 @@ import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 
-enum UserAuthState{
-    LOGGED_IN,
-    LOGGED_OUT,
-}
 
 public class FirebaseManager {
+    public enum UserAuthState{
+        LOGGED_IN,
+        LOGGED_OUT,
+    }
     private static FirebaseManager instance;
 
     private FirebaseAuth mFirebaseAuth;

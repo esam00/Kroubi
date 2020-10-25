@@ -14,7 +14,6 @@ import android.widget.ProgressBar;
 import android.widget.Toast;
 
 import com.essam.chatapp.R;
-import com.essam.chatapp.firebase.LoginHelper;
 import com.essam.chatapp.ui.home.activity.HomeActivity;
 import com.essam.chatapp.utils.Consts;
 import com.essam.chatapp.utils.SharedPrefrence;
@@ -33,7 +32,7 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
     private String mVerificationCode;
     private SharedPrefrence preference;
 
-    private LoginHelper mLoginHelper = new LoginHelper(this);
+    private LoginPresenter mLoginPresenter = new LoginPresenter(this);
 
     private static final String TAG = LoginActivity.class.getSimpleName();
 
@@ -79,7 +78,8 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
         }
 
         mPhoneProgressBar.setVisibility(View.VISIBLE);
-        mLoginHelper.getVerificationCode(phoneNumber,this);
+        mLoginPresenter.getVerificationCode(phoneNumber);
+        // TODO: 10/25/2020 Create a countDown timer for resending verification code
     }
 
     /**
@@ -96,7 +96,7 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
 
         mCodeProgress.setVisibility(View.VISIBLE);
         PhoneAuthCredential credential = PhoneAuthProvider.getCredential(mVerificationCode, enteredCode);
-        mLoginHelper.signInWithPhoneCredential(credential,this);
+        mLoginPresenter.signInWithPhoneCredential(credential);
     }
 
     private void swapLayout(){
@@ -145,5 +145,11 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
         startActivity(new Intent(this, HomeActivity.class));
         Log.i(TAG, "onLoginSuccess: " + R.string.msg_login_success);
         finish();
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        mLoginPresenter.detachView();
     }
 }
