@@ -37,5 +37,8 @@
     <string name="settings">Settings</string>
     <string name="profile">Profile</string>
     <string name="profile_transition">share_profile_transition</string>
+    <string name="send_verification_code">Send Verification Code</string>
+    <string name="invalid_phone_number">Invalid phone number!</string>
+    <string name="invalid_verification_code">Invalid verification code!</string>
 
 </resources>

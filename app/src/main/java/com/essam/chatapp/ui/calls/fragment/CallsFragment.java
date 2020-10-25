@@ -14,8 +14,7 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.airbnb.lottie.LottieAnimationView;
 import com.essam.chatapp.R;
 import com.essam.chatapp.ui.conversations.adapter.HomeChatAdapter;
-import com.essam.chatapp.utils.firebase.FirebaseHelper;
-import com.essam.chatapp.ui.conversations.model.Chat;
+import com.essam.chatapp.models.Chat;
 
 import com.google.firebase.database.DatabaseReference;
 
@@ -47,8 +46,6 @@ public class CallsFragment extends Fragment {
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
         View view = inflater.inflate(R.layout.fragment_calls, container, false);
-
-        appUserDb = FirebaseHelper.getAppUserDbReference();
 
         initViews(view);
         return view;

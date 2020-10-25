@@ -1,4 +1,4 @@
-package com.essam.chatapp.ui.contacts.model;
+package com.essam.chatapp.models;
 
 import android.os.Parcel;
 import android.os.Parcelable;

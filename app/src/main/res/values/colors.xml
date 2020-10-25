@@ -1,19 +1,19 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <color name="colorPrimary">#2ABC6B</color>
-    <color name="colorPrimaryDark">#14A352</color>
-    <color name="colorAccent">#4BE891</color>
+    <color name="colorPrimary">#075E54</color>
+    <color name="colorPrimaryDark">#043C34</color>
+    <color name="colorAccent">#25D366</color>
+
+    <color name="colorMain">#075E54</color>
+    <color name="colorMainLight">#128C7E</color>
 
     <color name="colorPrimaryWithOpacity">#303DDC84</color>
     <color name="colorPrimaryTransparent">#103DDC84</color>
-
-    <color name="colorMain">#1D255E</color>
-    <color name="colorMainLight">#3F51B5</color>
-
     <color name="colorMainWithOpacity">#991D255E</color>
 
     <color name="chat_background">#ECE5DD</color>
     <color name="outgoing_chat_bubble">#DCF8C6</color>
+
 
     <color name="disabledColor">#A9EBFFE3</color>
     <color name="white">#fff</color>
@@ -21,7 +21,9 @@
 
     <color name="dark_gray">#5E5757</color>
 
-    <color name="outgoing_background_color">#504BE891</color>
+    <color name="outgoing_background_color">#DDFFC2</color>
+    <color name="error_red_color">#AE0109</color>
+    <color name="error_red_color_with_opacity">#20AE0109</color>
 
 
 </resources>

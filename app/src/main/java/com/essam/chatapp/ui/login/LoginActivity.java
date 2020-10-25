@@ -1,7 +1,8 @@
 package com.essam.chatapp.ui.login;
 
-import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.constraintlayout.widget.ConstraintLayout;
+import androidx.core.content.ContextCompat;
 
 import android.content.Intent;
 import android.os.Bundle;
@@ -10,50 +11,29 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ProgressBar;
-import android.widget.RelativeLayout;
 import android.widget.Toast;
 
 import com.essam.chatapp.R;
-import com.essam.chatapp.ui.contacts.model.User;
+import com.essam.chatapp.firebase.LoginHelper;
 import com.essam.chatapp.ui.home.activity.HomeActivity;
 import com.essam.chatapp.utils.Consts;
 import com.essam.chatapp.utils.SharedPrefrence;
-import com.google.android.gms.tasks.OnCompleteListener;
-import com.google.android.gms.tasks.Task;
-import com.google.firebase.FirebaseApp;
-import com.google.firebase.FirebaseException;
-import com.google.firebase.auth.AuthResult;
-import com.google.firebase.auth.FirebaseAuth;
-import com.google.firebase.auth.FirebaseUser;
+
 import com.google.firebase.auth.PhoneAuthCredential;
 import com.google.firebase.auth.PhoneAuthProvider;
-import com.google.firebase.database.DataSnapshot;
-import com.google.firebase.database.DatabaseError;
-import com.google.firebase.database.DatabaseReference;
-import com.google.firebase.database.FirebaseDatabase;
-import com.google.firebase.database.ValueEventListener;
 
-import java.util.concurrent.TimeUnit;
-
-public class LoginActivity extends AppCompatActivity implements View.OnClickListener {
+public class LoginActivity extends AppCompatActivity implements View.OnClickListener, LoginCallbacks {
 
     //view
-    private EditText phoneNumberEditText, verificationCodeEditText;
-    private Button verifyButton;
-    private ProgressBar progressBar;
-    private RelativeLayout phoneRelativeLayout;
-
-    //firebase
-    private FirebaseAuth mAuth;
-    private FirebaseUser mUser;
-    private DatabaseReference mUserDb;
-    private DatabaseReference appUserDb;
-    private ValueEventListener userEventListener;
-    private PhoneAuthProvider.OnVerificationStateChangedCallbacks mCallBack;
+    private EditText mPhoneNumberEditText, mVerificationCodeEditText;
+    private ProgressBar mPhoneProgressBar, mCodeProgress;
+    private ConstraintLayout mPhoneEntryLayout, mCodeEntryLayout;
 
     //vars
-    private String mVerificationId;
+    private String mVerificationCode;
     private SharedPrefrence preference;
+
+    private LoginHelper mLoginHelper = new LoginHelper(this);
 
     private static final String TAG = LoginActivity.class.getSimpleName();
 
@@ -67,160 +47,103 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
         int uiOptions = View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN;
         decorView.setSystemUiVisibility(uiOptions);
 
-        initFirebase();
         initViews();
-        initCallBacks();
-    }
-
-    private void initFirebase(){
-        //initialize firebase
-        FirebaseApp.initializeApp(this);
-        mAuth = FirebaseAuth.getInstance();
-        appUserDb = FirebaseDatabase.getInstance().getReference().child(Consts.USER);
-
     }
 
     private void initViews() {
         //initialize views
-        phoneNumberEditText = findViewById(R.id.et_phone_number);
-        verificationCodeEditText = findViewById(R.id.et_verification_code);
-        progressBar = findViewById(R.id.progress);
-        Button loginButton = findViewById(R.id.btn_login);
-        verifyButton = findViewById(R.id.btn_verify);
-        phoneRelativeLayout = findViewById(R.id.rl_phone_entry);
+        mPhoneNumberEditText = findViewById(R.id.et_phone_number);
+        mVerificationCodeEditText = findViewById(R.id.et_verification_code);
+        mPhoneProgressBar = findViewById(R.id.send_code_progress);
+        mCodeProgress = findViewById(R.id.submit_code_progress);
+        Button sendCodeButton = findViewById(R.id.btn_send_code);
+        Button verifyButton = findViewById(R.id.btn_submit_code);
+        mPhoneEntryLayout = findViewById(R.id.layout_phone_entry);
+        mCodeEntryLayout = findViewById(R.id.layout_verify_code_entry);
         preference = SharedPrefrence.getInstance(this);
 
         //set click listeners
-        loginButton.setOnClickListener(this);
         verifyButton.setOnClickListener(this);
-    }
-
-    private void initCallBacks() {
-        // callback for phone authentication
-        // this call back basically overrides three methods
-        // 1- onVerificationCompleted : this means verification automatically done and no need to enter verify code
-        // 2- onCodeSent : returns a string verification code to users phone number so we have to compare this code with the code that entered by user
-        mCallBack = new PhoneAuthProvider.OnVerificationStateChangedCallbacks() {
-            @Override
-            public void onVerificationCompleted(@NonNull PhoneAuthCredential phoneAuthCredential) {
-                //check automatically for credentials
-                signInWithPhoneCredential(phoneAuthCredential);
-            }
-
-            @Override
-            public void onVerificationFailed(@NonNull FirebaseException e) {
-                progressBar.setVisibility(View.INVISIBLE);
-                Log.i(TAG, "onVerificationFailed: "+e.toString());
-                Toast.makeText(LoginActivity.this, R.string.verification_failed, Toast.LENGTH_SHORT).show();
-            }
-
-            @Override
-            public void onCodeSent(@NonNull String code, @NonNull PhoneAuthProvider.ForceResendingToken forceResendingToken) {
-                super.onCodeSent(code, forceResendingToken);
-                // check for credentials manually
-                phoneNumberEditText.setVisibility(View.GONE);
-                verificationCodeEditText.setVisibility(View.VISIBLE);
-                mVerificationId = code;
-                verifyButton.setText(R.string.verify_code);
-                phoneRelativeLayout.setVisibility(View.GONE);
-            }
-        };
-
-        userEventListener = new ValueEventListener() {
-            @Override
-            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                if (!dataSnapshot.exists()) {
-                    createNewUser();
-                }
-            }
-            @Override
-            public void onCancelled(@NonNull DatabaseError databaseError) {
-            }
-        };
+        sendCodeButton.setOnClickListener(this);
     }
 
     /**
-     * when calling this methods means that verification code has been sent , so this method will check
-     * that edit text is not empty and then create PhoneAuthCredential object to use this credential for signing in
-     *
-     * @param enteredCode content of verification edit text
+     * The first scenario of {user signing in} is to request a verification code to be sent to
+     * the phone number provided by user
      */
-    private void verifyPhoneNumberWithCode(String enteredCode) {
-        if (enteredCode.isEmpty()) {
-            Toast.makeText(this, R.string.verify_sign_in_code, Toast.LENGTH_SHORT).show();
-            return;
-        }
-        progressBar.setVisibility(View.VISIBLE);
-        PhoneAuthCredential credential = PhoneAuthProvider.getCredential(mVerificationId, enteredCode);
-        signInWithPhoneCredential(credential);
-    }
-
-    private void signInWithPhoneCredential(PhoneAuthCredential phoneAuthCredential) {
-        mAuth.signInWithCredential(phoneAuthCredential).addOnCompleteListener(this, new OnCompleteListener<AuthResult>() {
-            @Override
-            public void onComplete(@NonNull Task<AuthResult> task) {
-                progressBar.setVisibility(View.INVISIBLE);
-                if (task.isSuccessful()) {
-                    mUser = mAuth.getCurrentUser();
-                    if (mUser != null) {
-                        checkIfUserExistInDataBase();
-                        userLoggedIn();
-                    }
-                }
-            }
-        });
-    }
-
-    private void checkIfUserExistInDataBase(){
-        mUserDb = appUserDb.child(mUser.getUid());
-        mUserDb.addListenerForSingleValueEvent(userEventListener);
-        preference.setValue(Consts.USER_NAME, mUser.getPhoneNumber());
-    }
-
-    private void createNewUser(){
-        User user = new User(mUser.getUid(),
-                mUser.getPhoneNumber(),
-                mUser.getPhoneNumber(),
-                "Hey there , I'm using Kroubi",
-                "",
-                "online");
-        mUserDb.setValue(user);
-    }
-
-    private void userLoggedIn() {
-        Toast.makeText(LoginActivity.this, R.string.msg_login_success, Toast.LENGTH_SHORT).show();
-        startActivity(new Intent(this, HomeActivity.class));
-        finish();
-    }
-
-    private void startPhoneNumberVerification() {
-        String phoneNumber = phoneNumberEditText.getText().toString();
+    private void getVerificationCode() {
+        String phoneNumber = mPhoneNumberEditText.getText().toString();
         if (phoneNumber.isEmpty()) {
             Toast.makeText(this, R.string.verify_phone_number, Toast.LENGTH_SHORT).show();
             return;
         }
 
-        progressBar.setVisibility(View.VISIBLE);
-        PhoneAuthProvider.getInstance().verifyPhoneNumber(phoneNumber,
-                60,
-                TimeUnit.SECONDS,
-                this,
-                mCallBack);
+        mPhoneProgressBar.setVisibility(View.VISIBLE);
+        mLoginHelper.getVerificationCode(phoneNumber,this);
+    }
+
+    /**
+     * When receiving verification code, we are to make PhoneAuthCredential object that combines the
+     * code that was sent and the code that entered by user>> then sign in with this Credential
+     * using firebase
+     */
+    private void signInWithPhoneCredential() {
+        String enteredCode = mVerificationCodeEditText.getText().toString();
+        if (enteredCode.isEmpty()) {
+            Toast.makeText(this, R.string.verify_sign_in_code, Toast.LENGTH_SHORT).show();
+            return;
+        }
+
+        mCodeProgress.setVisibility(View.VISIBLE);
+        PhoneAuthCredential credential = PhoneAuthProvider.getCredential(mVerificationCode, enteredCode);
+        mLoginHelper.signInWithPhoneCredential(credential,this);
+    }
+
+    private void swapLayout(){
+        mPhoneEntryLayout.setVisibility(View.GONE);
+        mCodeEntryLayout.setVisibility(View.VISIBLE);
     }
 
     @Override
     public void onClick(View view) {
         switch (view.getId()) {
-            case R.id.btn_login:
+            case R.id.btn_send_code:
+                getVerificationCode();
                 break;
-            case R.id.btn_verify:
-                String enteredCode = verificationCodeEditText.getText().toString();
-
-                if (mVerificationId != null) {
-                    verifyPhoneNumberWithCode(enteredCode);
-                } else {
-                    startPhoneNumberVerification();
-                }
+            case R.id.btn_submit_code:
+                signInWithPhoneCredential();
+                break;
         }
+    }
+
+    @Override
+    public void onInvalidPhoneNumber() {
+        mPhoneProgressBar.setVisibility(View.INVISIBLE);
+        mPhoneNumberEditText.setBackground(ContextCompat.getDrawable(this, R.drawable.shape_login_error_gb));
+        mPhoneNumberEditText.setCompoundDrawablesRelativeWithIntrinsicBounds(R.drawable.ic_phone_red,0,0,0);
+        Toast.makeText(LoginActivity.this, R.string.invalid_phone_number, Toast.LENGTH_SHORT).show();
+    }
+
+    @Override
+    public void onInvalidVerificationCode() {
+        mCodeProgress.setVisibility(View.INVISIBLE);
+        mVerificationCodeEditText.setBackground(ContextCompat.getDrawable(this, R.drawable.shape_login_error_gb));
+        Toast.makeText(LoginActivity.this, R.string.invalid_verification_code, Toast.LENGTH_SHORT).show();
+    }
+
+    @Override
+    public void onVerificationCodeSent(String code) {
+        // check for credentials manually
+        mVerificationCode = code;
+        swapLayout();
+    }
+
+    @Override
+    public void onLoginSuccess(String userName) {
+        preference.setValue(Consts.USER_NAME, userName);
+        Toast.makeText(LoginActivity.this, R.string.msg_login_success, Toast.LENGTH_SHORT).show();
+        startActivity(new Intent(this, HomeActivity.class));
+        Log.i(TAG, "onLoginSuccess: " + R.string.msg_login_success);
+        finish();
     }
 }

@@ -74,7 +74,7 @@
                 android:id="@+id/tv_unseen_count"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:background="@drawable/oval_shape_messages_count_bg"
+                android:background="@drawable/shape_messages_count_bg"
                 android:gravity="center"
                 android:textColor="@color/white"
                 android:textSize="12sp"

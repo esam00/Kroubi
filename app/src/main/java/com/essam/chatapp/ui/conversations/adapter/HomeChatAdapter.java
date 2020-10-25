@@ -14,7 +14,7 @@ import androidx.recyclerview.widget.SortedListAdapterCallback;
 import com.essam.chatapp.R;
 import com.essam.chatapp.ui.contacts.utils.ContactsHelper;
 import com.essam.chatapp.ui.conversations.fragment.ChatsFragment;
-import com.essam.chatapp.ui.conversations.model.Chat;
+import com.essam.chatapp.models.Chat;
 import com.essam.chatapp.utils.DateTimeUtils;
 
 import java.text.NumberFormat;
@@ -131,7 +131,7 @@ public class HomeChatAdapter extends RecyclerView.Adapter<HomeChatAdapter.ViewHo
     @Override
     public ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         View view = LayoutInflater.from(parent.getContext())
-                .inflate(R.layout.home_chat_list_item, parent, false);
+                .inflate(R.layout.item_home_chat, parent, false);
         return new ViewHolder(view);
     }
 

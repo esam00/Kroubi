@@ -1,4 +1,4 @@
-package com.essam.chatapp;
+package com.essam.chatapp.ui;
 
 import androidx.appcompat.app.AppCompatActivity;
 
@@ -6,10 +6,10 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
 
+import com.essam.chatapp.firebase.FirebaseManager;
 import com.essam.chatapp.ui.home.activity.HomeActivity;
 import com.essam.chatapp.ui.login.LoginActivity;
-import com.google.firebase.auth.FirebaseAuth;
-import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.FirebaseApp;
 
 public class SplashActivity extends AppCompatActivity {
 
@@ -17,6 +17,8 @@ public class SplashActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        FirebaseApp.initializeApp(this);
+
         // just give it one second to display splash screen
         try {
             Thread.sleep(1000);
@@ -24,7 +26,8 @@ public class SplashActivity extends AppCompatActivity {
             e.printStackTrace();
         }
 
-        if(isUserLoggedIn()){
+        boolean isUserLoggedIn = FirebaseManager.getInstance().isUserLoggedIn();
+        if(isUserLoggedIn){
             Log.i(TAG, "isUserLoggedIn: YES");
             startActivity(new Intent(SplashActivity.this,HomeActivity.class));
         }
@@ -34,12 +37,4 @@ public class SplashActivity extends AppCompatActivity {
         }
         finish();
     }
-
-    private boolean isUserLoggedIn(){
-        final FirebaseAuth mAuth = FirebaseAuth.getInstance();
-        final FirebaseUser firebaseUser = mAuth.getCurrentUser();
-        return firebaseUser !=null;
-
-    }
-
 }

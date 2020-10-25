@@ -9,7 +9,6 @@ import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -24,37 +23,28 @@ import android.widget.TextView;
 
 import com.airbnb.lottie.LottieAnimationView;
 import com.essam.chatapp.R;
-import com.essam.chatapp.ui.contacts.model.User;
+import com.essam.chatapp.firebase.HomeChatHelper;
+import com.essam.chatapp.ui.conversations.HomeChatCallBacks;
+import com.essam.chatapp.models.User;
 import com.essam.chatapp.ui.contacts.utils.ContactsHelper;
 import com.essam.chatapp.ui.conversations.adapter.HomeChatAdapter;
 import com.essam.chatapp.utils.ProjectUtils;
-import com.essam.chatapp.ui.conversations.model.Chat;
+import com.essam.chatapp.models.Chat;
 import com.essam.chatapp.ui.chat.activity.ChatActivity;
 import com.essam.chatapp.utils.Consts;
-import com.google.firebase.auth.FirebaseAuth;
-import com.google.firebase.database.ChildEventListener;
-import com.google.firebase.database.DataSnapshot;
-import com.google.firebase.database.DatabaseError;
-import com.google.firebase.database.DatabaseReference;
-import com.google.firebase.database.FirebaseDatabase;
-import com.google.firebase.database.ValueEventListener;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Observable;
 import java.util.Observer;
 
-public class ChatsFragment extends Fragment implements HomeChatAdapter.ListItemClickListener, Observer {
+public class ChatsFragment extends Fragment implements HomeChatAdapter.ListItemClickListener,
+        Observer, HomeChatCallBacks {
 
     private RecyclerView homeChatRv;
     private HomeChatAdapter homeChatAdapter;
     private LinearLayout welcomeLl;
     private List<Chat> chatList = new ArrayList<>();
-
-    //firebase
-    private DatabaseReference userChatDb;
-    private ChildEventListener onChatAddedEventListener;
-    private ValueEventListener checkExistValueEventListener;
 
     private Context mContext;
     private boolean showNotification;
@@ -83,9 +73,7 @@ public class ChatsFragment extends Fragment implements HomeChatAdapter.ListItemC
         // Inflate the layout for this fragment
         View view = inflater.inflate(R.layout.fragment_chats, container, false);
 
-        initFirebase();
         initViews(view);
-        initEventListener();
         checkContactsPermission();
         return view;
     }
@@ -102,75 +90,6 @@ public class ChatsFragment extends Fragment implements HomeChatAdapter.ListItemC
         homeChatRv.setLayoutManager(layoutManager);
     }
 
-    private void initFirebase() {
-        FirebaseAuth mAuth = FirebaseAuth.getInstance();
-        FirebaseDatabase mDatabase = FirebaseDatabase.getInstance();
-        DatabaseReference mReference = mDatabase.getReference();
-
-        String userUid = mAuth.getUid();
-        if (userUid != null)
-            userChatDb = mReference.child(Consts.USER).child(userUid).child(Consts.CHAT);
-    }
-
-    private void initEventListener() {
-        // this value event listener is triggered once a new chat added Or existing chat updated
-        onChatAddedEventListener = new ChildEventListener() {
-            @Override
-            public void onChildAdded(@NonNull DataSnapshot dataSnapshot, @Nullable String s) {
-                Chat chat = dataSnapshot.getValue(Chat.class);
-                if (chat != null) {
-                    Log.i(TAG, "new chat added");
-                    // if this user name is already saved into my contacts replace user name with this saved name
-                    chat.setUserPhone(ContactsHelper.getContactName(getActivity(), chat.getUserPhone()));
-
-                    chatList.add(chat);
-                    homeChatAdapter.addAll(chatList);
-                    displayChatList();
-                }
-            }
-
-            @Override
-            public void onChildChanged(@NonNull DataSnapshot dataSnapshot, @Nullable String s) {
-                Chat chat = dataSnapshot.getValue(Chat.class);
-                if (chat != null) {
-                    Log.i(TAG, " new message Arrived to an existing chat");
-                    //update this chat with the new data
-                    homeChatAdapter.updateItem(chat);
-                }
-            }
-
-            @Override
-            public void onChildRemoved(@NonNull DataSnapshot dataSnapshot) {
-
-            }
-
-            @Override
-            public void onChildMoved(@NonNull DataSnapshot dataSnapshot, @Nullable String s) {
-
-            }
-
-            @Override
-            public void onCancelled(@NonNull DatabaseError databaseError) {
-                Log.e(TAG, "onCancelled: " + databaseError);
-            }
-        };
-
-        //single value event listener to check if user has any previous chats
-        checkExistValueEventListener = new ValueEventListener() {
-            @Override
-            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                if (!dataSnapshot.exists()) {
-                    // no conversations yet
-                    hideChatListAndDisplayWelcomeAnimation();
-                }
-            }
-
-            @Override
-            public void onCancelled(@NonNull DatabaseError databaseError) {
-            }
-        };
-    }
-
     /**
      * Before fetching user conversations list we need to be sure that user has accepted READ_CONTACTS
      * permission , we might need this permission granted to display chat's user name as it is saved [ if it is saved]
@@ -185,7 +104,7 @@ public class ChatsFragment extends Fragment implements HomeChatAdapter.ListItemC
     }
 
     /**
-     * This is the main method that is responsible for fetching previous chats AND listen for new messages
+     * fetching previous chats AND listen for new messages
      */
     private void getUserChatList() {
         if (!ProjectUtils.isNetworkConnected(mContext)) {
@@ -193,8 +112,7 @@ public class ChatsFragment extends Fragment implements HomeChatAdapter.ListItemC
             return;
         }
         showLoadingDialog();
-        userChatDb.addChildEventListener(onChatAddedEventListener);
-        userChatDb.addListenerForSingleValueEvent(checkExistValueEventListener);
+        new HomeChatHelper(this).getUserChatList();
     }
 
     /**
@@ -226,7 +144,7 @@ public class ChatsFragment extends Fragment implements HomeChatAdapter.ListItemC
         dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
         dialog.setCancelable(true);
 
-        dialog.setContentView(R.layout.notification_dialog);
+        dialog.setContentView(R.layout.dialog_welcome);
         ((TextView) dialog.findViewById(R.id.notificationText)).setText("إهداء الى قروبي الحبيب ❤️");
 
         dialog.show();
@@ -242,7 +160,7 @@ public class ChatsFragment extends Fragment implements HomeChatAdapter.ListItemC
     private void showLoadingDialog() {
         loadingDialog = new Dialog(mContext);
         loadingDialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
-        loadingDialog.setContentView(R.layout.loading_dialog);
+        loadingDialog.setContentView(R.layout.dialog_loading);
         loadingDialog.setCancelable(false);
 
         LottieAnimationView lottieAnimationView = loadingDialog.findViewById(R.id.loading_animation);
@@ -279,19 +197,40 @@ public class ChatsFragment extends Fragment implements HomeChatAdapter.ListItemC
 
     @Override
     public void onPause() {
-        userChatDb.removeEventListener(onChatAddedEventListener);
-        userChatDb.removeEventListener(checkExistValueEventListener);
         super.onPause();
     }
 
     @Override
     public void onResume() {
-        initEventListener();
         super.onResume();
     }
 
     @Override
     public void update(Observable o, Object arg) {
         getUserChatList();
+    }
+
+    @Override
+    public void onNewChatAdded(Chat chat) {
+        // if this user name is already saved into my contacts replace user name with this saved name
+        chat.setUserPhone(ContactsHelper.getContactName(getActivity(), chat.getUserPhone()));
+
+        chatList.add(chat);
+        homeChatAdapter.addAll(chatList);
+        displayChatList();
+    }
+
+    @Override
+    public void onChatUpdated(Chat chat) {
+        //update this chat with the new data
+        homeChatAdapter.updateItem(chat);
+    }
+
+    @Override
+    public void onCheckExistingChats(boolean hasPreviousChats) {
+        if (!hasPreviousChats){
+            // no conversations yet
+            hideChatListAndDisplayWelcomeAnimation();
+        }
     }
 }

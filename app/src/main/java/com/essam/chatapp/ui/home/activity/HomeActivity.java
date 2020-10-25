@@ -15,6 +15,7 @@ import androidx.appcompat.widget.Toolbar;
 import androidx.viewpager2.widget.ViewPager2;
 
 import com.essam.chatapp.R;
+import com.essam.chatapp.firebase.FirebaseManager;
 import com.essam.chatapp.ui.contacts.activity.ContactsActivity;
 import com.essam.chatapp.ui.home.adapter.ViewPagerAdapter;
 import com.essam.chatapp.ui.login.LoginActivity;
@@ -24,7 +25,6 @@ import com.essam.chatapp.utils.ProjectUtils;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.android.material.tabs.TabLayout;
 import com.google.android.material.tabs.TabLayoutMediator;
-import com.google.firebase.auth.FirebaseAuth;
 
 public class HomeActivity extends AppCompatActivity {
 
@@ -141,8 +141,7 @@ public class HomeActivity extends AppCompatActivity {
     }
 
     private void signOut() {
-        final FirebaseAuth mAuth = FirebaseAuth.getInstance();
-        mAuth.signOut();
+        FirebaseManager.getInstance().signOutUser();
         Intent intent = new Intent(this, LoginActivity.class);
         intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
         intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK);

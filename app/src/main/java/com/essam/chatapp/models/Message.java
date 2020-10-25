@@ -1,4 +1,4 @@
-package com.essam.chatapp.ui.chat.model;
+package com.essam.chatapp.models;
 
 public class Message {
     private String messageId;

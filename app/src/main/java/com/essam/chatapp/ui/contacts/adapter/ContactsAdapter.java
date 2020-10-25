@@ -9,7 +9,7 @@ import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.essam.chatapp.R;
-import com.essam.chatapp.ui.contacts.model.User;
+import com.essam.chatapp.models.User;
 
 import java.util.List;
 

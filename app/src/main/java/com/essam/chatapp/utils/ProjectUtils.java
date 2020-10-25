@@ -396,14 +396,8 @@ public class ProjectUtils {
      * False if number is not valid.
      */
     public static boolean isPhoneNumberValid(String number) {
-
-
-        if (number.length() < 10 || number.length() > 11) {
-            //	Log.d("tag", "Number is not valid");
-            return false;
-        }
-
-        return true;
+        //	Log.d("tag", "Number is not valid");
+        return number.length() >= 10 && number.length() <= 11;
     }
 
 
@@ -765,5 +759,7 @@ public class ProjectUtils {
         }
         return vId;
     }
+
+
 
 }

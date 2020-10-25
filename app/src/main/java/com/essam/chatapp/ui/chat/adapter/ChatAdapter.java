@@ -27,7 +27,7 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.load.engine.DiskCacheStrategy;
 import com.essam.chatapp.R;
-import com.essam.chatapp.ui.chat.model.Message;
+import com.essam.chatapp.models.Message;
 import com.essam.chatapp.utils.Consts;
 import com.essam.chatapp.utils.DateTimeUtils;
 import com.google.firebase.auth.FirebaseAuth;
@@ -68,10 +68,10 @@ public class ChatAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
         LayoutInflater inflater = LayoutInflater.from(parent.getContext());
 
         if (viewType == VIEW_TYPE_OUTGOING) {
-            view = inflater.inflate(R.layout.outgoing_list_item, parent, false);
+            view = inflater.inflate(R.layout.item_outgoing_message, parent, false);
             return new SenderViewHolder(view);
         } else {
-            view = inflater.inflate(R.layout.receiver_list_item, parent, false);
+            view = inflater.inflate(R.layout.item_receiver, parent, false);
             return new ReceiverViewHolder(view);
         }
     }
@@ -227,8 +227,9 @@ public class ChatAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
             //bind message time
             sentAtTextView.setText(DateTimeUtils.getDisplayableDateOfGivenTimeStamp(mContext,message.getTimeStamp(),true));
 
+            // TODO: 10/13/2020  
             //update message seen = true
-            updateSeenLogic(message);
+//            updateSeenLogic(message);
 
             //bind message text
             bindMessageText(message);

@@ -19,7 +19,7 @@ import android.widget.TextView;
 import com.essam.chatapp.R;
 import com.essam.chatapp.ui.chat.activity.ChatActivity;
 import com.essam.chatapp.ui.contacts.adapter.ContactsAdapter;
-import com.essam.chatapp.ui.contacts.model.User;
+import com.essam.chatapp.models.User;
 import com.essam.chatapp.ui.contacts.utils.ContactsHelper;
 import com.essam.chatapp.utils.Consts;
 import com.google.firebase.database.DataSnapshot;

@@ -29,27 +29,16 @@ import android.widget.Toast;
 import com.daimajia.androidanimations.library.Techniques;
 import com.daimajia.androidanimations.library.YoYo;
 import com.essam.chatapp.R;
+import com.essam.chatapp.firebase.ChatHelper;
 import com.essam.chatapp.ui.chat.adapter.ChatAdapter;
-import com.essam.chatapp.ui.chat.model.Message;
-import com.essam.chatapp.ui.contacts.model.User;
-import com.essam.chatapp.ui.conversations.model.Chat;
+import com.essam.chatapp.models.Message;
+import com.essam.chatapp.models.User;
+import com.essam.chatapp.models.Chat;
 import com.essam.chatapp.ui.profile.UserProfileActivity;
 import com.essam.chatapp.utils.ProjectUtils;
 import com.essam.chatapp.utils.SharedPrefrence;
 import com.essam.chatapp.ui.photoEditor.PhotoEditorActivity;
 import com.essam.chatapp.utils.Consts;
-import com.google.android.gms.tasks.OnSuccessListener;
-import com.google.firebase.auth.FirebaseAuth;
-import com.google.firebase.auth.FirebaseUser;
-import com.google.firebase.database.ChildEventListener;
-import com.google.firebase.database.DataSnapshot;
-import com.google.firebase.database.DatabaseError;
-import com.google.firebase.database.DatabaseReference;
-import com.google.firebase.database.FirebaseDatabase;
-import com.google.firebase.database.ValueEventListener;
-import com.google.firebase.storage.FirebaseStorage;
-import com.google.firebase.storage.StorageReference;
-import com.google.firebase.storage.UploadTask;
 
 import java.io.File;
 import java.io.IOException;
@@ -58,7 +47,7 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
-public class ChatActivity extends AppCompatActivity implements View.OnClickListener {
+public class ChatActivity extends AppCompatActivity implements View.OnClickListener, ChatCallBacks {
 
     //views
     private RecyclerView recyclerView;
@@ -66,31 +55,18 @@ public class ChatActivity extends AppCompatActivity implements View.OnClickListe
     private LinearLayout filePickerLl, emptyLayout;
     private ChatAdapter adapter;
     private List<Message> listMessages;
-    private List<View> onClickViews;
     private TextView titleTv;
 
     //vars
     private String inputMessage;
-    private String myUid, otherUid;
-    private String myPhone, otherPhone,otherPhoto;
-    private String chatID;
-    private int otherUnseenCount;
     private List<String> mediaUriList;
     private SharedPrefrence prefrence;
     private Uri picUri;
-    private String currentFormatDate;
-    private boolean isFirstTime = true;
-    private List<String> messageIdList;
-    private int mediaUploaded;
-    private String messageId;
 
-    //firebase
-    private DatabaseReference appChatDb, appUserDb,userChatDb, mChatDb, otherSideUnseenChildDb;
-    private ChildEventListener childEventListener;
-    private ValueEventListener checkSeenEventListener, checkPreviousConversations;
+    private ChatHelper mChatHelper = new ChatHelper(this);
 
     private final static String TAG = ChatActivity.class.getSimpleName();
-    private User mUser;
+    private User mOtherUser;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -98,8 +74,6 @@ public class ChatActivity extends AppCompatActivity implements View.OnClickListe
         setContentView(R.layout.activity_chat);
 
         initViews();
-        initFirebase();
-        initEventListeners();
         receiveIntents();
     }
 
@@ -131,7 +105,7 @@ public class ChatActivity extends AppCompatActivity implements View.OnClickListe
         adapter.setMessagesData(listMessages);
 
         //onClickListener
-        onClickViews = new ArrayList<>();
+        List<View> onClickViews = new ArrayList<>();
         onClickViews.add(sendIv);
         onClickViews.add(attachFileIv);
         onClickViews.add(openCameraIv);
@@ -140,7 +114,7 @@ public class ChatActivity extends AppCompatActivity implements View.OnClickListe
         onClickViews.add(backImageIcon);
         onClickViews.add(messageEt);
         onClickViews.add(titleTv);
-        addClickListeners();
+        for (View view : onClickViews) view.setOnClickListener(this);
     }
 
     /**
@@ -151,131 +125,12 @@ public class ChatActivity extends AppCompatActivity implements View.OnClickListe
     private void receiveIntents() {
         Intent intent = getIntent();
         if ((intent.hasExtra(Consts.USER))){
-            mUser = intent.getParcelableExtra(Consts.USER);
-            assert mUser != null;
-            otherUid = mUser.getUid();
-            otherPhone = mUser.getPhone();
-            String otherName = mUser.getName();
-            otherPhoto = mUser.getImage();
-            titleTv.setText(otherName);
-            checkPrevoiusConversations();
+            mOtherUser = intent.getParcelableExtra(Consts.USER);
+            assert mOtherUser != null;
+            titleTv.setText(mOtherUser.getName());
+
+            mChatHelper.checkForPreviousChatWith(mOtherUser);
         }
-    }
-
-    private void initFirebase() {
-        FirebaseAuth mAuth = FirebaseAuth.getInstance();
-        FirebaseDatabase mDatabase = FirebaseDatabase.getInstance();
-        DatabaseReference mReference = mDatabase.getReference();
-        FirebaseUser firebaseUser = mAuth.getCurrentUser();
-
-        myUid = mAuth.getUid();
-        appUserDb = mReference.child(Consts.USER);
-        appChatDb = mReference.child(Consts.CHAT);
-        userChatDb = mReference.child(Consts.USER).child(myUid).child(Consts.CHAT);
-        if (firebaseUser !=null )myPhone = firebaseUser.getPhoneNumber();
-    }
-
-    private void initEventListeners() {
-        checkPreviousConversations = new ValueEventListener() {
-            @Override
-            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                if (dataSnapshot.exists()) {
-                    for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
-                        Chat chat = snapshot.getValue(Chat.class);
-                        if (chat != null && otherUid.equals(chat.getUserUid())) {
-                            isFirstTime = false;
-                            chatID = chat.getChatId();
-                            //get the reference to this chat id chat database >> chat/chatId
-                            mChatDb = appChatDb.child(chatID);
-                            // pass this reference to adapter in order to handle and update seen state
-                            adapter.setChatDp(mChatDb);
-                            getMessages();
-                            Log.i(TAG, "onDataChange: there is previous conversation with this user , ChatId : " + chatID);
-                        }
-                    }
-                } else {
-                    isFirstTime = true;
-                    Log.i(TAG, "onDataChange: User has no previous chat yet! ");
-                }
-            }
-
-            @Override
-            public void onCancelled(@NonNull DatabaseError databaseError) {
-
-            }
-        };
-
-        // this listener is basically listening for a new message added to this conversation
-        childEventListener = new ChildEventListener() {
-            @Override
-            public void onChildAdded(@NonNull DataSnapshot dataSnapshot, @Nullable String s) {
-                if (dataSnapshot.exists()) {
-                    Message message = dataSnapshot.getValue(Message.class);
-                    if (message != null) {
-                        isFirstTime = false;
-                        updateUi(message);
-                        getLastUnseenCont();
-                        resetMyUnseenCount();
-                    }
-                }
-            }
-
-            @Override
-            public void onChildChanged(@NonNull DataSnapshot dataSnapshot, @Nullable String s) {
-                // changing means messages has been seen so update it in adapter
-                for (int i = 0; i < listMessages.size(); i++) {
-                    if (listMessages.get(i).getMessageId().equals(s)) {
-                        adapter.updateSeen(i);
-                    }
-                }
-
-            }
-
-            @Override
-            public void onChildRemoved(@NonNull DataSnapshot dataSnapshot) {
-
-            }
-
-            @Override
-            public void onChildMoved(@NonNull DataSnapshot dataSnapshot, @Nullable String s) {
-
-            }
-
-            @Override
-            public void onCancelled(@NonNull DatabaseError databaseError) {
-
-            }
-        };
-
-        checkSeenEventListener = new ValueEventListener() {
-            @Override
-            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                if (dataSnapshot.exists() && dataSnapshot.getValue() != null)
-                    otherUnseenCount = Integer.parseInt(dataSnapshot.getValue().toString());
-            }
-
-            @Override
-            public void onCancelled(@NonNull DatabaseError databaseError) {
-            }
-        };
-    }
-
-    /**
-     * setOnclickListeners for all view in one line
-     */
-    private void addClickListeners() {
-        for (View view : onClickViews) view.setOnClickListener(this);
-    }
-
-    private void checkPrevoiusConversations() {
-        userChatDb.addListenerForSingleValueEvent(checkPreviousConversations);
-    }
-
-    private void getMessages() {
-        if (mChatDb == null) return;
-
-        emptyLayout.setVisibility(View.GONE);
-        mChatDb.addChildEventListener(childEventListener);
     }
 
     private void preSendMessage() {
@@ -285,132 +140,41 @@ public class ChatActivity extends AppCompatActivity implements View.OnClickListe
         if (TextUtils.isEmpty(inputMessage)) {
             Toast.makeText(this, "Please type a message to be sent", Toast.LENGTH_SHORT).show();
         } else {
-            checkState();
+            mChatHelper.sendMessage(inputMessage,mediaUriList);
             messageEt.setText("");
         }
 
     }
 
-    private void checkState() {
-
-        if (isFirstTime) {
-            sendFirstMessage();
-        } else {
-            pushNewMessage();
-        }
+    // ----------------------------------- ChatCallBacks -----------------------------------------
+    @Override
+    public void onCheckPreviousConversationWithThisUser(boolean isFirstTime, Chat chat) {
+        // TODO: 10/13/2020 fix this
+//        this.isFirstTime = isFirstTime;
+//
+//        // pass this reference to adapter in order to handle and update seen state
+//        adapter.setChatDp(mChatDb);
     }
 
-    private void sendFirstMessage() {
-        // this is the first message between these two users
-        chatID = appChatDb.push().getKey();
-        if (chatID != null) {
-            mChatDb = appChatDb.child(chatID);
-            // update chatID
-            adapter.setChatDp(mChatDb);
-            getMessages();
-            // create new chat item in both current user and other user
-            pushNewMessage();
-            pushNewChat();
-        }
+    @Override
+    public void onCheckFirstTimeChat(boolean isFirstTime) {
+        if (!isFirstTime)
+            emptyLayout.setVisibility(View.GONE);
     }
 
-    private void pushNewMessage() {
-        if (!mediaUriList.isEmpty()) {
-            pushMediaMessages();
-        } else {
-            currentFormatDate = ProjectUtils.getDisplayableCurrentDateTime();
-            messageId = mChatDb.push().getKey();
-            if(messageId != null) {
-                DatabaseReference newMessageDb = mChatDb.child(messageId);
+    @Override
+    public void onNewMessageAdded(Message message) {
+        updateUi(message);
+    }
 
-                Message message = new Message(messageId, inputMessage, myUid, currentFormatDate,System.currentTimeMillis(), false);
-                newMessageDb.setValue(message);
-
-                if (!isFirstTime) updateLastMessage();
+    @Override
+    public void onMessageSeen(String messageId) {
+        // changing means messages has been seen so update it in adapter
+        for (int i = 0; i < listMessages.size(); i++) {
+            if (listMessages.get(i).getMessageId().equals(messageId)) {
+                adapter.updateSeen(i);
             }
         }
-
-    }
-
-    private void pushMediaMessages() {
-        mediaUploaded = 0;
-        messageIdList = new ArrayList<>();
-
-        for (String mediaUri : mediaUriList) {
-            messageId = mChatDb.push().getKey();
-            messageIdList.add(messageId);
-
-            final StorageReference filePath = FirebaseStorage.getInstance().getReference().child(Consts.CHAT).child(chatID).child(messageId);
-            UploadTask uploadTask = filePath.putFile(Uri.parse(mediaUri));
-            uploadTask.addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
-                @Override
-                public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
-                    filePath.getDownloadUrl().addOnSuccessListener(new OnSuccessListener<Uri>() {
-                        @Override
-                        public void onSuccess(Uri uri) {
-
-                            currentFormatDate = ProjectUtils.getDisplayableCurrentDateTime();
-                            Message message = new Message(messageIdList.get(mediaUploaded), inputMessage, myUid, currentFormatDate, uri.toString(),System.currentTimeMillis(), false);
-                            DatabaseReference newMessageDb = mChatDb.child(messageIdList.get(mediaUploaded));
-                            newMessageDb.setValue(message);
-                            if (!isFirstTime) updateLastMessage();
-                            inputMessage = "";
-                            mediaUploaded++;
-                            if (mediaUriList.size() == mediaUploaded) {
-                                mediaUriList.clear();
-                            }
-                        }
-                    });
-                }
-            });
-        }
-    }
-
-    private void pushNewChat() {
-        currentFormatDate = ProjectUtils.getDisplayableCurrentDateTime();
-
-        DatabaseReference mySideDb = userChatDb.child(chatID);
-        Chat mySideChat = new Chat(chatID,otherUid, otherPhone,otherPhoto, inputMessage,
-                currentFormatDate, System.currentTimeMillis(), 0,false);
-        mySideDb.setValue(mySideChat);
-
-        DatabaseReference otherSideDb = appUserDb.child(otherUid).child(Consts.CHAT).child(chatID);
-        String myPhoto = "";
-        Chat otherSideChat = new Chat(chatID, myUid, myPhone, myPhoto, inputMessage,
-                currentFormatDate, System.currentTimeMillis(), 1,false);
-        otherSideDb.setValue(otherSideChat);
-
-        getLastUnseenCont();
-    }
-
-    private void updateLastMessage() {
-        currentFormatDate = ProjectUtils.getDisplayableCurrentDateTime();
-        if (TextUtils.isEmpty(inputMessage)) {
-            if (!mediaUriList.isEmpty()) {
-                inputMessage = "Photo";
-            }
-        }
-
-        DatabaseReference mySideDb = userChatDb.child(chatID);
-        mySideDb.child(Consts.MESSAGE).setValue(inputMessage);
-        mySideDb.child(Consts.CREATED_AT).setValue(currentFormatDate);
-        mySideDb.child(Consts.TIME_STAMP).setValue(System.currentTimeMillis());
-
-        DatabaseReference otherSideDb = appUserDb.child(otherUid).child(Consts.CHAT).child(chatID);
-        otherSideDb.child(Consts.MESSAGE).setValue(inputMessage);
-        otherSideDb.child(Consts.CREATED_AT).setValue(currentFormatDate);
-        otherSideDb.child(Consts.TIME_STAMP).setValue(System.currentTimeMillis());
-        otherSideDb.child(Consts.UNSEEN_COUNT).setValue(otherUnseenCount + 1);
-    }
-
-    private void resetMyUnseenCount() {
-        DatabaseReference mySideDb = userChatDb.child(chatID);
-        mySideDb.child(Consts.UNSEEN_COUNT).setValue(0);
-    }
-
-    private void getLastUnseenCont() {
-        otherSideUnseenChildDb = appUserDb.child(otherUid).child(Consts.CHAT).child(chatID).child(Consts.UNSEEN_COUNT);
-        otherSideUnseenChildDb.addValueEventListener(checkSeenEventListener);
     }
 
     public void updateUi(Message message) {
@@ -418,6 +182,8 @@ public class ChatActivity extends AppCompatActivity implements View.OnClickListe
         adapter.setMessagesData(listMessages);
         recyclerView.smoothScrollToPosition(adapter.getItemCount() - 1);
     }
+
+    //---------------------------------- Attaches{} ---------------------------------------------
 
     /**
      * this method opens device's media to choose an image
@@ -428,9 +194,7 @@ public class ChatActivity extends AppCompatActivity implements View.OnClickListe
             Intent intent = new Intent();
             intent.setType("image/*");
             intent.setAction(Intent.ACTION_GET_CONTENT);
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN_MR2) {
-                intent.putExtra(Intent.EXTRA_ALLOW_MULTIPLE, true);
-            }
+            intent.putExtra(Intent.EXTRA_ALLOW_MULTIPLE, true);
             startActivityForResult(intent, Consts.PICK_IMAGES_REQUEST);
         }
     }
@@ -466,6 +230,19 @@ public class ChatActivity extends AppCompatActivity implements View.OnClickListe
                 e.printStackTrace();
             }
         }
+    }
+
+    private void openPhotoEditor(String imageUri, int requestCode) {
+        Intent intent = new Intent(this, PhotoEditorActivity.class);
+        intent.putExtra(Consts.EDIT_PHOTO, imageUri);
+        intent.putExtra("requestCode", requestCode);
+        startActivityForResult(intent, Consts.EDIT_PHOTO_REQUEST);
+    }
+
+    private void openProfile() {
+        Intent intent = new Intent(this, UserProfileActivity.class);
+        intent.putExtra(Consts.USER, mOtherUser);
+        startActivity(intent);
     }
 
     private File getOutputMediaFile() {
@@ -515,12 +292,7 @@ public class ChatActivity extends AppCompatActivity implements View.OnClickListe
 
     }
 
-    private void openPhotoEditor(String imageUri, int requestCode) {
-        Intent intent = new Intent(this, PhotoEditorActivity.class);
-        intent.putExtra(Consts.EDIT_PHOTO, imageUri);
-        intent.putExtra("requestCode", requestCode);
-        startActivityForResult(intent, Consts.EDIT_PHOTO_REQUEST);
-    }
+    // ------------------------------------------- Overrides -----------------------------------
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
@@ -563,7 +335,7 @@ public class ChatActivity extends AppCompatActivity implements View.OnClickListe
                 case Consts.EDIT_PHOTO_REQUEST:
                     if (data != null && data.getExtras() != null && data.getStringExtra("message") != null) {
                         inputMessage = data.getStringExtra("message");
-                        checkState();
+                        mChatHelper.sendMessage(inputMessage,mediaUriList);
                     } else {
                         Log.i(TAG, "onActivityResult: no Image was retrived ");
                         mediaUriList.clear();
@@ -594,21 +366,6 @@ public class ChatActivity extends AppCompatActivity implements View.OnClickListe
             Log.i(TAG, "onRequestPermissionsResult: capture image permission denied ");
         }
 
-    }
-
-    @Override
-    protected void onDestroy() {
-        removeListener();
-        super.onDestroy();
-    }
-
-    private void removeListener() {
-        // remove firebase eventListener .. no need for them since activity is shutting down
-        if (mChatDb != null)
-            mChatDb.removeEventListener(childEventListener);
-
-        if (otherSideUnseenChildDb != null)
-            otherSideUnseenChildDb.removeEventListener(checkSeenEventListener);
     }
 
     @Override
@@ -647,22 +404,6 @@ public class ChatActivity extends AppCompatActivity implements View.OnClickListe
         }
     }
 
-    private void openProfile() {
-        Intent intent = new Intent(this, UserProfileActivity.class);
-        intent.putExtra(Consts.USER, mUser);
-        startActivity(intent);
-    }
-
-    @Override
-    public void onBackPressed() {
-        if (filePickerLl.getVisibility() == View.VISIBLE) {
-            animateFilePickerDown();
-        } else {
-            removeListener();
-            super.onBackPressed();
-        }
-    }
-
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         if(item.getItemId() == android.R.id.home) {
@@ -672,8 +413,22 @@ public class ChatActivity extends AppCompatActivity implements View.OnClickListe
         return super.onOptionsItemSelected(item);
     }
 
-//    //web Socket
-//    private WebSocket webSocket;
+    @Override
+    public void onBackPressed() {
+        if (filePickerLl.getVisibility() == View.VISIBLE) {
+            animateFilePickerDown();
+        } else {
+            mChatHelper.unSubScribeAllListeners();
+            super.onBackPressed();
+        }
+    }
+
+    @Override
+    protected void onDestroy() {
+        mChatHelper.unSubScribeAllListeners();
+        super.onDestroy();
+    }
+
 //    private void openFilePickerDialog() {
 //        // TODO: 2/17/2020 make a custom dialog to present filePiker layout with nice animation
 //        AlertDialog.Builder builder = new AlertDialog.Builder(this);
@@ -694,19 +449,4 @@ public class ChatActivity extends AppCompatActivity implements View.OnClickListe
 //                .duration(200)
 //                .playOn(filePicker);
 //    }
-//
-//    private void instantiateWebSocket() {
-//        OkHttpClient client = new OkHttpClient();
-//        Request request = new Request.Builder().url("ws://192.168.0.103:6001").build();
-//        SocketListener socketListener = new SocketListener(this);
-//        webSocket = client.newWebSocket(request, socketListener);
-//
-//    }
-//
-//    private void sendUsingWebSocket(Message message) {
-//        //convert message object into json string
-//        String jsonString = new Gson().toJson(message);
-//        webSocket.send(jsonString);
-//    }
-
 }

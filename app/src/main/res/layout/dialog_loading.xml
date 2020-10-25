@@ -9,7 +9,7 @@
     <RelativeLayout
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:background="@drawable/white_rounded_bg_with_alpha"
+        android:background="@drawable/shape_white_rounded_bg_with_alpha"
         android:layout_margin="20dp">
 
             <com.airbnb.lottie.LottieAnimationView
