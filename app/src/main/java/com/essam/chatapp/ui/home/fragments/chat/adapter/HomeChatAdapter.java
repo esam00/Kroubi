@@ -1,4 +1,4 @@
-package com.essam.chatapp.ui.conversations.adapter;
+package com.essam.chatapp.ui.home.fragments.chat.adapter;
 
 import android.content.Context;
 import android.view.LayoutInflater;
@@ -13,7 +13,7 @@ import androidx.recyclerview.widget.SortedListAdapterCallback;
 
 import com.essam.chatapp.R;
 import com.essam.chatapp.ui.contacts.utils.ContactsHelper;
-import com.essam.chatapp.ui.conversations.fragment.ChatsFragment;
+import com.essam.chatapp.ui.home.fragments.chat.HomeChatFragment;
 import com.essam.chatapp.models.Chat;
 import com.essam.chatapp.utils.DateTimeUtils;
 
@@ -29,16 +29,16 @@ public class HomeChatAdapter extends RecyclerView.Adapter<HomeChatAdapter.ViewHo
     private Context context;
     private ListItemClickListener listItemClickListener;
     private SortedList<Chat> mChatList;
-    private ChatsFragment chatsFragment;
+    private HomeChatFragment mHomeChatFragment;
 
     public interface ListItemClickListener {
         void onClick(Chat chat,int adapterPosition);
     }
 
-    public HomeChatAdapter(ChatsFragment chatsFragment,ListItemClickListener listener, Context context) {
+    public HomeChatAdapter(HomeChatFragment homeChatFragment, ListItemClickListener listener, Context context) {
         this.listItemClickListener = listener;
         this.context = context;
-        this.chatsFragment = chatsFragment;
+        this.mHomeChatFragment = homeChatFragment;
         sort();
     }
 
@@ -99,7 +99,7 @@ public class HomeChatAdapter extends RecyclerView.Adapter<HomeChatAdapter.ViewHo
         }
 
         void bind(Chat chat, int position) {
-            // update ui [name, message text, date
+            // update ui [name, messageText, date]
             senderNameTV.setText(chat.getUserPhone());
             lastMessageTv.setText(chat.getMessage());
             dateTv.setText(DateTimeUtils.getDisplayableDateOfGivenTimeStamp(context,chat.getTimeStamp(), false));
@@ -110,7 +110,7 @@ public class HomeChatAdapter extends RecyclerView.Adapter<HomeChatAdapter.ViewHo
                 dateTv.setTextColor(context.getResources().getColor(R.color.colorAccent));
                 counterTv.setText((NumberFormat.getInstance().format(chat.getUnSeenCount())));
             } else {
-                counterTv.setVisibility(View.INVISIBLE);
+                counterTv.setVisibility(View.GONE);
                 dateTv.setTextColor(context.getResources().getColor(R.color.dark_gray));
             }
 
@@ -161,7 +161,7 @@ public class HomeChatAdapter extends RecyclerView.Adapter<HomeChatAdapter.ViewHo
         mChatList.beginBatchedUpdates();
         for (int i = 0; i < mChatList.size(); i++) {
             if (mChatList.get(i).getChatId().equals(chat.getChatId())) {
-                chat.setUserPhone(ContactsHelper.getContactName(chatsFragment.getActivity(), chat.getUserPhone()));
+                chat.setUserPhone(ContactsHelper.getContactName(mHomeChatFragment.getActivity(), chat.getUserPhone()));
                 mChatList.updateItemAt(i,chat);
             }
         }

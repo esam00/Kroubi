@@ -1,4 +1,4 @@
-package com.essam.chatapp.ui.conversations.fragment;
+package com.essam.chatapp.ui.home.fragments.chat;
 
 import android.Manifest;
 import android.app.Dialog;
@@ -23,11 +23,9 @@ import android.widget.TextView;
 
 import com.airbnb.lottie.LottieAnimationView;
 import com.essam.chatapp.R;
-import com.essam.chatapp.firebase.HomeChatHelper;
-import com.essam.chatapp.ui.conversations.HomeChatCallBacks;
 import com.essam.chatapp.models.User;
 import com.essam.chatapp.ui.contacts.utils.ContactsHelper;
-import com.essam.chatapp.ui.conversations.adapter.HomeChatAdapter;
+import com.essam.chatapp.ui.home.fragments.chat.adapter.HomeChatAdapter;
 import com.essam.chatapp.utils.ProjectUtils;
 import com.essam.chatapp.models.Chat;
 import com.essam.chatapp.ui.chat.activity.ChatActivity;
@@ -38,26 +36,23 @@ import java.util.List;
 import java.util.Observable;
 import java.util.Observer;
 
-public class ChatsFragment extends Fragment implements HomeChatAdapter.ListItemClickListener,
-        Observer, HomeChatCallBacks {
+public class HomeChatFragment extends Fragment implements HomeChatAdapter.ListItemClickListener,
+        Observer, HomeChatContract.View {
 
     private RecyclerView homeChatRv;
     private HomeChatAdapter homeChatAdapter;
     private LinearLayout welcomeLl;
     private List<Chat> chatList = new ArrayList<>();
+    private Dialog loadingDialog;
 
     private Context mContext;
     private boolean showNotification;
 
-    private final static String TAG = ChatsFragment.class.getSimpleName();
+    private HomeChatPresenter mPresenter = new HomeChatPresenter(this);
+    private final static String TAG = HomeChatFragment.class.getSimpleName();
 
-    public ChatsFragment() {
+    public HomeChatFragment() {
         // Required empty public constructor
-    }
-
-    @Override
-    public void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
     }
 
     @Override
@@ -112,7 +107,7 @@ public class ChatsFragment extends Fragment implements HomeChatAdapter.ListItemC
             return;
         }
         showLoadingDialog();
-        new HomeChatHelper(this).getUserChatList();
+        mPresenter.getUserChatList();
     }
 
     /**
@@ -131,6 +126,23 @@ public class ChatsFragment extends Fragment implements HomeChatAdapter.ListItemC
         hideLoading();
         homeChatRv.setVisibility(View.GONE);
         welcomeLl.setVisibility(View.VISIBLE);
+    }
+
+    private void showLoadingDialog() {
+        loadingDialog = new Dialog(mContext);
+        loadingDialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
+        loadingDialog.setContentView(R.layout.dialog_loading);
+        loadingDialog.setCancelable(false);
+
+        LottieAnimationView lottieAnimationView = loadingDialog.findViewById(R.id.loading_animation);
+        lottieAnimationView.playAnimation();
+
+        loadingDialog.show();
+        Window window = loadingDialog.getWindow();
+        if (window != null) {
+            loadingDialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
+            window.setLayout(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);
+        }
     }
 
     private void hideLoading() {
@@ -155,25 +167,6 @@ public class ChatsFragment extends Fragment implements HomeChatAdapter.ListItemC
         }
     }
 
-    private Dialog loadingDialog;
-
-    private void showLoadingDialog() {
-        loadingDialog = new Dialog(mContext);
-        loadingDialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
-        loadingDialog.setContentView(R.layout.dialog_loading);
-        loadingDialog.setCancelable(false);
-
-        LottieAnimationView lottieAnimationView = loadingDialog.findViewById(R.id.loading_animation);
-        lottieAnimationView.playAnimation();
-
-        loadingDialog.show();
-        Window window = loadingDialog.getWindow();
-        if (window != null) {
-            loadingDialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
-            window.setLayout(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);
-        }
-    }
-
     /**
      * onClick method of listItemClickListener interface in chats adapter
      * if a chat is clicked this listener will be triggered and it will  return the index of the item that was clicked
@@ -193,16 +186,6 @@ public class ChatsFragment extends Fragment implements HomeChatAdapter.ListItemC
         Intent intent = new Intent(this.getActivity(), ChatActivity.class);
         intent.putExtra(Consts.USER, user);
         startActivity(intent);
-    }
-
-    @Override
-    public void onPause() {
-        super.onPause();
-    }
-
-    @Override
-    public void onResume() {
-        super.onResume();
     }
 
     @Override
@@ -232,5 +215,11 @@ public class ChatsFragment extends Fragment implements HomeChatAdapter.ListItemC
             // no conversations yet
             hideChatListAndDisplayWelcomeAnimation();
         }
+    }
+
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        mPresenter.detachView();
     }
 }

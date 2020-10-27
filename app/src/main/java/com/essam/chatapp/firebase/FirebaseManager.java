@@ -15,10 +15,10 @@ public class FirebaseManager {
     private static FirebaseManager instance;
 
     private FirebaseAuth mFirebaseAuth;
-    public DatabaseReference appUserDb;     //ChatApp/user/
+    private DatabaseReference appUserDb;     //ChatApp/user/
     private DatabaseReference appChatDb;    //ChatApp/chat/
     private DatabaseReference mUserDb;      //ChatApp/user/uid/
-    public DatabaseReference userChatDb;    //ChatApp/user/uid/chat/
+    private DatabaseReference userChatDb;    //ChatApp/user/uid/chat/
 
     private FirebaseManager() {
         initFirebase();

@@ -1,4 +1,4 @@
-package com.essam.chatapp.ui.calls.fragment;
+package com.essam.chatapp.ui.home.fragments.calls.fragment;
 
 
 import android.os.Bundle;
@@ -13,7 +13,7 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.airbnb.lottie.LottieAnimationView;
 import com.essam.chatapp.R;
-import com.essam.chatapp.ui.conversations.adapter.HomeChatAdapter;
+import com.essam.chatapp.ui.home.fragments.chat.adapter.HomeChatAdapter;
 import com.essam.chatapp.models.Chat;
 
 import com.google.firebase.database.DatabaseReference;

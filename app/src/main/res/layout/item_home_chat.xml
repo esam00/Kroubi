@@ -1,45 +1,84 @@
 <?xml version="1.0" encoding="utf-8"?>
 
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.constraintlayout.widget.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:background="?android:attr/selectableItemBackground"
+    android:layout_marginBottom=".3dp"
     android:clickable="true"
-    android:focusable="true"
-    android:orientation="vertical">
+    android:focusable="true">
 
-    <RelativeLayout
-        android:layout_width="match_parent"
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/profileLayout"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginStart="12dp"
-        android:layout_marginTop="10dp"
-        android:layout_marginEnd="12dp">
+        android:padding="12dp"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent">
 
         <de.hdodenhof.circleimageview.CircleImageView
             android:id="@+id/contact_img"
             android:layout_width="54dp"
             android:layout_height="54dp"
-            android:layout_marginStart="0dp"
-            android:layout_marginEnd="12dp"
-            android:src="@drawable/user_placeholder" />
+            android:src="@drawable/user"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/constraintLayout"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:paddingEnd="12dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toEndOf="@+id/profileLayout"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.47000003">
+
+        <TextView
+            android:id="@+id/tv_sender_name"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textColor="@android:color/primary_text_light"
+            android:textSize="16sp"
+            app:layout_constraintEnd_toStartOf="@+id/tv_last_message_date"
+            app:layout_constraintHorizontal_bias="0.0"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            tools:text="Ahmed Rashed" />
 
         <LinearLayout
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_centerVertical="true"
-            android:layout_toStartOf="@+id/ll_more_info"
-            android:layout_toEndOf="@+id/contact_img"
-            android:orientation="vertical">
+            android:layout_marginTop="2dp"
+            android:gravity="center_vertical"
+            android:orientation="horizontal"
+            app:layout_constraintEnd_toStartOf="@+id/tv_unseen_count"
+            app:layout_constraintHorizontal_bias="0.0"
+            app:layout_constraintStart_toStartOf="@+id/tv_sender_name"
+            app:layout_constraintTop_toBottomOf="@+id/tv_sender_name">
 
-            <TextView
-                android:id="@+id/tv_sender_name"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:textColor="@android:color/primary_text_light"
-                android:textSize="16sp"
-                android:textStyle="bold"
-                tools:text="Ahmed Rashed" />
+            <ImageView
+                android:id="@+id/iv_message_state"
+                android:layout_width="20dp"
+                android:layout_height="20dp"
+                android:layout_marginEnd="2dp"
+                android:contentDescription="@string/seen_icon"
+                android:src="@drawable/ic_sent" />
+
+            <ImageView
+                android:id="@+id/iv_message_type"
+                android:layout_width="20dp"
+                android:layout_height="20dp"
+                android:layout_marginEnd="2dp"
+                android:contentDescription="@string/seen_icon"
+                android:src="@drawable/ic_camera" />
 
             <TextView
                 android:id="@+id/tv_sender_last_message"
@@ -48,49 +87,43 @@
                 android:maxLines="1"
                 android:textColor="@color/dark_gray"
                 android:textSize="15sp"
-                tools:text="خلاص هقوم اخد قيلولة" />
+                tools:text="Photo" />
 
         </LinearLayout>
 
-        <LinearLayout
-            android:id="@+id/ll_more_info"
+        <TextView
+            android:id="@+id/tv_last_message_date"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_alignParentEnd="true"
-            android:layout_centerVertical="true"
-            android:gravity="end"
-            android:orientation="vertical">
+            android:textColor="@color/colorAccent"
+            android:textSize="12sp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            tools:text="Yesterday" />
 
-            <TextView
-                android:id="@+id/tv_last_message_date"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginBottom="5dp"
-                android:textColor="@color/colorAccent"
-                android:textSize="12sp"
-                tools:text="Yesterday" />
-
-            <TextView
-                android:id="@+id/tv_unseen_count"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:background="@drawable/shape_messages_count_bg"
-                android:gravity="center"
-                android:textColor="@color/white"
-                android:textSize="12sp"
-                tools:text="3" />
-        </LinearLayout>
-    </RelativeLayout>
+        <TextView
+            android:id="@+id/tv_unseen_count"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="4dp"
+            android:layout_marginEnd="5dp"
+            android:background="@drawable/shape_messages_count_bg"
+            android:gravity="center"
+            android:textColor="@color/white"
+            android:textSize="12sp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/tv_last_message_date"
+            tools:text="3" />
+    </androidx.constraintlayout.widget.ConstraintLayout>
 
     <View
         android:id="@+id/separator"
-        android:layout_width="match_parent"
+        android:layout_width="0dp"
         android:layout_height=".3dp"
-        android:layout_marginStart="89dp"
-        android:layout_marginTop="10dp"
-        android:layout_marginEnd="15sp"
-        android:background="@color/light_gray">
+        android:background="@color/light_gray"
+        android:layout_marginEnd="8dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toEndOf="@+id/profileLayout"/>
 
-    </View>
-
-</LinearLayout>
+</androidx.constraintlayout.widget.ConstraintLayout>

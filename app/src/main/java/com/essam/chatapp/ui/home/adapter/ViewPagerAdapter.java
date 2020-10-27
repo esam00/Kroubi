@@ -5,10 +5,10 @@ import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentActivity;
 import androidx.viewpager2.adapter.FragmentStateAdapter;
 
-import com.essam.chatapp.ui.calls.fragment.CallsFragment;
-import com.essam.chatapp.ui.conversations.FragmentObserver;
-import com.essam.chatapp.ui.conversations.fragment.ChatsFragment;
-import com.essam.chatapp.ui.status.fragment.StatusFragment;
+import com.essam.chatapp.ui.home.fragments.calls.fragment.CallsFragment;
+import com.essam.chatapp.ui.home.fragments.chat.FragmentObserver;
+import com.essam.chatapp.ui.home.fragments.chat.HomeChatFragment;
+import com.essam.chatapp.ui.home.fragments.status.fragment.StatusFragment;
 
 import java.util.Observable;
 import java.util.Observer;
@@ -26,7 +26,7 @@ public class ViewPagerAdapter extends FragmentStateAdapter {
         switch (position) {
             case 0:
                 mObservers.deleteObservers(); // Clear existing observers.
-                Fragment chatFragment = new ChatsFragment();
+                Fragment chatFragment = new HomeChatFragment();
                 mObservers.addObserver((Observer) chatFragment);
                 return chatFragment;
             case 1:
