@@ -7,6 +7,8 @@ public class Chat {
     private String userPhoto;
     private String message;
     private String createdAt;
+    private String creatorId;
+    private boolean seen;
     private Long timeStamp;
     private int unSeenCount;
     private boolean isTyping;
@@ -16,7 +18,10 @@ public class Chat {
     }
 
     public Chat(String chatId, String userUid, String userPhone, String userPhoto,
-                String message, String createdAt, long timeStamp, int unSeenCount, boolean isTyping) {
+                String message, String createdAt, long timeStamp, int unSeenCount, boolean isTyping,
+                String creatorId, boolean seen
+    )
+    {
         this.chatId = chatId;
         this.userUid = userUid;
         this.userPhone = userPhone;
@@ -26,6 +31,8 @@ public class Chat {
         this.timeStamp = timeStamp;
         this.unSeenCount = unSeenCount;
         this.isTyping = isTyping;
+        this.creatorId = creatorId;
+        this.seen = seen;
     }
 
     public String getChatId() {
@@ -98,5 +105,21 @@ public class Chat {
 
     public void setTyping(boolean typing) {
         isTyping = typing;
+    }
+
+    public String getCreatorId() {
+        return creatorId;
+    }
+
+    public void setCreatorId(String creatorId) {
+        this.creatorId = creatorId;
+    }
+
+    public boolean isSeen() {
+        return seen;
+    }
+
+    public void setSeen(boolean seen) {
+        this.seen = seen;
     }
 }

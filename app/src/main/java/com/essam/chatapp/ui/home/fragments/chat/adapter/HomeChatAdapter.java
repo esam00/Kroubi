@@ -4,14 +4,18 @@ import android.content.Context;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
+import androidx.constraintlayout.widget.ConstraintLayout;
+import androidx.core.content.ContextCompat;
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.recyclerview.widget.SortedList;
 import androidx.recyclerview.widget.SortedListAdapterCallback;
 
 import com.essam.chatapp.R;
+import com.essam.chatapp.firebase.FirebaseManager;
 import com.essam.chatapp.ui.contacts.utils.ContactsHelper;
 import com.essam.chatapp.ui.home.fragments.chat.HomeChatFragment;
 import com.essam.chatapp.models.Chat;
@@ -85,6 +89,8 @@ public class HomeChatAdapter extends RecyclerView.Adapter<HomeChatAdapter.ViewHo
     public class ViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
         private TextView senderNameTV, lastMessageTv, dateTv, counterTv;
         private View separator;
+        private ImageView messageStateIv;
+        private ConstraintLayout parentView;
 
         private ViewHolder(@NonNull View itemView) {
             super(itemView);
@@ -93,6 +99,8 @@ public class HomeChatAdapter extends RecyclerView.Adapter<HomeChatAdapter.ViewHo
             dateTv = itemView.findViewById(R.id.tv_last_message_date);
             counterTv = itemView.findViewById(R.id.tv_unseen_count);
             separator = itemView.findViewById(R.id.separator);
+            parentView = itemView.findViewById(R.id.parent_view);
+            messageStateIv = itemView.findViewById(R.id.iv_message_state);
 
             itemView.setOnClickListener(this);
 
@@ -109,9 +117,17 @@ public class HomeChatAdapter extends RecyclerView.Adapter<HomeChatAdapter.ViewHo
                 counterTv.setVisibility(View.VISIBLE);
                 dateTv.setTextColor(context.getResources().getColor(R.color.colorAccent));
                 counterTv.setText((NumberFormat.getInstance().format(chat.getUnSeenCount())));
+                parentView.setBackground(ContextCompat.getDrawable(context,R.drawable.ripple_effect_highlighted));
             } else {
                 counterTv.setVisibility(View.GONE);
                 dateTv.setTextColor(context.getResources().getColor(R.color.dark_gray));
+                parentView.setBackground(ContextCompat.getDrawable(context,R.drawable.ripple_effect_basic));
+            }
+
+            if (chat.getCreatorId().equals(FirebaseManager.getInstance().getMyUid())){
+                messageStateIv.setVisibility(View.VISIBLE);
+            }else {
+                messageStateIv.setVisibility(View.GONE);
             }
 
             // hide separator for last item in the list

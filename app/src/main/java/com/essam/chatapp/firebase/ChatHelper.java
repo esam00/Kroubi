@@ -83,7 +83,7 @@ public class ChatHelper {
 
             }
         };
-        mManager.getUserChatDb().addListenerForSingleValueEvent(checkPreviousConversations);
+        mManager.checkChatHistoryForCurrentUser(checkPreviousConversations);
     }
 
     public void getAllMessages() {
@@ -154,7 +154,7 @@ public class ChatHelper {
     private void pushNewChat(String inputMessage) {
         currentFormatDate = ProjectUtils.getDisplayableCurrentDateTime();
 
-        DatabaseReference mySideDb = mManager.getUserChatDb().child(chatID);
+        DatabaseReference mySideDb = mManager.getReferenceToThisChat(chatID);
         Chat mySideChat = new Chat(chatID,
                 otherUser.getUid(),
                 otherUser.getPhone(),
@@ -162,13 +162,17 @@ public class ChatHelper {
                 inputMessage,
                 currentFormatDate, System.currentTimeMillis(),
                 0,
+                false,
+                mManager.getMyUid(),
                 false);
         mySideDb.setValue(mySideChat);
 
         DatabaseReference otherSideDb = mManager.getAppUserDb().child(otherUser.getUid()).child(Consts.CHAT).child(chatID);
         String myPhoto = "";
         Chat otherSideChat = new Chat(chatID, mManager.getMyUid(), mManager.getMyPhone(), myPhoto, inputMessage,
-                currentFormatDate, System.currentTimeMillis(), 1,false);
+                currentFormatDate, System.currentTimeMillis(), 1,false,
+                mManager.getMyUid(),
+                false);
         otherSideDb.setValue(otherSideChat);
 
         getLastUnseenCont();
@@ -215,7 +219,7 @@ public class ChatHelper {
     }
 
     private void resetMyUnseenCount() {
-        DatabaseReference mySideDb = mManager.getUserChatDb().child(chatID);
+        DatabaseReference mySideDb = mManager.getReferenceToThisChat(chatID);
         mySideDb.child(Consts.UNSEEN_COUNT).setValue(0);
     }
 
@@ -227,16 +231,19 @@ public class ChatHelper {
             }
         }
 
-        DatabaseReference mySideDb = mManager.getUserChatDb().child(chatID);
+        DatabaseReference mySideDb = mManager.getReferenceToThisChat(chatID);
         mySideDb.child(Consts.MESSAGE).setValue(inputMessage);
         mySideDb.child(Consts.CREATED_AT).setValue(currentFormatDate);
         mySideDb.child(Consts.TIME_STAMP).setValue(System.currentTimeMillis());
+        mySideDb.child(Consts.CREATOR_ID).setValue(mManager.getMyUid());
 
         DatabaseReference otherSideDb = mManager.getAppUserDb().child(otherUser.getUid()).child(Consts.CHAT).child(chatID);
         otherSideDb.child(Consts.MESSAGE).setValue(inputMessage);
         otherSideDb.child(Consts.CREATED_AT).setValue(currentFormatDate);
         otherSideDb.child(Consts.TIME_STAMP).setValue(System.currentTimeMillis());
         otherSideDb.child(Consts.UNSEEN_COUNT).setValue(otherUnseenCount + 1);
+        otherSideDb.child(Consts.CREATOR_ID).setValue(mManager.getMyUid());
+
     }
 
     private void pushMediaMessages(final List<String>mediaUriList) {

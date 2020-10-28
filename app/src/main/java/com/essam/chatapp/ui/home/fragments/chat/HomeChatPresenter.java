@@ -14,50 +14,39 @@ import com.google.firebase.database.ValueEventListener;
 
 public class HomeChatPresenter implements HomeChatContract.Presenter{
     private HomeChatContract.View mView;
-    private FirebaseManager mManager;
+    private FirebaseManager mFirebaseManager;
     private ChildEventListener mHomeChatsEventListener;
-
     private static final String TAG = HomeChatPresenter.class.getSimpleName();
 
     public HomeChatPresenter(HomeChatContract.View view) {
         mView = view;
-        mManager = FirebaseManager.getInstance();
-    }
-
-    public void detachView(){
-        mView = null;
-        removeHomeChatListeners();
+        mFirebaseManager = FirebaseManager.getInstance();
     }
 
     @Override
     public void getUserChatList() {
+        // single event listener to check first if there is any chat history
         checkChatHistoryForCurrentUser();
+
+        // Subscribing to user/chat node to get notified when ever a chat added, changed or deleted
+        startFetchingUserChatList();
     }
 
-    /**
-     * Check if current user has any chat history
-     */
     private void checkChatHistoryForCurrentUser(){
         //single value event listener to check if user has any previous chats
-        mManager.getUserChatDb().addListenerForSingleValueEvent(new ValueEventListener() {
+        mFirebaseManager.checkChatHistoryForCurrentUser(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                boolean hasPreviousChats = dataSnapshot.exists();
-                mView.onCheckExistingChats(hasPreviousChats);
-
-                // if current user has chat history start fetching chat list
-                if (hasPreviousChats) startFetchingUserChatList();
+                mView.onCheckExistingChats(dataSnapshot.exists());
             }
 
             @Override
             public void onCancelled(@NonNull DatabaseError databaseError) {
+                mView.onNetworkError();
             }
         });
     }
 
-    /**
-     * This method is responsible for fetching previous chats AND listen for new messages
-     */
     private void startFetchingUserChatList() {
         // this value event listener is triggered once a new chat added Or existing chat updated
         mHomeChatsEventListener = new ChildEventListener() {
@@ -94,12 +83,16 @@ public class HomeChatPresenter implements HomeChatContract.Presenter{
                 Log.e(TAG, "onCancelled: " + databaseError);
             }
         };
-        mManager.getUserChatDb().addChildEventListener(mHomeChatsEventListener);
+        mFirebaseManager.getUserChatList(mHomeChatsEventListener);
+    }
+
+    public void detachView(){
+        mView = null;
+        removeHomeChatListeners();
     }
 
     private void removeHomeChatListeners() {
-        if (mHomeChatsEventListener != null){
-            mManager.getUserChatDb().removeEventListener(mHomeChatsEventListener);
-        }
+        mFirebaseManager.removeHomeChatListeners(mHomeChatsEventListener);
     }
+
 }

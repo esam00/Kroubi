@@ -14,5 +14,7 @@ public class HomeChatContract {
         void onChatUpdated(Chat chat);
 
         void onCheckExistingChats(boolean hasPreviousChats);
+
+        void onNetworkError();
     }
 }

@@ -40,5 +40,7 @@
     <string name="send_verification_code">Send Verification Code</string>
     <string name="invalid_phone_number">Invalid phone number!</string>
     <string name="invalid_verification_code">Invalid verification code!</string>
+    <string name="network_error_msg">Something went wrong, please try again!</string>
+    <string name="attachment_icon">Attachment icon</string>
 
 </resources>

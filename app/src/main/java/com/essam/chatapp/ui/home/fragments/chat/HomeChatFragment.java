@@ -20,6 +20,7 @@ import android.view.ViewGroup;
 import android.view.Window;
 import android.widget.LinearLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.airbnb.lottie.LottieAnimationView;
 import com.essam.chatapp.R;
@@ -215,6 +216,11 @@ public class HomeChatFragment extends Fragment implements HomeChatAdapter.ListIt
             // no conversations yet
             hideChatListAndDisplayWelcomeAnimation();
         }
+    }
+
+    @Override
+    public void onNetworkError() {
+        Toast.makeText(mContext, R.string.network_error_msg, Toast.LENGTH_SHORT).show();
     }
 
     @Override

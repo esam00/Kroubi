@@ -23,13 +23,13 @@ import java.util.concurrent.TimeUnit;
 
 public class LoginPresenter {
     private LoginCallbacks mCallbacks;
-    private FirebaseManager mManager;
+    private FirebaseManager mFirebaseManager;
 
     private static final String TAG = LoginPresenter.class.getSimpleName();
 
     public LoginPresenter(LoginCallbacks callbacks) {
         mCallbacks = callbacks;
-        mManager = FirebaseManager.getInstance();
+        mFirebaseManager = FirebaseManager.getInstance();
     }
 
     public void getVerificationCode(String phoneNumber) {
@@ -74,19 +74,19 @@ public class LoginPresenter {
     }
 
     public void signInWithPhoneCredential(PhoneAuthCredential phoneAuthCredential) {
-        mManager.getFirebaseAuth().signInWithCredential(phoneAuthCredential)
+        mFirebaseManager.getFirebaseAuth().signInWithCredential(phoneAuthCredential)
                 .addOnCompleteListener(new OnCompleteListener<AuthResult>() {
             @Override
             public void onComplete(@NonNull Task<AuthResult> task) {
                 if (task.isSuccessful()) {
                     // Tell firebase manager that user has been successfully logged in
-                    mManager.updateUserAuthState(FirebaseManager.UserAuthState.LOGGED_IN);
+                    mFirebaseManager.updateUserAuthState(FirebaseManager.UserAuthState.LOGGED_IN);
 
                     // check if this is a new user or already registered user
                     checkIfUserExistInDataBase();
 
                     // update view
-                    mCallbacks.onLoginSuccess(mManager.getMyPhone());
+                    mCallbacks.onLoginSuccess(mFirebaseManager.getMyPhone());
                 }
             }
         })
@@ -99,7 +99,7 @@ public class LoginPresenter {
     }
 
     private void checkIfUserExistInDataBase() {
-        ValueEventListener userEventListener = new ValueEventListener() {
+        mFirebaseManager.checkIfUserExistInDataBase(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                 if (!dataSnapshot.exists()) {
@@ -110,19 +110,17 @@ public class LoginPresenter {
             @Override
             public void onCancelled(@NonNull DatabaseError databaseError) {
             }
-        };
-
-        mManager.getUserDb().addListenerForSingleValueEvent(userEventListener);
+        });
     }
 
     private void createNewUser() {
-        User user = new User(mManager.getMyUid(),
-                mManager.getMyPhone(),
-                mManager.getMyPhone(),
+        User user = new User(mFirebaseManager.getMyUid(),
+                mFirebaseManager.getMyPhone(),
+                mFirebaseManager.getMyPhone(),
                 "Hey there , I'm using Kroubi",
                 "",
                 "online");
-        mManager.getUserDb().setValue(user);
+        mFirebaseManager.addCurrentUserToDatabase(user);
     }
 
     public void detachView(){
