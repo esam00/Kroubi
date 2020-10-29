@@ -9,6 +9,13 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
+/** FirebaseManager is a Singleton class that holds all firebase database references
+ * Also holds UserAuth state and manages other cases ..
+ * This is a very helpful class as we don't have to create DatabaseReference object every time.
+ * we just declare and initialize those references once, and use the helper methods that attache and
+ * remove eventListeners to them. YAAi ^_^
+ * */
+
 public class FirebaseManager {
     public enum UserAuthState{
         LOGGED_IN,
@@ -17,10 +24,10 @@ public class FirebaseManager {
     private static FirebaseManager instance;
 
     private FirebaseAuth mFirebaseAuth;
-    private DatabaseReference appUserDb;        //ChatApp/user/
-    private DatabaseReference appChatDb;        //ChatApp/chat/
-    private DatabaseReference mUserDb;          //ChatApp/user/uid/
-    private DatabaseReference userChatDb;       //ChatApp/user/uid/chat/
+    private DatabaseReference appUserDb;        //App/user/
+    private DatabaseReference appChatDb;        //App/chat/
+    private DatabaseReference mUserDb;          //App/user/uid/
+    private DatabaseReference userChatDb;       //App/user/uid/chat/
 
     private FirebaseManager() {
         initFirebase();
@@ -44,6 +51,16 @@ public class FirebaseManager {
             userChatDb = mUserDb.child(Consts.CHAT);
         }
     }
+
+    public String getMyUid() {
+        return getFirebaseUser().getUid();
+    }
+
+    public String getMyPhone() {
+        return getFirebaseUser().getPhoneNumber();
+    }
+
+    /* ---------------------------------- Authentication ----------------------------------------*/
 
     public void updateUserAuthState(UserAuthState state){
         switch (state){
@@ -74,22 +91,6 @@ public class FirebaseManager {
 
     public FirebaseUser getFirebaseUser() {
         return getFirebaseAuth().getCurrentUser();
-    }
-
-    public String getMyUid() {
-        return getFirebaseUser().getUid();
-    }
-
-    public String getMyPhone() {
-        return getFirebaseUser().getPhoneNumber();
-    }
-
-    public DatabaseReference getAppUserDb() {
-        return appUserDb;
-    }
-
-    public DatabaseReference getAppChatDb() {
-        return appChatDb;
     }
 
     /* -------------------------------------- Login ---------------------------------------------*/
@@ -126,8 +127,19 @@ public class FirebaseManager {
 
     /* ----------------------------------- One To One Chat -------------------------------------*/
 
-    public DatabaseReference getReferenceToThisChat(String chatId){
+    public String pushNewTopLevelChat(){
+        return appChatDb.push().getKey();
+    }
+
+    public DatabaseReference getReferenceToSpecificUserChat(String chatId){
         return userChatDb.child(chatId);
     }
 
+    public DatabaseReference getReferenceToSpecificUserChat(String userUid, String chatId){
+        return appUserDb.child(userUid).child(Consts.CHAT).child(chatId);
+    }
+
+    public DatabaseReference getReferenceToSpecificAppChat(String chatId){
+        return appChatDb.child(chatId);
+    }
 }

@@ -28,24 +28,26 @@ import com.bumptech.glide.Glide;
 import com.bumptech.glide.load.engine.DiskCacheStrategy;
 import com.essam.chatapp.R;
 import com.essam.chatapp.models.Message;
-import com.essam.chatapp.utils.Consts;
 import com.essam.chatapp.utils.DateTimeUtils;
 import com.google.firebase.auth.FirebaseAuth;
-import com.google.firebase.database.DatabaseReference;
 
 import java.util.List;
 
 public class ChatAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
-
     private List<Message> mMessages;
     private Context mContext;
-    private DatabaseReference chatDb;
+    private ChatListener mListener;
 
     private static final int VIEW_TYPE_OUTGOING = 1;
     private static final int VIEW_TYPE_RECEIVED = 2;
 
-    public ChatAdapter(Context context) {
+    public ChatAdapter(ChatListener listener,Context context) {
         this.mContext = context;
+        this.mListener = listener;
+    }
+
+    public interface ChatListener{
+        void onUpdateComingMessageAsSeen(String messageId);
     }
 
     // Determine the appropriate ViewType according to the sender of the message.
@@ -131,7 +133,7 @@ public class ChatAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
             bindMessageMedia(message);
 
             //bind seen
-            bindSeenLogic(message);
+            handleSeenUi(message.isSeen());
         }
 
         void bindMessageText(Message message) {
@@ -166,8 +168,8 @@ public class ChatAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
             }
         }
 
-        void bindSeenLogic(Message message) {
-            if (message.isSeen())
+        void handleSeenUi(boolean isSeen) {
+            if (isSeen)
                 messageStateIV.setImageResource(R.drawable.ic_seen);
             else
                 messageStateIV.setImageResource(R.drawable.ic_sent);
@@ -227,9 +229,8 @@ public class ChatAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
             //bind message time
             sentAtTextView.setText(DateTimeUtils.getDisplayableDateOfGivenTimeStamp(mContext,message.getTimeStamp(),true));
 
-            // TODO: 10/13/2020  
             //update message seen = true
-//            updateSeenLogic(message);
+            mListener.onUpdateComingMessageAsSeen(message.getMessageId());
 
             //bind message text
             bindMessageText(message);
@@ -279,7 +280,6 @@ public class ChatAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
                 smallMessageTv.setVisibility(View.GONE);
                 messageTextView.setText(message.getMessage());
             }
-
         }
 
         void bindMessageMedia(final Message message) {
@@ -296,25 +296,10 @@ public class ChatAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
                 imageMessageIv.setVisibility(View.GONE);
             }
         }
-
-        void updateSeenLogic(Message message) {
-            DatabaseReference msgDb = chatDb.child(message.getMessageId());
-            msgDb.child(Consts.SEEN).setValue(true);
-        }
     }
 
     public void setMessagesData(List<Message> messages) {
         mMessages = messages;
-        notifyDataSetChanged();
-    }
-
-    /**
-     * get the reference to this chat id chat database >> chat/chatId
-     *
-     * @param mChatDb >> chat/chatId
-     */
-    public void setChatDp(DatabaseReference mChatDb) {
-        chatDb = mChatDb;
         notifyDataSetChanged();
     }
 

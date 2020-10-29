@@ -16,6 +16,7 @@ import androidx.recyclerview.widget.SortedListAdapterCallback;
 
 import com.essam.chatapp.R;
 import com.essam.chatapp.firebase.FirebaseManager;
+import com.essam.chatapp.models.Message;
 import com.essam.chatapp.ui.contacts.utils.ContactsHelper;
 import com.essam.chatapp.ui.home.fragments.chat.HomeChatFragment;
 import com.essam.chatapp.models.Chat;
@@ -56,7 +57,11 @@ public class HomeChatAdapter extends RecyclerView.Adapter<HomeChatAdapter.ViewHo
 
             @Override
             public boolean areContentsTheSame(Chat oldItem, Chat newItem) {
-                return oldItem.getTimeStamp().equals(newItem.getTimeStamp());
+                // What are the scenarios of home chat to be updated?
+                //1- last message updated >> check for time stamp
+                //2- last message was sent by current user and message has seen >> check for seen
+                return oldItem.getTimeStamp().equals(newItem.getTimeStamp()) &&
+                        oldItem.isSeen() == newItem.isSeen();
             }
 
             @Override
@@ -126,6 +131,7 @@ public class HomeChatAdapter extends RecyclerView.Adapter<HomeChatAdapter.ViewHo
 
             if (chat.getCreatorId().equals(FirebaseManager.getInstance().getMyUid())){
                 messageStateIv.setVisibility(View.VISIBLE);
+                handleSeenUi(chat.isSeen());
             }else {
                 messageStateIv.setVisibility(View.GONE);
             }
@@ -135,6 +141,13 @@ public class HomeChatAdapter extends RecyclerView.Adapter<HomeChatAdapter.ViewHo
                 separator.setVisibility(View.GONE);
             else
                 separator.setVisibility(View.VISIBLE);
+        }
+
+        void handleSeenUi(boolean isSeen) {
+            if (isSeen)
+                messageStateIv.setImageResource(R.drawable.ic_seen);
+            else
+                messageStateIv.setImageResource(R.drawable.ic_sent);
         }
 
         @Override

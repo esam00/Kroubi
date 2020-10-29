@@ -29,7 +29,7 @@ import android.widget.Toast;
 import com.daimajia.androidanimations.library.Techniques;
 import com.daimajia.androidanimations.library.YoYo;
 import com.essam.chatapp.R;
-import com.essam.chatapp.firebase.ChatHelper;
+import com.essam.chatapp.firebase.ChatManager;
 import com.essam.chatapp.ui.chat.adapter.ChatAdapter;
 import com.essam.chatapp.models.Message;
 import com.essam.chatapp.models.User;
@@ -47,7 +47,8 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
-public class ChatActivity extends AppCompatActivity implements View.OnClickListener, ChatCallBacks {
+public class ChatActivity extends AppCompatActivity implements View.OnClickListener,
+        ChatCallBacks, ChatAdapter.ChatListener {
 
     //views
     private RecyclerView recyclerView;
@@ -63,7 +64,7 @@ public class ChatActivity extends AppCompatActivity implements View.OnClickListe
     private SharedPrefrence prefrence;
     private Uri picUri;
 
-    private ChatHelper mChatHelper = new ChatHelper(this);
+    private ChatManager mChatManager = new ChatManager(this);
 
     private final static String TAG = ChatActivity.class.getSimpleName();
     private User mOtherUser;
@@ -96,7 +97,7 @@ public class ChatActivity extends AppCompatActivity implements View.OnClickListe
         prefrence = SharedPrefrence.getInstance(this);
 
         //recyclerView
-        adapter = new ChatAdapter(this);
+        adapter = new ChatAdapter(this, this);
         listMessages = new ArrayList<>();
         recyclerView.setAdapter(adapter);
         LinearLayoutManager layoutManager = new LinearLayoutManager(this);
@@ -126,10 +127,12 @@ public class ChatActivity extends AppCompatActivity implements View.OnClickListe
         Intent intent = getIntent();
         if ((intent.hasExtra(Consts.USER))){
             mOtherUser = intent.getParcelableExtra(Consts.USER);
-            assert mOtherUser != null;
-            titleTv.setText(mOtherUser.getName());
+            if (mOtherUser != null){
+                titleTv.setText(mOtherUser.getName());
 
-            mChatHelper.checkForPreviousChatWith(mOtherUser);
+                mChatManager.checkForPreviousChatWith(mOtherUser);
+            }
+
         }
     }
 
@@ -140,21 +143,12 @@ public class ChatActivity extends AppCompatActivity implements View.OnClickListe
         if (TextUtils.isEmpty(inputMessage)) {
             Toast.makeText(this, "Please type a message to be sent", Toast.LENGTH_SHORT).show();
         } else {
-            mChatHelper.sendMessage(inputMessage,mediaUriList);
+            mChatManager.sendMessage(inputMessage,mediaUriList);
             messageEt.setText("");
         }
-
     }
 
     // ----------------------------------- ChatCallBacks -----------------------------------------
-    @Override
-    public void onCheckPreviousConversationWithThisUser(boolean isFirstTime, Chat chat) {
-        // TODO: 10/13/2020 fix this
-//        this.isFirstTime = isFirstTime;
-//
-//        // pass this reference to adapter in order to handle and update seen state
-//        adapter.setChatDp(mChatDb);
-    }
 
     @Override
     public void onCheckFirstTimeChat(boolean isFirstTime) {
@@ -183,7 +177,7 @@ public class ChatActivity extends AppCompatActivity implements View.OnClickListe
         recyclerView.smoothScrollToPosition(adapter.getItemCount() - 1);
     }
 
-    //---------------------------------- Attaches{} ---------------------------------------------
+    /*---------------------------------- Attachments ---------------------------------------------*/
 
     /**
      * this method opens device's media to choose an image
@@ -292,7 +286,7 @@ public class ChatActivity extends AppCompatActivity implements View.OnClickListe
 
     }
 
-    // ------------------------------------------- Overrides -----------------------------------
+    /* --------------------------------- Activity callbacks -----------------------------------*/
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
@@ -335,7 +329,7 @@ public class ChatActivity extends AppCompatActivity implements View.OnClickListe
                 case Consts.EDIT_PHOTO_REQUEST:
                     if (data != null && data.getExtras() != null && data.getStringExtra("message") != null) {
                         inputMessage = data.getStringExtra("message");
-                        mChatHelper.sendMessage(inputMessage,mediaUriList);
+                        mChatManager.sendMessage(inputMessage,mediaUriList);
                     } else {
                         Log.i(TAG, "onActivityResult: no Image was retrived ");
                         mediaUriList.clear();
@@ -418,15 +412,20 @@ public class ChatActivity extends AppCompatActivity implements View.OnClickListe
         if (filePickerLl.getVisibility() == View.VISIBLE) {
             animateFilePickerDown();
         } else {
-            mChatHelper.unSubScribeAllListeners();
+            mChatManager.unSubScribeAllListeners();
             super.onBackPressed();
         }
     }
 
     @Override
     protected void onDestroy() {
-        mChatHelper.unSubScribeAllListeners();
+        mChatManager.unSubScribeAllListeners();
         super.onDestroy();
+    }
+
+    @Override
+    public void onUpdateComingMessageAsSeen(String messageId) {
+        mChatManager.updateComingMessageAsSeen(messageId);
     }
 
 //    private void openFilePickerDialog() {

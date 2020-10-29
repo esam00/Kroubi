@@ -22,7 +22,6 @@ import com.google.firebase.auth.PhoneAuthCredential;
 import com.google.firebase.auth.PhoneAuthProvider;
 
 public class LoginActivity extends AppCompatActivity implements View.OnClickListener, LoginCallbacks {
-
     //view
     private EditText mPhoneNumberEditText, mVerificationCodeEditText;
     private ProgressBar mPhoneProgressBar, mCodeProgress;
@@ -33,7 +32,6 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
     private SharedPrefrence preference;
 
     private LoginPresenter mLoginPresenter = new LoginPresenter(this);
-
     private static final String TAG = LoginActivity.class.getSimpleName();
 
     @Override

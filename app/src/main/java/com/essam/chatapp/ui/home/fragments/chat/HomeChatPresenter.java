@@ -28,7 +28,7 @@ public class HomeChatPresenter implements HomeChatContract.Presenter{
         // single event listener to check first if there is any chat history
         checkChatHistoryForCurrentUser();
 
-        // Subscribing to user/chat node to get notified when ever a chat added, changed or deleted
+        // Subscribing to user/chat to get notified whenever a chat added, changed or deleted
         startFetchingUserChatList();
     }
 
@@ -70,12 +70,10 @@ public class HomeChatPresenter implements HomeChatContract.Presenter{
 
             @Override
             public void onChildRemoved(@NonNull DataSnapshot dataSnapshot) {
-
             }
 
             @Override
             public void onChildMoved(@NonNull DataSnapshot dataSnapshot, @Nullable String s) {
-
             }
 
             @Override
