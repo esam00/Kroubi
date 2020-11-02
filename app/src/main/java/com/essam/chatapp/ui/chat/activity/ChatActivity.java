@@ -16,7 +16,9 @@ import android.os.Bundle;
 import android.os.Environment;
 import android.os.Handler;
 import android.provider.MediaStore;
+import android.text.Editable;
 import android.text.TextUtils;
+import android.text.TextWatcher;
 import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
@@ -26,14 +28,13 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.bumptech.glide.Glide;
 import com.daimajia.androidanimations.library.Techniques;
 import com.daimajia.androidanimations.library.YoYo;
 import com.essam.chatapp.R;
-import com.essam.chatapp.firebase.ChatManager;
+import com.essam.chatapp.models.Profile;
 import com.essam.chatapp.ui.chat.adapter.ChatAdapter;
 import com.essam.chatapp.models.Message;
-import com.essam.chatapp.models.User;
-import com.essam.chatapp.models.Chat;
 import com.essam.chatapp.ui.profile.UserProfileActivity;
 import com.essam.chatapp.utils.ProjectUtils;
 import com.essam.chatapp.utils.SharedPrefrence;
@@ -48,38 +49,40 @@ import java.util.Date;
 import java.util.List;
 
 public class ChatActivity extends AppCompatActivity implements View.OnClickListener,
-        ChatCallBacks, ChatAdapter.ChatListener {
-
+        ChatContract.View, ChatAdapter.ChatListener {
     //views
     private RecyclerView recyclerView;
     private EditText messageEt;
-    private LinearLayout filePickerLl, emptyLayout;
+    private LinearLayout filePickerLl;
+    private LinearLayout emptyLayout;
     private ChatAdapter adapter;
     private List<Message> listMessages;
-    private TextView titleTv;
+    private TextView titleTv, isTypingTv, loadingTv;
+    private ImageView profileIv;
 
     //vars
     private String inputMessage;
     private List<String> mediaUriList;
     private SharedPrefrence prefrence;
     private Uri picUri;
+    private boolean isTyping = false;
 
-    private ChatManager mChatManager = new ChatManager(this);
+    private ChatContract.Presenter mPresenter;
 
     private final static String TAG = ChatActivity.class.getSimpleName();
-    private User mOtherUser;
+    private Profile mOtherUserProfile;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_chat);
 
+        mPresenter = new ChatPresenter(this);
         initViews();
         receiveIntents();
     }
 
     private void initViews() {
-
         recyclerView = findViewById(R.id.msg_rv);
         messageEt = findViewById(R.id.send_msg_et);
         ImageView sendIv = findViewById(R.id.send_iv);
@@ -91,7 +94,10 @@ public class ChatActivity extends AppCompatActivity implements View.OnClickListe
         ImageView openGalleryIv = findViewById(R.id.open_gallery_iv);
         emptyLayout = findViewById(R.id.empty_ll);
         titleTv = findViewById(R.id.user_name_tv);
-
+        isTypingTv = findViewById(R.id.is_typing_tv);
+        profileIv = findViewById(R.id.profile_iv);
+        LinearLayout userInfoLl = findViewById(R.id.user_info_ll);
+        loadingTv = findViewById(R.id.loading_tv);
 
         mediaUriList = new ArrayList<>();
         prefrence = SharedPrefrence.getInstance(this);
@@ -114,8 +120,33 @@ public class ChatActivity extends AppCompatActivity implements View.OnClickListe
         onClickViews.add(openGalleryIv);
         onClickViews.add(backImageIcon);
         onClickViews.add(messageEt);
-        onClickViews.add(titleTv);
+        onClickViews.add(userInfoLl);
         for (View view : onClickViews) view.setOnClickListener(this);
+
+        messageEt.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+
+            }
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+                if (s.length() > 0){
+                    if (!isTyping){
+                        isTyping = true;
+                        mPresenter.toggleIsTypingState(true);
+                    }
+                }else {
+                    isTyping = false;
+                    mPresenter.toggleIsTypingState(false);
+                }
+            }
+
+            @Override
+            public void afterTextChanged(Editable s) {
+
+            }
+        });
     }
 
     /**
@@ -125,45 +156,60 @@ public class ChatActivity extends AppCompatActivity implements View.OnClickListe
      */
     private void receiveIntents() {
         Intent intent = getIntent();
-        if ((intent.hasExtra(Consts.USER))){
-            mOtherUser = intent.getParcelableExtra(Consts.USER);
-            if (mOtherUser != null){
-                titleTv.setText(mOtherUser.getName());
-
-                mChatManager.checkForPreviousChatWith(mOtherUser);
+        if ((intent.hasExtra(Consts.PROFILE))){
+            mOtherUserProfile = intent.getParcelableExtra(Consts.PROFILE);
+            if (mOtherUserProfile != null){
+                onUpdateProfileInfo(mOtherUserProfile);
+                fetchChatMessages();
             }
 
         }
     }
 
+    private void fetchChatMessages(){
+        if (!ProjectUtils.isNetworkConnected(this)) {
+            ProjectUtils.showToast(this, getString(R.string.check_network));
+            loadingTv.setText(R.string.check_network);
+            return;
+        }
+
+        mPresenter.checkForPreviousChatWith(mOtherUserProfile);
+    }
+
     private void preSendMessage() {
         //get message that has been input by user
         inputMessage = messageEt.getText().toString().trim();
-
         if (TextUtils.isEmpty(inputMessage)) {
             Toast.makeText(this, "Please type a message to be sent", Toast.LENGTH_SHORT).show();
         } else {
-            mChatManager.sendMessage(inputMessage,mediaUriList);
+            mPresenter.sendMessage(inputMessage,mediaUriList);
             messageEt.setText("");
         }
     }
 
-    // ----------------------------------- ChatCallBacks -----------------------------------------
+    // ----------------------------------- Presenter CallBacks -----------------------------------------
 
     @Override
     public void onCheckFirstTimeChat(boolean isFirstTime) {
-        if (!isFirstTime)
+        if (isFirstTime)
+            emptyLayout.setVisibility(View.VISIBLE);
+        else
             emptyLayout.setVisibility(View.GONE);
+
+        loadingTv.setVisibility(View.GONE);
     }
 
     @Override
     public void onNewMessageAdded(Message message) {
-        updateUi(message);
-    }
+        if (loadingTv.getVisibility() == View.VISIBLE){
+            loadingTv.setVisibility(View.GONE);
+        }
+        listMessages.add(message);
+        adapter.setMessagesData(listMessages);
+        recyclerView.smoothScrollToPosition(adapter.getItemCount() - 1);    }
 
     @Override
     public void onMessageSeen(String messageId) {
-        // changing means messages has been seen so update it in adapter
         for (int i = 0; i < listMessages.size(); i++) {
             if (listMessages.get(i).getMessageId().equals(messageId)) {
                 adapter.updateSeen(i);
@@ -171,10 +217,28 @@ public class ChatActivity extends AppCompatActivity implements View.OnClickListe
         }
     }
 
-    public void updateUi(Message message) {
-        listMessages.add(message);
-        adapter.setMessagesData(listMessages);
-        recyclerView.smoothScrollToPosition(adapter.getItemCount() - 1);
+    @Override
+    public void onToggleIsTyping(boolean isTyping) {
+        if (isTyping)
+            isTypingTv.setText(R.string.typing);
+        else
+            isTypingTv.setText(R.string.online);
+    }
+
+    @Override
+    public void onUpdateProfileInfo(Profile profile) {
+        titleTv.setText(mOtherUserProfile.getUserName());
+
+        Glide.with(this).load(profile.getAvatar())
+                .error(R.drawable.user)
+                .placeholder(R.drawable.user)
+                .into(profileIv);
+
+        if (profile.isOnline()){
+            isTypingTv.setVisibility(View.VISIBLE);
+        }else {
+            isTypingTv.setVisibility(View.GONE);
+        }
     }
 
     /*---------------------------------- Attachments ---------------------------------------------*/
@@ -235,7 +299,7 @@ public class ChatActivity extends AppCompatActivity implements View.OnClickListe
 
     private void openProfile() {
         Intent intent = new Intent(this, UserProfileActivity.class);
-        intent.putExtra(Consts.USER, mOtherUser);
+        intent.putExtra(Consts.USER, mOtherUserProfile);
         startActivity(intent);
     }
 
@@ -329,7 +393,7 @@ public class ChatActivity extends AppCompatActivity implements View.OnClickListe
                 case Consts.EDIT_PHOTO_REQUEST:
                     if (data != null && data.getExtras() != null && data.getStringExtra("message") != null) {
                         inputMessage = data.getStringExtra("message");
-                        mChatManager.sendMessage(inputMessage,mediaUriList);
+                        mPresenter.sendMessage(inputMessage, mediaUriList);
                     } else {
                         Log.i(TAG, "onActivityResult: no Image was retrived ");
                         mediaUriList.clear();
@@ -365,7 +429,7 @@ public class ChatActivity extends AppCompatActivity implements View.OnClickListe
     @Override
     public void onClick(View view) {
         switch (view.getId()) {
-            case R.id.user_name_tv:
+            case R.id.user_info_ll:
                 openProfile();
                 break;
 
@@ -384,17 +448,15 @@ public class ChatActivity extends AppCompatActivity implements View.OnClickListe
                 break;
 
             case R.id.attach_file_iv:
+                openGalleryChooser();
 //                openFilePickerDialog();
-                toggleFilePicker();
+//                toggleFilePicker();
                 break;
 
             case R.id.open_camera:
             case R.id.open_camera_iv:
                 openCamera();
                 break;
-
-            case R.id.open_gallery_iv:
-                openGalleryChooser();
         }
     }
 
@@ -412,20 +474,21 @@ public class ChatActivity extends AppCompatActivity implements View.OnClickListe
         if (filePickerLl.getVisibility() == View.VISIBLE) {
             animateFilePickerDown();
         } else {
-            mChatManager.unSubScribeAllListeners();
+            mPresenter.detachView();
             super.onBackPressed();
         }
     }
 
     @Override
     protected void onDestroy() {
-        mChatManager.unSubScribeAllListeners();
+        mPresenter.detachView();
         super.onDestroy();
     }
 
+    /*-----------------------------------Adapter Callbacks---------------------------------------*/
     @Override
     public void onUpdateComingMessageAsSeen(String messageId) {
-        mChatManager.updateComingMessageAsSeen(messageId);
+        mPresenter.updateComingMessageAsSeen(messageId);
     }
 
 //    private void openFilePickerDialog() {

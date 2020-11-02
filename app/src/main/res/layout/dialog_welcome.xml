@@ -24,7 +24,7 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:adjustViewBounds="true"
-                    android:src="@drawable/kroubi"
+                    android:src="@drawable/my_picture"
                     android:contentDescription="@string/notification_image" />
             </LinearLayout>
             <TextView

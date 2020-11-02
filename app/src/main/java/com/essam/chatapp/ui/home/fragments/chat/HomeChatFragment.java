@@ -24,7 +24,7 @@ import android.widget.Toast;
 
 import com.airbnb.lottie.LottieAnimationView;
 import com.essam.chatapp.R;
-import com.essam.chatapp.models.User;
+import com.essam.chatapp.models.Profile;
 import com.essam.chatapp.ui.contacts.utils.ContactsHelper;
 import com.essam.chatapp.ui.home.fragments.chat.adapter.HomeChatAdapter;
 import com.essam.chatapp.utils.ProjectUtils;
@@ -180,12 +180,15 @@ public class HomeChatFragment extends Fragment implements HomeChatAdapter.ListIt
         homeChatAdapter.clearUnSeenCount(chat, adapterPosition);
 
         //Chat Activity only accepts User object as extras..
-        User user = new User(chat.getUserUid(),
+        Profile profile = new Profile(
+                chat.getUserUid(),
                 chat.getUserPhone(),
                 chat.getUserPhone(),
-                "", "online");
+                chat.getUserPhoto(),
+                "",
+                false);
         Intent intent = new Intent(this.getActivity(), ChatActivity.class);
-        intent.putExtra(Consts.USER, user);
+        intent.putExtra(Consts.PROFILE, profile);
         startActivity(intent);
     }
 

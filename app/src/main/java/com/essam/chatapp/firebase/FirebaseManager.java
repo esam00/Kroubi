@@ -1,5 +1,6 @@
 package com.essam.chatapp.firebase;
 
+import com.essam.chatapp.models.Profile;
 import com.essam.chatapp.models.User;
 import com.essam.chatapp.utils.Consts;
 import com.google.firebase.auth.FirebaseAuth;
@@ -22,12 +23,14 @@ public class FirebaseManager {
         LOGGED_OUT,
     }
     private static FirebaseManager instance;
+    public boolean isFirstTime = false;
 
     private FirebaseAuth mFirebaseAuth;
     private DatabaseReference appUserDb;        //App/user/
     private DatabaseReference appChatDb;        //App/chat/
     private DatabaseReference mUserDb;          //App/user/uid/
     private DatabaseReference userChatDb;       //App/user/uid/chat/
+    private DatabaseReference userProfileDb;    //App/user/uid/profile/
 
     private FirebaseManager() {
         initFirebase();
@@ -49,6 +52,7 @@ public class FirebaseManager {
         if (isUserLoggedIn()){
             mUserDb = appUserDb.child(getMyUid());
             userChatDb = mUserDb.child(Consts.CHAT);
+            userProfileDb = mUserDb.child(Consts.PROFILE);
         }
     }
 
@@ -82,6 +86,7 @@ public class FirebaseManager {
 
     public void signOutUser() {
         getFirebaseAuth().signOut();
+        toggleOnlineState(false);
         instance = null;
     }
 
@@ -99,8 +104,32 @@ public class FirebaseManager {
         mUserDb.addListenerForSingleValueEvent(eventListener);
     }
 
-    public void addCurrentUserToDatabase(User user){
+    public void addNewUserToDataBase(Profile userProfile){
+        isFirstTime = true;
+        User user = new User(
+                getMyUid(),
+                getMyPhone(),
+                userProfile
+        );
         mUserDb.setValue(user);
+    }
+
+    public void toggleOnlineState(boolean isOnline){
+        if (isFirstTime) return; // user just signed in and state is online by default
+        if (isOnline) {
+            userProfileDb.child(Consts.IS_ONLINE).setValue(true);
+        } else {
+            if (isUserLoggedIn()) // user just signed out and state updated to offline
+                userProfileDb.child(Consts.IS_ONLINE).setValue(false);
+        }
+    }
+
+    public void getUserProfileInfo(String userId, ValueEventListener listener){
+        appUserDb.child(userId).child(Consts.PROFILE).addValueEventListener(listener);
+    }
+
+    public void removeUserProfileListener(String userId, ValueEventListener listener){
+        appUserDb.child(userId).child(Consts.PROFILE).removeEventListener(listener);
     }
 
     /* -------------------------------------- Home Chat ----------------------------------------*/
@@ -131,6 +160,10 @@ public class FirebaseManager {
         return appChatDb.push().getKey();
     }
 
+    public DatabaseReference getReferenceToSpecificAppChat(String chatId){
+        return appChatDb.child(chatId);
+    }
+
     public DatabaseReference getReferenceToSpecificUserChat(String chatId){
         return userChatDb.child(chatId);
     }
@@ -139,7 +172,4 @@ public class FirebaseManager {
         return appUserDb.child(userUid).child(Consts.CHAT).child(chatId);
     }
 
-    public DatabaseReference getReferenceToSpecificAppChat(String chatId){
-        return appChatDb.child(chatId);
-    }
 }

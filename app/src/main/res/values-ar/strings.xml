@@ -31,11 +31,13 @@
     <string name="select_contact">تحديد جهة اتصال</string>
     <string name="yesterday">أمس</string>
     <string name="settings">الاعدادات</string>
-    <string name="profile">Profile</string>
-    <string name="profile_transition">share_profile_transition</string>
-    <string name="send_verification_code">Send Verification Code</string>
-    <string name="invalid_phone_number">Invalid phone number!</string>
-    <string name="invalid_verification_code">Invalid verification code!</string>
-    <string name="network_error_msg">Something went wrong, please try again!</string>
-    <string name="attachment_icon">Attachment</string>
+    <string name="profile">الصفحة الشخصية</string>
+    <string name="send_verification_code">أرسل الرمز التأكيدي</string>
+    <string name="invalid_phone_number">رقم الهاتف غير صحيح</string>
+    <string name="invalid_verification_code">الرمز التأكيدي غير صحيح</string>
+    <string name="network_error_msg">حدث خطأ ما ، من فلك أعد المحاولة!</string>
+    <string name="typing">يقوم بالكتابة…</string>
+    <string name="online">متاح</string>
+    <string name="loading">جار التحميل…</string>
+    <string name="check_network">Check your network connection!</string>
 </resources>

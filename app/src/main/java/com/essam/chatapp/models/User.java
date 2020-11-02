@@ -5,69 +5,38 @@ import android.os.Parcelable;
 
 public class User implements Parcelable {
     private String uid;
-    private String name;
     private String phone;
-    private String status;
-    private String image = "";
-    private String state = "online";
+    private Profile mProfile;
 
     public User() {
         // Default constructor required for calls to DataSnapshot.getValue(User.class)
     }
 
-    public User(String uid, String name, String phone, String status, String image, String state) {
+    public User(String uid, String phone, Profile profile) {
         this.uid = uid;
-        this.name = name;
         this.phone = phone;
-        this.status = status;
-        this.image = image;
-        this.state = state;
+        mProfile = profile;
     }
 
-    public User(String uid, String name, String phone, String image, String state) {
+    public User(String uid, String phone) {
         this.uid = uid;
-        this.name = name;
         this.phone = phone;
-        this.image = image;
-        this.state = state;
     }
 
-    public User(String uid, String name, String phone) {
-        this.uid = uid;
-        this.name = name;
-        this.phone = phone;
+    public Profile getProfile() {
+        return mProfile;
+    }
+
+    public void setProfile(Profile profile) {
+        mProfile = profile;
     }
 
     public String getUid() {
         return uid;
     }
 
-    public String getName() {
-        return name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
-    }
-
     public String getPhone() {
         return phone;
-    }
-
-    public String getImage() {
-        return image;
-    }
-
-    public void setImage(String image) {
-        this.image = image;
-    }
-
-    public String getStatus() {
-        return status;
-    }
-
-    public void setStatus(String status) {
-        this.status = status;
     }
 
     public void setUid(String uid) {
@@ -78,14 +47,6 @@ public class User implements Parcelable {
         this.phone = phone;
     }
 
-    public String getState() {
-        return state;
-    }
-
-    public void setState(String state) {
-        this.state = state;
-    }
-
     @Override
     public int describeContents() {
         return 0;
@@ -93,11 +54,7 @@ public class User implements Parcelable {
 
     protected User(Parcel in) {
         uid = in.readString();
-        name = in.readString();
         phone = in.readString();
-        status = in.readString();
-        image = in.readString();
-        state = in.readString();
     }
 
     public static final Creator<User> CREATOR = new Creator<User>() {
@@ -115,10 +72,6 @@ public class User implements Parcelable {
     @Override
     public void writeToParcel(Parcel parcel, int i) {
         parcel.writeString(uid);
-        parcel.writeString(name);
         parcel.writeString(phone);
-        parcel.writeString(status);
-        parcel.writeString(image);
-        parcel.writeString(state);
     }
 }

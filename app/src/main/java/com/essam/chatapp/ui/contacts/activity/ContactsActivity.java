@@ -17,6 +17,7 @@ import android.widget.ProgressBar;
 import android.widget.TextView;
 
 import com.essam.chatapp.R;
+import com.essam.chatapp.models.Profile;
 import com.essam.chatapp.ui.chat.activity.ChatActivity;
 import com.essam.chatapp.ui.contacts.adapter.ContactsAdapter;
 import com.essam.chatapp.models.User;
@@ -107,7 +108,7 @@ public class ContactsActivity extends AppCompatActivity implements ContactsAdapt
                     phone = isoPrefix + phone;
                 }
 
-                User contact = new User("", name, phone);
+                User contact = new User("", phone, new Profile(name));
                 if (!isRedundant(phone)) {
                     contacts.add(contact);
                     checkIfThisContactIsUser(contact);
@@ -151,8 +152,8 @@ public class ContactsActivity extends AppCompatActivity implements ContactsAdapt
                     for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
                         User mUser = snapshot.getValue(User.class);
                         if(mUser !=null){
-                            if (mUser.getName().equals(mUser.getPhone())) {
-                                mUser.setName(mContact.getName());
+                            if (mUser.getProfile().getUserName().equals(mUser.getPhone())) {
+                                mUser.getProfile().setUserName(mContact.getProfile().getUserName());
                             }
                             users.add(mUser);
                         }
@@ -196,7 +197,7 @@ public class ContactsActivity extends AppCompatActivity implements ContactsAdapt
     @Override
     public void onClick(final int index) {
         Intent intent = new Intent(ContactsActivity.this, ChatActivity.class);
-        intent.putExtra(Consts.USER,users.get(index));
+        intent.putExtra(Consts.PROFILE,users.get(index).getProfile());
         startActivity(intent);
         finish();
     }

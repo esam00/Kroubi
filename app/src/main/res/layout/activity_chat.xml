@@ -10,7 +10,7 @@
         android:id="@+id/ll_chat_header"
         android:layout_width="match_parent"
         android:layout_height="?attr/actionBarSize"
-        android:elevation="2dp"
+        android:elevation="6dp"
         android:background="@color/colorPrimary"
         android:gravity="center_vertical"
         android:orientation="horizontal">
@@ -26,21 +26,42 @@
             android:id="@+id/profile_iv"
             android:layout_width="35dp"
             android:layout_height="35dp"
-            android:src="@drawable/my_picture" />
+            android:src="@drawable/user" />
 
-        <TextView
-            android:id="@+id/user_name_tv"
-            android:layout_width="wrap_content"
+        <LinearLayout
+            android:id="@+id/user_info_ll"
+            android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:background="?attr/selectableItemBackground"
-            android:gravity="center"
-            android:paddingStart="20dp"
+            android:animateLayoutChanges="true"
+            android:gravity="center_vertical"
+            android:paddingStart="14dp"
             android:paddingEnd="20dp"
-            android:layout_marginStart="5dp"
-            tools:text="User name"
-            android:textColor="@color/white"
-            android:textStyle="bold"
-            android:textAppearance="@style/TextAppearance.AppCompat.Medium"/>
+            android:orientation="vertical">
+
+            <TextView
+                android:id="@+id/user_name_tv"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:gravity="center"
+                tools:text="Essam mosbah"
+                android:textColor="@color/white"
+                android:textStyle="bold"
+                android:textAppearance="@style/TextAppearance.AppCompat.Medium"/>
+
+            <TextView
+                android:id="@+id/is_typing_tv"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:background="?attr/selectableItemBackground"
+                android:gravity="center"
+                android:text="@string/online"
+                android:visibility="gone"
+                android:textColor="@color/white"
+                android:textAppearance="@style/TextAppearance.AppCompat.Small"/>
+
+        </LinearLayout>
+
 
 
     </LinearLayout>
@@ -62,6 +83,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_centerInParent="true"
+        android:visibility="invisible"
         android:layout_margin="10dp"
         android:gravity="center"
         android:orientation="vertical">
@@ -87,6 +109,19 @@
         </TextView>
 
     </LinearLayout>
+
+    <TextView
+        android:id="@+id/loading_tv"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_margin="10dp"
+        android:layout_centerInParent="true"
+        android:gravity="center"
+        android:padding="5dp"
+        android:text="@string/loading"
+        android:textAppearance="@android:style/TextAppearance.DeviceDefault.Small">
+
+    </TextView>
 
     <LinearLayout
         android:id="@+id/ll_file_picker"

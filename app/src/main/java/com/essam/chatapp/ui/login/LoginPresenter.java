@@ -6,6 +6,7 @@ import android.util.Log;
 import androidx.annotation.NonNull;
 
 import com.essam.chatapp.firebase.FirebaseManager;
+import com.essam.chatapp.models.Profile;
 import com.essam.chatapp.models.User;
 import com.essam.chatapp.utils.ProjectUtils;
 import com.google.android.gms.tasks.OnCompleteListener;
@@ -43,7 +44,8 @@ public class LoginPresenter {
 
         // this call back basically overrides three methods
         // 1- onVerificationCompleted : this means verification automatically done and no need to enter verify code
-        // 2- onCodeSent : returns a string verification code to users phone number so we have to compare this code with the code that entered by user
+        // 2- onCodeSent : returns a string verification code to users phone number so we have to
+        // compare this code with the code that entered by user
         //check automatically for credentials
         PhoneAuthProvider.OnVerificationStateChangedCallbacks loginPhoneCallBack =
                 new PhoneAuthProvider.OnVerificationStateChangedCallbacks() {
@@ -114,13 +116,15 @@ public class LoginPresenter {
     }
 
     private void createNewUser() {
-        User user = new User(mFirebaseManager.getMyUid(),
+        Profile myProfile = new Profile(
+                mFirebaseManager.getMyUid(),
                 mFirebaseManager.getMyPhone(),
                 mFirebaseManager.getMyPhone(),
-                "Hey there , I'm using Kroubi",
                 "",
-                "online");
-        mFirebaseManager.addCurrentUserToDatabase(user);
+                "Hey there , I'm using Kroubi",
+                true
+                );
+        mFirebaseManager.addNewUserToDataBase(myProfile);
     }
 
     public void detachView(){

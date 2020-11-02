@@ -33,13 +33,19 @@ public class HomeActivity extends AppCompatActivity {
     private ViewPagerAdapter viewPagerAdapter;
 
     private final static String TAG = HomeActivity.class.getSimpleName();
+    private FirebaseManager mFirebaseManager;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_home);
 
+        mFirebaseManager = FirebaseManager.getInstance();
         initViews();
+    }
+
+    private void toggleOnlineState(boolean isOnline) {
+        mFirebaseManager.toggleOnlineState(isOnline);
     }
 
     private void initViews() {
@@ -141,12 +147,31 @@ public class HomeActivity extends AppCompatActivity {
     }
 
     private void signOut() {
-        FirebaseManager.getInstance().signOutUser();
+        mFirebaseManager.signOutUser();
         Intent intent = new Intent(this, LoginActivity.class);
         intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
         intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK);
         startActivity(intent);
         finish();
+    }
+
+    @Override
+    protected void onPause() {
+        // I couldn't figure a way to get notified when user kills the entire process
+        // I've tried to use onStop() then check if isFinishing() to set online state false
+        // But this only happens when the activity goes in back stack [when pressing back button]
+        // SO >>>>>> Online state will be false when ever onPause() method get called and then back to
+        // online when onResume() called >>
+        // then in every other activity we choose to set it back to online or keep it offline
+        // I think the most important activity is ChatActivity
+         toggleOnlineState(false);
+        super.onPause();
+    }
+
+    @Override
+    protected void onResume() {
+        toggleOnlineState(true);
+        super.onResume();
     }
 
     @Override

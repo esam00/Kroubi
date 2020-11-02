@@ -5,6 +5,7 @@ public class Consts {
     //firebase
     public static final String USER = "user";
     public static final String CHAT = "chat";
+    public static final String PROFILE = "profile";
 
     public static final String NAME ="name" ;
     public static final String PHONE ="phone" ;
@@ -18,6 +19,8 @@ public class Consts {
     public static final String MESSAGE = "message";
     public static final String CREATOR_ID = "creatorId";
     public static final String MEDIA = "media";
+    public static final String IS_ONLINE = "online" ;
+    public static final String IS_TYPING = "typing" ;
 
     //request
     public static final int PICK_IMAGES_REQUEST =1;
@@ -34,5 +37,4 @@ public class Consts {
     public static final String LONGITUDE = "longitude";
     public static final String IMAGE_URI_CAMERA ="image_uri_camera" ;
     public static final String CHAT_ID = "chatID";
-
 }

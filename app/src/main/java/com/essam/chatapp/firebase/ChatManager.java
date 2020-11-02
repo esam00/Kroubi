@@ -2,15 +2,12 @@ package com.essam.chatapp.firebase;
 
 import android.net.Uri;
 import android.text.TextUtils;
-import android.util.Log;
 
 import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
 
-import com.essam.chatapp.ui.chat.activity.ChatCallBacks;
-import com.essam.chatapp.models.Message;
-import com.essam.chatapp.models.User;
 import com.essam.chatapp.models.Chat;
+import com.essam.chatapp.models.Message;
+import com.essam.chatapp.models.Profile;
 import com.essam.chatapp.utils.Consts;
 import com.essam.chatapp.utils.ProjectUtils;
 import com.google.android.gms.tasks.OnSuccessListener;
@@ -26,114 +23,102 @@ import com.google.firebase.storage.UploadTask;
 import java.util.ArrayList;
 import java.util.List;
 
+/** ChatManager is a simple class that created with every [one to one] chat room
+ * It holds A three basic database references [ChatDb, MySideDb, OtherSideDb]
+ * So this class is responsible for :
+ * 1- Creating the chat room at top level app/chat/chatId that holds and listens for new messages
+ * 2- Creating the chat snippet in both current user and other user chat node to update last message that displayed in home
+ * 3- ChatManager is considered as a bridge between chatPresenter and FirebaseManager class
+ * */
 public class ChatManager {
-    //firebase
-    private DatabaseReference otherSideUnseenChildDb;
-    private ChildEventListener newMessageEventListener;
-    private ValueEventListener checkSeenEventListener;
+    private Profile otherProfile; // the profile of the other user
+    private String chatID;
     private DatabaseReference mChatDb; //App/chat/chatId/
-    private DatabaseReference mySideDb, otherSideDb;
+    private DatabaseReference mySideDb, otherSideDb; // reference to this chat in both current user and other user
 
     // vars
     private String messageId;
     private String inputMessage;
-    private String chatID;
-    private User otherUser;
     private String currentFormatDate;
     private int otherUnseenCount;
     private List<String> messageIdList;
     private int mediaUploaded;
-    private boolean isFirstTime = true;
-
-    private static final String TAG = ChatManager.class.getSimpleName();
+    private FirebaseManager mManager;
 
     //Constructor
-    private ChatCallBacks mCallBacks;
-    private FirebaseManager mManager;
-    public ChatManager(ChatCallBacks callBacks) {
-        mCallBacks = callBacks;
+    // Created when user first enter chat room
+    public ChatManager(Profile otherProfile) {
+        this.otherProfile = otherProfile;
         mManager = FirebaseManager.getInstance();
     }
 
-    public void checkForPreviousChatWith(final User otherUser) {
-        this.otherUser = otherUser;
-        mManager.checkChatHistoryForCurrentUser(new ValueEventListener() {
+    public ChatManager(String chatID, Profile otherProfile){
+        this.chatID = chatID;
+        this.otherProfile = otherProfile;
+        this.mManager = FirebaseManager.getInstance();
+        InitChatRoomInfo();
+    }
+
+    /* -------------------------------Initialization[private helpers]----------------------------*/
+
+    private void InitChatRoomInfo(){
+        //initialize reference to top level chat reference in database >> app/chat/chatID
+        mChatDb = mManager.getReferenceToSpecificAppChat(chatID);
+
+        //initialize reference to chat node at my side in database >> app/user/myUid/chat/chatID
+        mySideDb = mManager.getReferenceToSpecificUserChat(chatID);
+
+        //initialize reference to chat node at other user in database >> app/user/otherUid/chat/chatID
+        otherSideDb = mManager.getReferenceToSpecificUserChat(otherProfile.getId(), chatID);
+
+        //Set User online state to true
+        mManager.toggleOnlineState(true);
+    }
+
+    /* ----------------------------------------Public -------------------------------------------*/
+
+    public void checkForPreviousChatWith(ValueEventListener listener){
+        mManager.checkChatHistoryForCurrentUser(listener);
+    }
+
+    public String pushNewTopLevelChat(){
+        return mManager.pushNewTopLevelChat();
+    }
+
+    public void listenForUserProfileChanges(String userId, ValueEventListener listener){
+        mManager.getUserProfileInfo(userId, listener);
+    }
+
+    public void listenForTyping(ValueEventListener eventListener){
+        otherSideDb.child(Consts.IS_TYPING).addValueEventListener(eventListener);
+    }
+
+    public void toggleIsTypingState(boolean isTyping){
+        if (chatID != null){
+            mySideDb.child(Consts.IS_TYPING).setValue(isTyping);
+        }
+    }
+
+    public void listenForMessages(ChildEventListener childEventListener) {
+        mChatDb.addChildEventListener(childEventListener);
+    }
+
+    public void getLastUnseenCont() {
+        otherSideDb.child(Consts.UNSEEN_COUNT).addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                if (dataSnapshot.exists()) {
-                    for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
-                        Chat chat = snapshot.getValue(Chat.class);
-                        if (chat != null && otherUser.getUid().equals(chat.getUserUid())) {
-                            isFirstTime = false;
-                            chatID = chat.getChatId();
-                            //get the reference to this chat id chat database >> app/chat/chatId
-                            mChatDb = mManager.getReferenceToSpecificAppChat(chatID);
-                            mySideDb = mManager.getReferenceToSpecificUserChat(chatID);
-                            otherSideDb = mManager.getReferenceToSpecificUserChat(otherUser.getUid(), chatID);
-
-                            mCallBacks.onCheckFirstTimeChat(false);
-
-                            getAllMessages();
-                        }
-                    }
-                } else {
-                    isFirstTime = true;
-                    mCallBacks.onCheckFirstTimeChat(true);
-                    Log.i(TAG, "User has no previous chat with this user yet! ");
-                }
+                if (dataSnapshot.exists() && dataSnapshot.getValue() != null)
+                    otherUnseenCount = Integer.parseInt(dataSnapshot.getValue().toString());
             }
 
             @Override
             public void onCancelled(@NonNull DatabaseError databaseError) {
-
             }
         });
     }
 
-    public void getAllMessages() {
-        // this listener is basically listening for a new message added to this conversation
-        newMessageEventListener = new ChildEventListener() {
-            @Override
-            public void onChildAdded(@NonNull DataSnapshot dataSnapshot, @Nullable String s) {
-                if (dataSnapshot.exists()) {
-                    Message message = dataSnapshot.getValue(Message.class);
-                    if (message != null) {
-                        isFirstTime = false;
-                        mCallBacks.onCheckFirstTimeChat(false);
-                        mCallBacks.onNewMessageAdded(message);
-                        getLastUnseenCont();
-                        resetMyUnseenCount();
-                    }
-                }
-            }
-
-            @Override
-            public void onChildChanged(@NonNull DataSnapshot dataSnapshot, @Nullable String s) {
-                mCallBacks.onMessageSeen(s);
-            }
-
-            @Override
-            public void onChildRemoved(@NonNull DataSnapshot dataSnapshot) {
-            }
-
-            @Override
-            public void onChildMoved(@NonNull DataSnapshot dataSnapshot, @Nullable String s) {
-            }
-
-            @Override
-            public void onCancelled(@NonNull DatabaseError databaseError) {
-            }
-        };
-        mChatDb.addChildEventListener(newMessageEventListener);
-    }
-
-    public void sendMessage(String inputMessage, List<String>mMediaUriList) {
-        this.inputMessage = inputMessage;
-        if (isFirstTime) {
-            sendFirstMessage(mMediaUriList);
-        } else {
-            pushNewMessage(mMediaUriList);
-        }
+    public void resetMyUnseenCount() {
+        mySideDb.child(Consts.UNSEEN_COUNT).setValue(0);
     }
 
     public void updateComingMessageAsSeen(String messageId){
@@ -141,49 +126,31 @@ public class ChatManager {
         otherSideDb.child(Consts.SEEN).setValue(true);
     }
 
-    private void sendFirstMessage(List<String>mMediaUriList) {
+    public void removeIsTypingListener(ValueEventListener valueEventListener){
+        otherSideDb.child(Consts.IS_TYPING).removeEventListener(valueEventListener);
+    }
+
+    public void reMoveChatListener(ChildEventListener childEventListener){
+        if (mChatDb != null)
+            mChatDb.removeEventListener(childEventListener);
+    }
+
+    public void removeUserProfileListener(ValueEventListener listener){
+        mManager.removeUserProfileListener(otherProfile.getId(), listener);
+    }
+
+    /* -----------------------------------Send Message logic[Private]---------------------------------*/
+
+    public void sendFirstMessage(List<String>mMediaUriList, String inputMessage) {
         // this is the first message between these two users
-        chatID = mManager.pushNewTopLevelChat(); // app/chat/chatId
-        if (chatID != null) {
-            mChatDb = mManager.getReferenceToSpecificAppChat(chatID);
-            mySideDb = mManager.getReferenceToSpecificUserChat(chatID);
-            otherSideDb = mManager.getReferenceToSpecificUserChat(otherUser.getUid(), chatID);
-
-            getAllMessages();
+            pushNewMessage(mMediaUriList, inputMessage, true);
             // create new chat item in both current user and other user
-            pushNewMessage(mMediaUriList);
-
             pushNewChat(inputMessage);
-        }
     }
 
-    private void pushNewChat(String inputMessage) {
-        currentFormatDate = ProjectUtils.getDisplayableCurrentDateTime();
-        Chat mySideChat = new Chat(chatID,
-                otherUser.getUid(),
-                otherUser.getPhone(),
-                otherUser.getImage(),
-                inputMessage,
-                currentFormatDate, System.currentTimeMillis(),
-                0,
-                false,
-                mManager.getMyUid(),
-                false);
-        mySideDb.setValue(mySideChat);
-
-        String myPhoto = "";
-        Chat otherSideChat = new Chat(chatID, mManager.getMyUid(), mManager.getMyPhone(), myPhoto, inputMessage,
-                currentFormatDate, System.currentTimeMillis(), 1,false,
-                mManager.getMyUid(),
-                false);
-        otherSideDb.setValue(otherSideChat);
-
-        getLastUnseenCont();
-    }
-
-    private void pushNewMessage(List<String>mediaUriList) {
+    public void pushNewMessage(List<String>mediaUriList, String inputMessage, boolean isFirstTime) {
         if (!mediaUriList.isEmpty()) {
-            pushMediaMessages(mediaUriList);
+            pushMediaMessages(mediaUriList, isFirstTime);
         } else {
             currentFormatDate = ProjectUtils.getDisplayableCurrentDateTime();
             messageId = mChatDb.push().getKey();
@@ -205,24 +172,28 @@ public class ChatManager {
 
     }
 
-    private void getLastUnseenCont() {
-        checkSeenEventListener = new ValueEventListener() {
-            @Override
-            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                if (dataSnapshot.exists() && dataSnapshot.getValue() != null)
-                    otherUnseenCount = Integer.parseInt(dataSnapshot.getValue().toString());
-            }
+    private void pushNewChat(String inputMessage) {
+        currentFormatDate = ProjectUtils.getDisplayableCurrentDateTime();
+        Chat mySideChat = new Chat(chatID,
+                otherProfile.getId(),
+                otherProfile.getPhone(),
+                otherProfile.getAvatar(),
+                inputMessage,
+                currentFormatDate, System.currentTimeMillis(),
+                0,
+                false,
+                mManager.getMyUid(),
+                false);
+        mySideDb.setValue(mySideChat);
 
-            @Override
-            public void onCancelled(@NonNull DatabaseError databaseError) {
-            }
-        };
-        otherSideUnseenChildDb = mManager.getReferenceToSpecificUserChat(otherUser.getUid(), chatID).child(Consts.UNSEEN_COUNT);
-        otherSideUnseenChildDb.addValueEventListener(checkSeenEventListener);
-    }
+        String myPhoto = "";
+        Chat otherSideChat = new Chat(chatID, mManager.getMyUid(), mManager.getMyPhone(), myPhoto, inputMessage,
+                currentFormatDate, System.currentTimeMillis(), 1,false,
+                mManager.getMyUid(),
+                false);
+        otherSideDb.setValue(otherSideChat);
 
-    private void resetMyUnseenCount() {
-        mySideDb.child(Consts.UNSEEN_COUNT).setValue(0);
+        getLastUnseenCont();
     }
 
     private void updateLastMessage(String inputMessage, List<String>mediaUriList) {
@@ -247,7 +218,7 @@ public class ChatManager {
 
     }
 
-    private void pushMediaMessages(final List<String>mediaUriList) {
+    private void pushMediaMessages(final List<String>mediaUriList,final boolean isFirstTime) {
         mediaUploaded = 0;
         messageIdList = new ArrayList<>();
 
@@ -279,14 +250,5 @@ public class ChatManager {
                 }
             });
         }
-    }
-
-    public void unSubScribeAllListeners(){
-        // remove firebase eventListener .. no need for them since activity is shutting down
-        if (mChatDb != null)
-            mChatDb.removeEventListener(newMessageEventListener);
-
-        if (otherSideUnseenChildDb != null)
-            otherSideUnseenChildDb.removeEventListener(checkSeenEventListener);
     }
 }

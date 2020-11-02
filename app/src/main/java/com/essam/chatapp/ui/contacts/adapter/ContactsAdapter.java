@@ -39,7 +39,7 @@ public class ContactsAdapter extends RecyclerView.Adapter<ContactsAdapter.ViewHo
 
         }
         void bind (User user){
-            contactNameTV.setText(user.getName());
+            contactNameTV.setText(user.getProfile().getUserName());
             statusTv.setText(user.getPhone());
         }
 
