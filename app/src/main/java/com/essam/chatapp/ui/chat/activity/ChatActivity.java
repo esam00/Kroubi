@@ -485,6 +485,20 @@ public class ChatActivity extends AppCompatActivity implements View.OnClickListe
         super.onDestroy();
     }
 
+    @Override
+    protected void onPause() {
+        mPresenter.toggleOnlineState(false);
+        super.onPause();
+    }
+
+    @Override
+    protected void onResume() {
+        if (mPresenter != null){
+            mPresenter.toggleOnlineState(true);
+        }
+        super.onResume();
+    }
+
     /*-----------------------------------Adapter Callbacks---------------------------------------*/
     @Override
     public void onUpdateComingMessageAsSeen(String messageId) {

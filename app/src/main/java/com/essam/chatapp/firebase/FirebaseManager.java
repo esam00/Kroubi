@@ -22,9 +22,9 @@ public class FirebaseManager {
         LOGGED_IN,
         LOGGED_OUT,
     }
-    private static FirebaseManager instance;
     public boolean isFirstTime = false;
 
+    private static FirebaseManager instance;
     private FirebaseAuth mFirebaseAuth;
     private DatabaseReference appUserDb;        //App/user/
     private DatabaseReference appChatDb;        //App/chat/
@@ -76,12 +76,16 @@ public class FirebaseManager {
         }
     }
 
-    private void logInUser(){
-        initFirebase();
-    }
-
     public boolean isUserLoggedIn() {
         return getFirebaseUser() != null;
+    }
+
+    public FirebaseUser getFirebaseUser() {
+        return getFirebaseAuth().getCurrentUser();
+    }
+
+    public FirebaseAuth getFirebaseAuth() {
+        return mFirebaseAuth;
     }
 
     public void signOutUser() {
@@ -90,12 +94,8 @@ public class FirebaseManager {
         instance = null;
     }
 
-    public FirebaseAuth getFirebaseAuth() {
-        return mFirebaseAuth;
-    }
-
-    public FirebaseUser getFirebaseUser() {
-        return getFirebaseAuth().getCurrentUser();
+    private void logInUser(){
+        initFirebase();
     }
 
     /* -------------------------------------- Login ---------------------------------------------*/

@@ -24,11 +24,11 @@ public class ChatPresenter implements ChatContract.Presenter {
     private ChildEventListener newMessageEventListener;
     private ValueEventListener mIsTypingListener;
     private ValueEventListener mUserProfileEventListener;
-    private Profile otherProfile; // the profile of the other user
-    private String chatID;
 
     // vars
     private boolean isFirstTime = true;
+    private Profile otherProfile; // the profile of the other user
+    private String chatID;
 
     private static final String TAG = ChatPresenter.class.getSimpleName();
 
@@ -118,6 +118,11 @@ public class ChatPresenter implements ChatContract.Presenter {
         }
     }
 
+    @Override
+    public void toggleOnlineState(boolean isOnline) {
+        mChatManager.toggleOnlineState(isOnline);
+    }
+
     private void checkChatHistoryBetweenTheesTwoUsers(DataSnapshot dataSnapshot) {
         for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
             Chat chat = snapshot.getValue(Chat.class);
@@ -196,6 +201,8 @@ public class ChatPresenter implements ChatContract.Presenter {
 
     private void unSubScribeAllListeners() {
         toggleIsTypingState(false);
+        mChatManager.removeLastUnseenCountListener();
+
         // remove firebase eventListener .. no need for them since activity is shutting down
         if (newMessageEventListener != null)
             mChatManager.reMoveChatListener(newMessageEventListener);

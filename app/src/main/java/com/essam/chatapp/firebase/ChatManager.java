@@ -38,12 +38,12 @@ public class ChatManager {
 
     // vars
     private String messageId;
-    private String inputMessage;
     private String currentFormatDate;
     private int otherUnseenCount;
     private List<String> messageIdList;
     private int mediaUploaded;
     private FirebaseManager mManager;
+    private ValueEventListener mLastUnseenCountListener;
 
     //Constructor
     // Created when user first enter chat room
@@ -70,9 +70,6 @@ public class ChatManager {
 
         //initialize reference to chat node at other user in database >> app/user/otherUid/chat/chatID
         otherSideDb = mManager.getReferenceToSpecificUserChat(otherProfile.getId(), chatID);
-
-        //Set User online state to true
-        mManager.toggleOnlineState(true);
     }
 
     /* ----------------------------------------Public -------------------------------------------*/
@@ -99,12 +96,18 @@ public class ChatManager {
         }
     }
 
+    public void toggleOnlineState(boolean isOnline){
+        if (mManager != null){
+            mManager.toggleOnlineState(isOnline);
+        }
+    }
+
     public void listenForMessages(ChildEventListener childEventListener) {
         mChatDb.addChildEventListener(childEventListener);
     }
 
     public void getLastUnseenCont() {
-        otherSideDb.child(Consts.UNSEEN_COUNT).addListenerForSingleValueEvent(new ValueEventListener() {
+        mLastUnseenCountListener = new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                 if (dataSnapshot.exists() && dataSnapshot.getValue() != null)
@@ -114,7 +117,14 @@ public class ChatManager {
             @Override
             public void onCancelled(@NonNull DatabaseError databaseError) {
             }
-        });
+        };
+        otherSideDb.child(Consts.UNSEEN_COUNT).addValueEventListener(mLastUnseenCountListener);
+    }
+
+    public void removeLastUnseenCountListener(){
+        if (mLastUnseenCountListener != null){
+            otherSideDb.child(Consts.UNSEEN_COUNT).removeEventListener(mLastUnseenCountListener);
+        }
     }
 
     public void resetMyUnseenCount() {
@@ -150,7 +160,7 @@ public class ChatManager {
 
     public void pushNewMessage(List<String>mediaUriList, String inputMessage, boolean isFirstTime) {
         if (!mediaUriList.isEmpty()) {
-            pushMediaMessages(mediaUriList, isFirstTime);
+            pushMediaMessages(mediaUriList, inputMessage, isFirstTime);
         } else {
             currentFormatDate = ProjectUtils.getDisplayableCurrentDateTime();
             messageId = mChatDb.push().getKey();
@@ -218,7 +228,7 @@ public class ChatManager {
 
     }
 
-    private void pushMediaMessages(final List<String>mediaUriList,final boolean isFirstTime) {
+    private void pushMediaMessages(final List<String>mediaUriList, final String inputMessage, final boolean isFirstTime) {
         mediaUploaded = 0;
         messageIdList = new ArrayList<>();
 
@@ -240,7 +250,7 @@ public class ChatManager {
                             DatabaseReference newMessageDb = mChatDb.child(messageIdList.get(mediaUploaded));
                             newMessageDb.setValue(message);
                             if (!isFirstTime) updateLastMessage(inputMessage,mediaUriList);
-                            inputMessage = "";
+//                            inputMessage = "";
                             mediaUploaded++;
                             if (mediaUriList.size() == mediaUploaded) {
                                 mediaUriList.clear();

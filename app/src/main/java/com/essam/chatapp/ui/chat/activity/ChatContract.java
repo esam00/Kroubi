@@ -16,6 +16,8 @@ public class ChatContract {
 
         void toggleIsTypingState(boolean isTyping);
 
+        void toggleOnlineState(boolean isOnline);
+
         void updateComingMessageAsSeen(String messageId);
 
         void detachView();
