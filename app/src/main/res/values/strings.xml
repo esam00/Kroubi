@@ -13,7 +13,7 @@
     <string name="ok">OK</string>
     <string name="cancel">Cancel</string>
     <string name="verify_code">Verify Code</string>
-    <string name="we_will_send_code">We will send a verification code to your phone number</string>
+    <string name="we_will_send_code">We will send an SMS message to verify your phone number</string>
     <string name="phone_number">Phone number</string>
     <string name="enter_verification_code">Enter verification code</string>
     <string name="submit">Submit</string>
@@ -47,5 +47,12 @@
     <string name="online">online</string>
     <string name="loading">Loading…</string>
     <string name="check_network">Check your network connection!</string>
+    <string name="phone_digits">0123456789</string>
+    <string name="enter_your_phone_number">Enter your phone number</string>
+    <string name="detect_phone_automatically">Waiting to automatically detect an SMS sent to</string>
+    <string name="enter_6_digit_code">Enter 6-digit code</string>
+    <string name="verify">Verify %1$s</string>
+    <string name="verify_phone_failed">Failed to verify phone number!</string>
+    <string name="resend_sms">Resend SMS</string>
 
 </resources>

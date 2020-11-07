@@ -1,53 +1,87 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
-    <EditText
-        android:id="@+id/et_phone_number"
-        android:layout_width="match_parent"
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/phoneNumberCl"
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:autofillHints="@string/phone_number"
+        android:layoutDirection="ltr"
         android:background="@drawable/shape_login_et_gb"
-        android:drawableStart="@drawable/ic_phone"
-        android:drawablePadding="15dp"
-        android:hint="@string/phone_number"
-        android:inputType="phone"
-        android:padding="14dp"
-        android:paddingStart="12dp"
-        android:paddingEnd="42dp"
-        android:textColor="@color/white"
-        android:textColorHint="@android:color/secondary_text_dark"
         app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.414"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintTop_toTopOf="parent">
 
-    <ProgressBar
-        android:id="@+id/send_code_progress"
-        android:layout_width="36dp"
-        android:layout_height="36dp"
-        android:layout_alignParentEnd="true"
-        android:layout_marginEnd="8dp"
-        android:visibility="invisible"
-        app:layout_constraintBottom_toBottomOf="@+id/et_phone_number"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toTopOf="@+id/et_phone_number" />
+        <EditText
+            android:id="@+id/et_phone_number"
+            android:layout_width="0dp"
+            android:layout_height="48dp"
+            android:background="@null"
+            android:digits="@string/phone_digits"
+            android:gravity="center"
+            android:hint="@string/phone_number"
+            android:imeOptions="actionDone"
+            android:inputType="phone"
+            android:maxLength="20"
+            android:textSize="15sp"
+            android:maxLines="1"
+            android:padding="8dp"
+            android:textColor="@color/black"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toEndOf="@+id/ccp"
+            app:layout_constraintTop_toTopOf="parent"
+            android:autofillHints="@string/phone_number" />
+
+        <com.hbb20.CountryCodePicker
+            android:id="@+id/ccp"
+            android:layout_width="80dp"
+            android:layout_height="0dp"
+            android:layout_margin="6dp"
+            android:background="@color/white"
+            android:gravity="center"
+            app:ccp_autoDetectCountry="true"
+            app:ccp_autoFormatNumber="false"
+            app:ccp_contentColor="@color/black"
+            app:ccp_countryAutoDetectionPref="SIM_NETWORK_LOCALE"
+            app:ccp_showNameCode="false"
+            app:ccp_showPhoneCode="true"
+            app:ccp_textGravity="RIGHT"
+            app:ccp_textSize="12sp"
+            app:layout_constraintBottom_toBottomOf="@+id/et_phone_number"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="@+id/et_phone_number"
+            app:layout_constraintVertical_bias="1.0" />
+
+        <ImageView
+            android:layout_width="1dp"
+            android:layout_height="0dp"
+            android:background="@color/light_gray"
+            app:layout_constraintBottom_toBottomOf="@+id/et_phone_number"
+            app:layout_constraintStart_toEndOf="@+id/ccp"
+            app:layout_constraintTop_toTopOf="@+id/et_phone_number"
+            tools:ignore="ContentDescription" />
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
 
     <Button
         android:id="@+id/btn_send_code"
-        android:layout_width="match_parent"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="24dp"
-        android:background="@drawable/shape_white_rounded_bg"
+        android:layout_marginTop="32dp"
+        android:background="@drawable/ripple_effect_btn_bg"
+        android:textAllCaps="false"
+        android:paddingStart="20dp"
+        android:paddingEnd="20dp"
         android:text="@string/send_verification_code"
-        android:textColor="@color/colorAccent"
-        android:textSize="15sp"
-        app:layout_constraintEnd_toEndOf="@+id/et_phone_number"
-        app:layout_constraintStart_toStartOf="@+id/et_phone_number"
-        app:layout_constraintTop_toBottomOf="@+id/et_phone_number" />
-
-
+        android:textColor="@color/white"
+        android:textSize="16sp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.497"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/phoneNumberCl" />
 </androidx.constraintlayout.widget.ConstraintLayout>

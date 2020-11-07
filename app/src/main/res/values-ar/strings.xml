@@ -35,9 +35,16 @@
     <string name="send_verification_code">أرسل الرمز التأكيدي</string>
     <string name="invalid_phone_number">رقم الهاتف غير صحيح</string>
     <string name="invalid_verification_code">الرمز التأكيدي غير صحيح</string>
-    <string name="network_error_msg">حدث خطأ ما ، من فلك أعد المحاولة!</string>
+    <string name="network_error_msg">حدث خطأ ما، من فضلك أعد المحاولة!</string>
     <string name="typing">يقوم بالكتابة…</string>
-    <string name="online">متاح</string>
+    <string name="online">متصل الآن</string>
     <string name="loading">جار التحميل…</string>
-    <string name="check_network">Check your network connection!</string>
+    <string name="check_network">تأكد من الاتصال بالانترنت!</string>
+    <string name="phone_digits">0123456789</string>
+    <string name="enter_your_phone_number">أدخل رقم الهاتف</string>
+    <string name="detect_phone_automatically">سوف نقوم بإرسال رمز تأكيدي الى رقم الهاتف الخاص بك</string>
+    <string name="enter_6_digit_code">أدخل الرمز التأكيدي</string>
+    <string name="verify">التحقق من %1$s</string>
+    <string name="verify_phone_failed">خطأفي التحقق من رقم الهاتف!</string>
+    <string name="resend_sms">Resend SMS</string>
 </resources>

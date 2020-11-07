@@ -23,19 +23,22 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
+        <activity android:name=".ui.login.verification.VerificationActivity"
+            android:theme="@style/LoginTheme"/>
         <activity
             android:name=".ui.SplashActivity"
             android:theme="@style/SplashTheme">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <action android:name="android.intent.action.VIEW" />
+
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
         <activity
             android:name=".ui.login.LoginActivity"
-            android:theme="@style/LoginTheme"
-            android:screenOrientation="portrait"/>
+            android:screenOrientation="portrait"
+            android:theme="@style/LoginTheme" />
         <activity
             android:name=".ui.home.activity.HomeActivity"
             android:label="@string/home_activity_title"
@@ -72,10 +75,9 @@
             android:name=".ui.profile.MyProfileActivity"
             android:label="@string/profile"
             android:parentActivityName=".ui.settings.SettingsActivity">
-
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
-                android:value=".ui.settings.SettingsActivity"/>
+                android:value=".ui.settings.SettingsActivity" />
         </activity>
 
         <provider

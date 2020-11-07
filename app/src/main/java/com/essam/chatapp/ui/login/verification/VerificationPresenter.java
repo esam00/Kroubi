@@ -1,4 +1,4 @@
-package com.essam.chatapp.ui.login;
+package com.essam.chatapp.ui.login.verification;
 
 import android.app.Activity;
 import android.util.Log;
@@ -7,8 +7,6 @@ import androidx.annotation.NonNull;
 
 import com.essam.chatapp.firebase.FirebaseManager;
 import com.essam.chatapp.models.Profile;
-import com.essam.chatapp.models.User;
-import com.essam.chatapp.utils.ProjectUtils;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.Task;
@@ -22,26 +20,19 @@ import com.google.firebase.database.ValueEventListener;
 
 import java.util.concurrent.TimeUnit;
 
-public class LoginPresenter {
-    private LoginCallbacks mCallbacks;
+public class VerificationPresenter implements VerificationContract.Presenter {
+    private VerificationContract.View mView;
     private FirebaseManager mFirebaseManager;
 
-    private static final String TAG = LoginPresenter.class.getSimpleName();
+    private static final String TAG = VerificationPresenter.class.getSimpleName();
 
-    public LoginPresenter(LoginCallbacks callbacks) {
-        mCallbacks = callbacks;
+    public VerificationPresenter(VerificationContract.View view) {
+        mView = view;
         mFirebaseManager = FirebaseManager.getInstance();
     }
 
+    @Override
     public void getVerificationCode(String phoneNumber) {
-        if (!ProjectUtils.isPhoneNumberValid(phoneNumber)){
-            mCallbacks.onInvalidPhoneNumber();
-            return;
-        }
-
-        // Static for Egypt ISO code now OR Emulator
-        phoneNumber = (ProjectUtils.isEmulator()? "+1" : "+20") + phoneNumber;
-
         // this call back basically overrides three methods
         // 1- onVerificationCompleted : this means verification automatically done and no need to enter verify code
         // 2- onCodeSent : returns a string verification code to users phone number so we have to
@@ -58,23 +49,24 @@ public class LoginPresenter {
             @Override
             public void onVerificationFailed(@NonNull FirebaseException e) {
                 Log.e(TAG, "onVerificationFailed: " + e.toString());
-                mCallbacks.onInvalidPhoneNumber();
+                mView.onVerifyPhoneNumberFailed();
             }
 
             @Override
             public void onCodeSent(@NonNull String code, @NonNull PhoneAuthProvider.ForceResendingToken forceResendingToken) {
                 super.onCodeSent(code, forceResendingToken);
-                mCallbacks.onVerificationCodeSent(code);
+                mView.onVerificationCodeSent(code);
             }
         };
 
         PhoneAuthProvider.getInstance().verifyPhoneNumber(phoneNumber,
                 60,
                 TimeUnit.SECONDS,
-                (Activity) mCallbacks,
+                (Activity) mView,
                 loginPhoneCallBack);
     }
 
+    @Override
     public void signInWithPhoneCredential(PhoneAuthCredential phoneAuthCredential) {
         mFirebaseManager.getFirebaseAuth().signInWithCredential(phoneAuthCredential)
                 .addOnCompleteListener(new OnCompleteListener<AuthResult>() {
@@ -88,14 +80,14 @@ public class LoginPresenter {
                     checkIfUserExistInDataBase();
 
                     // update view
-                    mCallbacks.onLoginSuccess(mFirebaseManager.getMyPhone());
+                    mView.onLoginSuccess(mFirebaseManager.getMyPhone());
                 }
             }
         })
                 .addOnFailureListener(new OnFailureListener() {
             @Override
             public void onFailure(@NonNull Exception e) {
-                mCallbacks.onInvalidVerificationCode();
+                mView.onInvalidVerificationCode();
             }
         });
     }
@@ -127,7 +119,8 @@ public class LoginPresenter {
         mFirebaseManager.addNewUserToDataBase(myProfile);
     }
 
+    @Override
     public void detachView(){
-        mCallbacks = null;
+        mView = null;
     }
 }
