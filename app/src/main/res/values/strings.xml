@@ -54,5 +54,6 @@
     <string name="verify">Verify %1$s</string>
     <string name="verify_phone_failed">Failed to verify phone number!</string>
     <string name="resend_sms">Resend SMS</string>
+    <string name="intro">intro</string>
 
 </resources>

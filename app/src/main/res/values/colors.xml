@@ -7,6 +7,7 @@
     <color name="colorMain">#075E54</color>
     <color name="colorMainLight">#128C7E</color>
 
+    <color name="colorPrimaryFade">#A616786D</color>
     <color name="colorPrimaryWithOpacity">#303DDC84</color>
     <color name="colorPrimaryTransparent">#103DDC84</color>
     <color name="colorMainWithOpacity">#991D255E</color>

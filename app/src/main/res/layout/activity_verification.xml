@@ -36,7 +36,7 @@
         android:layout_height="0dp"
         android:layout_centerInParent="true"
         android:layout_marginTop="16dp"
-        android:background="@drawable/shape_rounded_bg"
+        android:background="@drawable/shape_top_rounded_bg"
         android:orientation="vertical"
         android:padding="20dp"
         app:layout_constraintBottom_toBottomOf="parent"

@@ -47,4 +47,5 @@
     <string name="verify">التحقق من %1$s</string>
     <string name="verify_phone_failed">خطأفي التحقق من رقم الهاتف!</string>
     <string name="resend_sms">Resend SMS</string>
+    <string name="intro">intro</string>
 </resources>
