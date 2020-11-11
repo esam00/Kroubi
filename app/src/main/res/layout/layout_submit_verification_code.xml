@@ -40,9 +40,9 @@
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_marginTop="24dp"
-        android:paddingStart="10dp"
-        android:paddingEnd="10dp"
+        android:layout_marginTop="15dp"
+        android:padding="15dp"
+        android:background="@color/colorPrimaryTransparent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/enter_code_tv">
@@ -68,12 +68,13 @@
             app:isShowMinute="true"
             app:isShowSecond="true"
             app:isTimeTextBold="true"
+            app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toTopOf="parent"
             app:suffixGravity="bottom"
-            app:suffixTextColor="@color/colorAccent"
+            app:suffixTextColor="@color/dark_gray"
             app:suffixTextSize="16sp"
-            app:timeTextColor="@color/colorAccent"
+            app:timeTextColor="@color/dark_gray"
             app:timeTextSize="15sp" />
     </androidx.constraintlayout.widget.ConstraintLayout>
 

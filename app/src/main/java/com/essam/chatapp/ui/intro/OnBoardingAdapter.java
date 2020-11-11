@@ -55,10 +55,9 @@ public class OnBoardingAdapter extends RecyclerView.Adapter<OnBoardingAdapter.On
         }
 
         void bindOnBoardingData(OnBoardingItem item) {
-            String locale = mContext.getResources().getConfiguration().locale.getLanguage();
-            imageView.setImageResource(item.getImage());
-            titleTv.setText(item.getTitle(locale));
-            descriptionTv.setText(item.getDescription(locale));
+            imageView.setImageResource(item.getImageSrcId());
+            titleTv.setText(mContext.getResources().getText(item.getTitleSrcId()));
+            descriptionTv.setText(mContext.getResources().getText(item.getDescriptionSrcId()));
         }
     }
 }

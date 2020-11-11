@@ -48,4 +48,10 @@
     <string name="verify_phone_failed">خطأفي التحقق من رقم الهاتف!</string>
     <string name="resend_sms">Resend SMS</string>
     <string name="intro">intro</string>
+    <string name="first_intro_title">أهلا بك في قروبي</string>
+    <string name="first_intro_description">استمتع بتجربة جديدة للمحادثات السريعة</string>
+    <string name="second_intro_title">تواصل</string>
+    <string name="second_intro_description">ابحث عن أحد جهات اتصالك المسجلين وارسال لهم العديد من الرسائل والصور</string>
+    <string name="third_intro_title">هيا نبدأ</string>
+    <string name="third_intro_description">ماذا تنتظر؟ سجل الآن بطريقة سهلة جدا لتبدأ</string>
 </resources>

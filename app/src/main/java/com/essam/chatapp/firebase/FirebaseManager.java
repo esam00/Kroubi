@@ -23,6 +23,7 @@ public class FirebaseManager {
         LOGGED_OUT,
     }
     public boolean isFirstTime = false;
+    private Profile currentUserProfile;
 
     private static FirebaseManager instance;
     private FirebaseAuth mFirebaseAuth;
@@ -56,12 +57,28 @@ public class FirebaseManager {
         }
     }
 
+    public Profile getCurrentUserProfile() {
+        return currentUserProfile;
+    }
+
+    public void setCurrentUserProfile(Profile currentUserProfile) {
+        this.currentUserProfile = currentUserProfile;
+    }
+
     public String getMyUid() {
         return getFirebaseUser().getUid();
     }
 
     public String getMyPhone() {
         return getFirebaseUser().getPhoneNumber();
+    }
+
+    public void getCurrentUserProfile(ValueEventListener listener){
+        userProfileDb.addValueEventListener(listener);
+    }
+
+    public void removeCurrentUserProfileListener(ValueEventListener listener){
+        userProfileDb.removeEventListener(listener);
     }
 
     /* ---------------------------------- Authentication ----------------------------------------*/
@@ -106,6 +123,7 @@ public class FirebaseManager {
 
     public void addNewUserToDataBase(Profile userProfile){
         isFirstTime = true;
+        currentUserProfile = userProfile;
         User user = new User(
                 getMyUid(),
                 getMyPhone(),

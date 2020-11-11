@@ -11,14 +11,21 @@ import android.transition.Fade;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.ImageView;
+import android.widget.TextView;
+import android.widget.Toast;
 
+import com.bumptech.glide.Glide;
 import com.essam.chatapp.R;
+import com.essam.chatapp.models.Profile;
 import com.essam.chatapp.ui.profile.MyProfileActivity;
+import com.essam.chatapp.utils.Consts;
 
 public class SettingsActivity extends AppCompatActivity implements View.OnClickListener {
 
-    private ConstraintLayout profileHeaderLayout;
     private ImageView profileIv;
+    private TextView userNameTv, statusTv;
+
+    private Profile myProfile;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -26,12 +33,38 @@ public class SettingsActivity extends AppCompatActivity implements View.OnClickL
         setContentView(R.layout.activity_settings);
 
         initViews();
+        getProfileInfo();
+    }
+
+    private void getProfileInfo() {
+        Intent intent = getIntent();
+        if(intent.hasExtra(Consts.PROFILE)){
+            myProfile = intent.getParcelableExtra(Consts.PROFILE);
+            populateProfileData();
+        }
+    }
+
+    private void populateProfileData() {
+        userNameTv.setText(myProfile.getUserName());
+        statusTv.setText(myProfile.getStatus());
+        Glide.with(this)
+                .load(myProfile.getAvatar())
+                .placeholder(R.drawable.user)
+                .error(R.drawable.user)
+                .into(profileIv);
     }
 
     private void initViews() {
-        profileHeaderLayout = findViewById(R.id.profile_header);
+        ConstraintLayout profileHeaderLayout = findViewById(R.id.profile_header);
         profileIv = findViewById(R.id.profile_iv);
+        userNameTv = findViewById(R.id.name_tv);
+        statusTv = findViewById(R.id.statusTv);
 
+        findViewById(R.id.account).setOnClickListener(this);
+        findViewById(R.id.chats).setOnClickListener(this);
+        findViewById(R.id.notifications).setOnClickListener(this);
+        findViewById(R.id.storage).setOnClickListener(this);
+        findViewById(R.id.help).setOnClickListener(this);
         profileHeaderLayout.setOnClickListener(this);
     }
 
@@ -49,8 +82,16 @@ public class SettingsActivity extends AppCompatActivity implements View.OnClickL
 
     @Override
     public void onClick(View v) {
-        if (v.getId() == R.id.profile_header){
-            openProfileWithTransition();
+        switch (v.getId()){
+            case R.id.profile_header:
+                openProfileWithTransition();
+                break;
+            case R.id.account:
+            case R.id.chats:
+            case R.id.notifications:
+            case R.id.storage:
+            case R.id.help:
+                Toast.makeText(this, " Just a design!", Toast.LENGTH_SHORT).show();
         }
     }
 

@@ -17,26 +17,20 @@ public class Intro {
     }
 
     private static OnBoardingItem firstIntro = new OnBoardingItem(
-            "Title1",
-            "العنوان الأول",
-            "Description1",
-            "الوصف الأول",
-            R.drawable.ic_status
+            R.string.first_intro_title,
+            R.string.first_intro_description,
+            R.drawable.ic_intro_first
     );
 
     private static OnBoardingItem secondIntro = new OnBoardingItem(
-            "Title2",
-            "العنوان الثاني",
-            "Description2",
-            "الوصف الثاني",
-            R.drawable.ic_status
+            R.string.second_intro_title,
+            R.string.second_intro_description,
+            R.drawable.ic_intro_second
     );
 
     private static OnBoardingItem thirdIntro = new OnBoardingItem(
-            "Title3",
-            "العنوان الثالث",
-            "Description3",
-            "الوصف الثالث",
-            R.drawable.ic_status
+            R.string.third_intro_title,
+            R.string.third_intro_description,
+            R.drawable.ic_intro_third
     );
 }

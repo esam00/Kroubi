@@ -55,5 +55,11 @@
     <string name="verify_phone_failed">Failed to verify phone number!</string>
     <string name="resend_sms">Resend SMS</string>
     <string name="intro">intro</string>
+    <string name="first_intro_title">Welcome to Kroubi</string>
+    <string name="first_intro_description">Enjoy the real time messaging experience</string>
+    <string name="second_intro_title">Get connected </string>
+    <string name="second_intro_description">Find your contacts users and send them text and photo messages</string>
+    <string name="third_intro_title">Let\'s start</string>
+    <string name="third_intro_description">What are you waiting for? login now in avery easy step to get started</string>
 
 </resources>

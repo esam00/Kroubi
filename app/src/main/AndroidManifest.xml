@@ -7,9 +7,11 @@
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
-    <uses-permission android:name="android.permission.INTERNET" /> <!-- Required to show current location -->
+    <uses-permission android:name="android.permission.INTERNET" />
+    <!-- Required to show current location -->
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
-    <uses-permission android:name="android.permission.CAMERA" /> <!-- Permission to use camera - required -->
+    <!-- Permission to use camera - required -->
+    <uses-permission android:name="android.permission.CAMERA" />
     <!-- Camera features - recommended -->
     <uses-permission android:name="android.permission.ACCESS_WIFI_STATE" />
     <uses-permission android:name="android.permission.READ_CONTACTS" />
@@ -23,12 +25,6 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-        <activity android:name=".ui.intro.OnBoardingActivity"
-            android:theme="@style/IntroTheme"/>
-        <activity android:name=".ui.profile.complete_profile.CompleteProfileActivity" />
-        <activity
-            android:name=".ui.login.verification.VerificationActivity"
-            android:theme="@style/LoginTheme" />
         <activity
             android:name=".ui.SplashActivity"
             android:theme="@style/SplashTheme">
@@ -40,9 +36,18 @@
             </intent-filter>
         </activity>
         <activity
+            android:name=".ui.intro.OnBoardingActivity"
+            android:theme="@style/IntroTheme"
+            android:screenOrientation="portrait"/>
+        <activity
             android:name=".ui.login.LoginActivity"
             android:screenOrientation="portrait"
             android:theme="@style/LoginTheme" />
+        <activity
+            android:name=".ui.login.verification.VerificationActivity"
+            android:theme="@style/LoginTheme" />
+        <activity
+            android:name=".ui.profile.complete_profile.CompleteProfileActivity" />
         <activity
             android:name=".ui.home.activity.HomeActivity"
             android:label="@string/home_activity_title"

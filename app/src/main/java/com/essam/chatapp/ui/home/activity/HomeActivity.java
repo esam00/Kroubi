@@ -16,6 +16,7 @@ import androidx.viewpager2.widget.ViewPager2;
 
 import com.essam.chatapp.R;
 import com.essam.chatapp.firebase.FirebaseManager;
+import com.essam.chatapp.models.Profile;
 import com.essam.chatapp.ui.contacts.activity.ContactsActivity;
 import com.essam.chatapp.ui.home.adapter.ViewPagerAdapter;
 import com.essam.chatapp.ui.login.LoginActivity;
@@ -26,14 +27,16 @@ import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.android.material.tabs.TabLayout;
 import com.google.android.material.tabs.TabLayoutMediator;
 
-public class HomeActivity extends AppCompatActivity {
+public class HomeActivity extends AppCompatActivity implements HomeContract.View {
 
     private ViewPager2 mViewPager2;
     private FloatingActionButton fab;
     private ViewPagerAdapter viewPagerAdapter;
+    private Profile currentUserProfile;
 
     private final static String TAG = HomeActivity.class.getSimpleName();
     private FirebaseManager mFirebaseManager;
+    private HomeContract.Presenter mPresenter = new HomePresenter(this);
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -41,7 +44,16 @@ public class HomeActivity extends AppCompatActivity {
         setContentView(R.layout.activity_home);
 
         mFirebaseManager = FirebaseManager.getInstance();
+        getCurrentUserProfile();
         initViews();
+    }
+
+    private void getCurrentUserProfile() {
+        if (mFirebaseManager.getCurrentUserProfile() != null){
+            currentUserProfile = mFirebaseManager.getCurrentUserProfile();
+        }else {
+            mPresenter.getProfileInfo();
+        }
     }
 
     private void toggleOnlineState(boolean isOnline) {
@@ -135,6 +147,12 @@ public class HomeActivity extends AppCompatActivity {
         // TODO: 3/7/2020 implement status by opening camera
     }
 
+    private void goToSettings() {
+        Intent intent = new Intent(this, SettingsActivity.class);
+        intent.putExtra(Consts.PROFILE, currentUserProfile);
+        startActivity(intent);
+    }
+
     private void makeNewVoiceCall() {
         // TODO: 3/7/2020 this will be a whole new feature i hope i will be able to implement voice calls one day ^_^
     }
@@ -175,6 +193,24 @@ public class HomeActivity extends AppCompatActivity {
     }
 
     @Override
+    public void onBackPressed() {
+        if (mViewPager2.getCurrentItem() == 0) {
+            // If the user is currently looking at the first step, allow the system to handle the
+            // Back button. This calls finish() on this activity and pops the back stack.
+            super.onBackPressed();
+        } else {
+            // Otherwise, select the previous step.
+            mViewPager2.setCurrentItem(0);
+        }
+    }
+
+    @Override
+    protected void onDestroy() {
+        mPresenter.detachView();
+        super.onDestroy();
+    }
+
+    @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.home_menu, menu);
         return true;
@@ -191,22 +227,6 @@ public class HomeActivity extends AppCompatActivity {
                 break;
         }
         return super.onOptionsItemSelected(item);
-    }
-
-    private void goToSettings() {
-        startActivity(new Intent(this, SettingsActivity.class));
-    }
-
-    @Override
-    public void onBackPressed() {
-        if (mViewPager2.getCurrentItem() == 0) {
-            // If the user is currently looking at the first step, allow the system to handle the
-            // Back button. This calls finish() on this activity and pops the back stack.
-            super.onBackPressed();
-        } else {
-            // Otherwise, select the previous step.
-            mViewPager2.setCurrentItem(0);
-        }
     }
 
     @Override
@@ -238,4 +258,12 @@ public class HomeActivity extends AppCompatActivity {
 
     }
 
+    @Override
+    public void onLoadProfileSuccess(Profile profile) {
+        currentUserProfile = profile;
+    }
+
+    @Override
+    public void onLoadProfileFailed(String msg) {
+    }
 }

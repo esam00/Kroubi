@@ -1,37 +1,25 @@
 package com.essam.chatapp.ui.intro;
 
 public class OnBoardingItem {
-    private String enTitle;
-    private String arTitle;
-    private String enDescription;
-    private String arDescription;
-    private int image;
+    private int titleSrcId;
+    private int descriptionSrcId;
+    private int imageSrcId;
 
-    public OnBoardingItem(String enTitle, String arTitle, String enDescription, String arDescription, int image) {
-        this.enTitle = enTitle;
-        this.arTitle = arTitle;
-        this.enDescription = enDescription;
-        this.arDescription = arDescription;
-        this.image = image;
+    public OnBoardingItem(int titleSrcId, int descriptionSrcId, int imageSrcId) {
+        this.titleSrcId = titleSrcId;
+        this.descriptionSrcId = descriptionSrcId;
+        this.imageSrcId = imageSrcId;
     }
 
-    public int getImage() {
-        return image;
+    public int getTitleSrcId() {
+        return titleSrcId;
     }
 
-    public String getTitle(String locale){
-        if (locale.equals("en")){
-            return enTitle;
-        }else {
-            return arTitle;
-        }
+    public int getDescriptionSrcId() {
+        return descriptionSrcId;
     }
 
-    public String getDescription(String locale){
-        if (locale.equals("en")){
-            return enDescription;
-        }else {
-            return arDescription;
-        }
+    public int getImageSrcId() {
+        return imageSrcId;
     }
 }

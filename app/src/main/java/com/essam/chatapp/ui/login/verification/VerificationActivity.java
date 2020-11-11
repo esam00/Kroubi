@@ -108,11 +108,13 @@ public class VerificationActivity extends AppCompatActivity implements Verificat
 
     private void handleCountDown(boolean enableResend){
         if (enableResend){
+            mCountdownView.setVisibility(View.GONE);
             resendCodeTv.setEnabled(true);
             resendCodeTv.setTextColor(getResources().getColor(R.color.colorAccent));
             resendCodeTv.setCompoundDrawablesRelativeWithIntrinsicBounds(R.drawable.ic_resend_enabled,0,0,0);
 
         }else {
+            mCountdownView.setVisibility(View.VISIBLE);
             resendCodeTv.setEnabled(false);
             resendCodeTv.setTextColor(getResources().getColor(R.color.light_gray));
             resendCodeTv.setCompoundDrawablesRelativeWithIntrinsicBounds(R.drawable.ic_resend_disabled,0,0,0);

@@ -17,10 +17,10 @@
 
 
     <color name="disabledColor">#A9EBFFE3</color>
+    <color name="colorBlueLight">#0F4AFF</color>
     <color name="white">#fff</color>
     <color name="black">#000</color>
     <color name="light_gray">#A79A9A</color>
-
     <color name="dark_gray">#5E5757</color>
 
     <color name="outgoing_background_color">#DDFFC2</color>
