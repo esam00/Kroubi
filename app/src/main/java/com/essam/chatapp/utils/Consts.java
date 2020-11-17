@@ -6,6 +6,8 @@ public class Consts {
     public static final String USER = "user";
     public static final String CHAT = "chat";
     public static final String PROFILE = "profile";
+    public static final String PROFILE_IMAGES = "profile_images";
+    public static final String CHAT_IMAGES = "chat_images";
 
     public static final String NAME ="name" ;
     public static final String PHONE ="phone" ;
@@ -37,4 +39,6 @@ public class Consts {
     public static final String LONGITUDE = "longitude";
     public static final String IMAGE_URI_CAMERA ="image_uri_camera" ;
     public static final String CHAT_ID = "chatID";
+    public static final String AVATAR = "avatar" ;
+    public static final String STATUS = "status";
 }

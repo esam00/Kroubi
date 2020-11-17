@@ -3,6 +3,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="wrap_content"
     android:layout_height="wrap_content"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_marginStart="15dp"
     android:layout_marginTop="15dp"
     android:layout_marginEnd="15dp">
@@ -13,6 +14,7 @@
         android:layout_height="60dp"
         android:layout_marginEnd="14dp"
         android:layout_marginRight="14dp"
+        app:civ_circle_background_color="@color/colorPrimaryDark"
         android:src="@drawable/user" />
 
     <LinearLayout
@@ -29,7 +31,7 @@
             android:layout_height="wrap_content"
             android:layout_marginBottom="5dp"
             android:textAppearance="@android:style/TextAppearance.DeviceDefault.Large"
-            android:textColor="@android:color/black"
+            android:textColor="@color/colorPrimaryText"
             android:textSize="18sp"
             tools:text="احمد محمد"/>
 
@@ -37,7 +39,7 @@
             android:id="@+id/tv_status"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:textColor="@color/dark_gray"
+            android:textColor="@color/colorSecondaryText"
             android:textSize="15sp"
             tools:text="ألحياة روح والموسيقى روح الحياة"/>
 

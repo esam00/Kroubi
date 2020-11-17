@@ -4,6 +4,8 @@ import android.content.Context;
 import android.content.SharedPreferences;
 import android.preference.PreferenceManager;
 
+import com.essam.chatapp.models.Profile;
+
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashSet;
@@ -42,6 +44,24 @@ public class SharedPrefrence {
         prefsEditor.commit();
     }
 
+    public void setMyProfile(Profile profile){
+        setValue(Consts.USER_UID, profile.getId());
+        setValue(Consts.USER_NAME, profile.getUserName());
+        setValue(Consts.PHONE, profile.getPhone());
+        setValue(Consts.AVATAR, profile.getAvatar());
+        setValue(Consts.STATUS, profile.getStatus());
+    }
+
+    public Profile getMyProfile(){
+        return new Profile(
+                getValue(Consts.USER_UID),
+                getValue(Consts.USER_NAME),
+                getValue(Consts.PHONE),
+                getValue(Consts.AVATAR),
+                getValue(Consts.STATUS),
+                true
+        );
+    }
 
     public void setIntValue(String Tag, int value) {
         prefsEditor.putInt(Tag, value);

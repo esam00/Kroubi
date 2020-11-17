@@ -17,6 +17,7 @@
     <androidx.cardview.widget.CardView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        app:cardBackgroundColor="@color/colorVerificationCardBackGround"
         android:layout_marginTop="25dp"
         android:layout_marginStart="10dp"
         android:layout_marginEnd="10dp"
@@ -47,6 +48,7 @@
                 android:gravity="center"
                 android:layout_margin="10dp"
                 android:padding="5dp"
+                android:textColor="@color/colorPrimaryText"
                 android:textAppearance="@android:style/TextAppearance.DeviceDefault.Medium"
                 android:text="Your status and your friends status will be displayed here soon"
                 >

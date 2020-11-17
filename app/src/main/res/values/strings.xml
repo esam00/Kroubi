@@ -61,5 +61,12 @@
     <string name="second_intro_description">Find your contacts users and send them text and photo messages</string>
     <string name="third_intro_title">Let\'s start</string>
     <string name="third_intro_description">What are you waiting for? login now in avery easy step to get started</string>
+    <string name="profile_info">Profile Info</string>
+    <string name="please_provide_your_name_and_an_optional_profile_photo">Please provide your name and an optional profile photo</string>
+    <string name="type_your_name_here">Type your name here</string>
+    <string name="next">Next</string>
+    <string name="updated_successfully">updated successfully!</string>
+    <string name="upload_profile_failed">Failed to upload profile image, please try again!</string>
+    <string name="no_chats_here_yet_select_a_friend_to_start_an_awesome_chat">No chats here yet, select a friend to start an awesome chat</string>
 
 </resources>

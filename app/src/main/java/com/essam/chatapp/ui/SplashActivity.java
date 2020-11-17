@@ -9,7 +9,6 @@ import android.util.Log;
 import com.essam.chatapp.firebase.FirebaseManager;
 import com.essam.chatapp.ui.home.activity.HomeActivity;
 import com.essam.chatapp.ui.intro.OnBoardingActivity;
-import com.essam.chatapp.ui.login.LoginActivity;
 import com.google.firebase.FirebaseApp;
 
 public class SplashActivity extends AppCompatActivity {

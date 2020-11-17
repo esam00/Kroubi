@@ -24,7 +24,7 @@
             android:layout_width="54dp"
             android:layout_height="54dp"
             android:src="@drawable/user"
-            app:civ_circle_background_color="@color/white"
+            app:civ_circle_background_color="@color/colorPrimary"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
@@ -54,7 +54,7 @@
             android:id="@+id/tv_sender_name"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:textColor="@android:color/primary_text_light"
+            android:textColor="@color/colorPrimaryText"
             android:textSize="16sp"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
@@ -94,7 +94,7 @@
                 android:layout_height="wrap_content"
                 android:ellipsize="end"
                 android:maxLines="1"
-                android:textColor="@color/dark_gray"
+                android:textColor="@color/colorSecondaryText"
                 android:textSize="15sp"
                 tools:text="Hello, how are you? i hope you are doing well" />
 

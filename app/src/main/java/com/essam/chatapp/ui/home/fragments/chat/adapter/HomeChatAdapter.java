@@ -9,7 +9,6 @@ import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.constraintlayout.widget.ConstraintLayout;
-import androidx.core.content.ContextCompat;
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.recyclerview.widget.SortedList;
 import androidx.recyclerview.widget.SortedListAdapterCallback;
@@ -17,7 +16,6 @@ import androidx.recyclerview.widget.SortedListAdapterCallback;
 import com.bumptech.glide.Glide;
 import com.essam.chatapp.R;
 import com.essam.chatapp.firebase.FirebaseManager;
-import com.essam.chatapp.models.Message;
 import com.essam.chatapp.ui.contacts.utils.ContactsHelper;
 import com.essam.chatapp.ui.home.fragments.chat.HomeChatFragment;
 import com.essam.chatapp.models.Chat;
@@ -33,16 +31,18 @@ import java.util.List;
 public class HomeChatAdapter extends RecyclerView.Adapter<HomeChatAdapter.ViewHolder> {
 
     private Context context;
-    private ListItemClickListener listItemClickListener;
+    private HomeChatListener mHomeChatListener;
     private SortedList<Chat> mChatList;
     private HomeChatFragment mHomeChatFragment;
 
-    public interface ListItemClickListener {
+    public interface HomeChatListener {
         void onClick(Chat chat, int adapterPosition);
+
+        void getUpdatedProfileImage(Chat chat);
     }
 
-    public HomeChatAdapter(HomeChatFragment homeChatFragment, ListItemClickListener listener, Context context) {
-        this.listItemClickListener = listener;
+    public HomeChatAdapter(HomeChatFragment homeChatFragment, HomeChatListener listener, Context context) {
+        this.mHomeChatListener = listener;
         this.context = context;
         this.mHomeChatFragment = homeChatFragment;
         sort();
@@ -98,7 +98,6 @@ public class HomeChatAdapter extends RecyclerView.Adapter<HomeChatAdapter.ViewHo
         private TextView senderNameTV, lastMessageTv, dateTv, counterTv;
         private View separator;
         private ImageView profileImv, messageStateIv;
-        private ConstraintLayout parentView;
 
         private ViewHolder(@NonNull View itemView) {
             super(itemView);
@@ -107,7 +106,6 @@ public class HomeChatAdapter extends RecyclerView.Adapter<HomeChatAdapter.ViewHo
             dateTv = itemView.findViewById(R.id.tv_last_message_date);
             counterTv = itemView.findViewById(R.id.tv_unseen_count);
             separator = itemView.findViewById(R.id.separator);
-            parentView = itemView.findViewById(R.id.parent_view);
             messageStateIv = itemView.findViewById(R.id.iv_message_state);
             profileImv = itemView.findViewById(R.id.profile_img);
 
@@ -127,18 +125,18 @@ public class HomeChatAdapter extends RecyclerView.Adapter<HomeChatAdapter.ViewHo
                 lastMessageTv.setTextColor(context.getResources().getColor(R.color.colorAccent));
             } else {
                 lastMessageTv.setText(chat.getMessage());
-                lastMessageTv.setTextColor(context.getResources().getColor(R.color.dark_gray));
+                lastMessageTv.setTextColor(context.getResources().getColor(R.color.colorSecondaryText));
             }
             //colors
             if (chat.getUnSeenCount() > 0) {
                 counterTv.setVisibility(View.VISIBLE);
                 dateTv.setTextColor(context.getResources().getColor(R.color.colorAccent));
                 counterTv.setText((NumberFormat.getInstance().format(chat.getUnSeenCount())));
-                parentView.setBackground(ContextCompat.getDrawable(context, R.drawable.ripple_effect_highlighted));
+//                parentView.setBackground(ContextCompat.getDrawable(context, R.drawable.ripple_effect_highlighted));
             } else {
                 counterTv.setVisibility(View.GONE);
-                dateTv.setTextColor(context.getResources().getColor(R.color.dark_gray));
-                parentView.setBackground(ContextCompat.getDrawable(context, R.drawable.ripple_effect_basic));
+                dateTv.setTextColor(context.getResources().getColor(R.color.colorSecondaryText));
+//                parentView.setBackground(ContextCompat.getDrawable(context, R.drawable.ripple_effect_basic));
             }
 
             if (chat.getCreatorId().equals(FirebaseManager.getInstance().getMyUid())) {
@@ -164,7 +162,7 @@ public class HomeChatAdapter extends RecyclerView.Adapter<HomeChatAdapter.ViewHo
 
         @Override
         public void onClick(View view) {
-            listItemClickListener.onClick(mChatList.get(getAdapterPosition()), getAdapterPosition());
+            mHomeChatListener.onClick(mChatList.get(getAdapterPosition()), getAdapterPosition());
         }
     }
 

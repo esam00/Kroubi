@@ -1,8 +1,38 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="wrap_content"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:gravity="center"
+    android:orientation="vertical">
+
+    <ImageView
+        android:layout_width="80dp"
+        android:layout_height="80dp"
+        android:src="@drawable/ic_login"/>
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="15dp"
+        android:gravity="center"
+        android:text="@string/detect_phone_automatically"
+        android:textAppearance="@style/TextAppearance.AppCompat.Small"
+        android:textSize="15sp"
+        android:textColor="@color/colorPrimaryText" />
+
+    <TextView
+        android:id="@+id/phone_tv"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="15dp"
+        android:gravity="center"
+        android:textAppearance="@style/TextAppearance.AppCompat.Small"
+        android:textSize="15sp"
+        android:textColor="@color/colorAccent"
+        android:textStyle="bold"
+        tools:text="+201019965971" />
 
     <com.mukesh.OtpView
         android:id="@+id/otp_view"
@@ -12,15 +42,11 @@
         android:enabled="true"
         android:focusableInTouchMode="true"
         android:inputType="number"
-        android:textColor="@color/black"
+        android:textColor="@color/colorPrimaryText"
         app:itemCount="6"
         app:itemHeight="40dp"
         app:itemSpacing="10dp"
         app:itemWidth="40dp"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.498"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
         app:lineColor="@color/colorAccent"
         app:viewType="line" />
 
@@ -32,30 +58,24 @@
         android:gravity="center"
         android:text="@string/enter_6_digit_code"
         android:textAppearance="@style/TextAppearance.AppCompat.Small"
-        android:textColor="@color/dark_gray"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/otp_view" />
+        android:textColor="@color/colorSecondaryText"/>
 
     <androidx.constraintlayout.widget.ConstraintLayout
-        android:layout_width="0dp"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginTop="15dp"
         android:padding="15dp"
-        android:background="@color/colorPrimaryTransparent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/enter_code_tv">
+        android:background="@color/colorPrimaryTransparent">
 
         <TextView
             android:id="@+id/resend_code_text_view"
-            android:layout_width="match_parent"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:drawablePadding="15dp"
             android:enabled="false"
             android:text="@string/resend_sms"
             android:textAppearance="@style/TextAppearance.AppCompat.Small"
-            android:textColor="@color/dark_gray"
+            android:textColor="@color/colorDisabledText"
             app:drawableStartCompat="@drawable/ic_resend_disabled"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
@@ -67,15 +87,14 @@
             app:isHideTimeBackground="true"
             app:isShowMinute="true"
             app:isShowSecond="true"
-            app:isTimeTextBold="true"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toTopOf="parent"
             app:suffixGravity="bottom"
-            app:suffixTextColor="@color/dark_gray"
+            app:suffixTextColor="@color/colorSecondaryText"
             app:suffixTextSize="16sp"
-            app:timeTextColor="@color/dark_gray"
+            app:timeTextColor="@color/colorSecondaryText"
             app:timeTextSize="15sp" />
     </androidx.constraintlayout.widget.ConstraintLayout>
 
-</androidx.constraintlayout.widget.ConstraintLayout>
+</LinearLayout>

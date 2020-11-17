@@ -13,13 +13,13 @@
             android:layout_width="match_parent"
             android:layout_height="?attr/actionBarSize"
             android:background="@color/colorPrimary"
-            app:tabTextColor="@color/disabledColor"
+            app:tabTextColor="@color/colorDisabledText"
             app:tabTextAppearance="@style/TextAppearance.AppCompat.Widget.ActionBar.Menu"
             app:tabRippleColor="@color/white"
-            app:tabIndicatorColor="@color/white"
+            app:tabIndicatorColor="@color/colorAccent"
             app:tabIndicatorHeight="3dp"
             android:elevation="4dp"
-            app:tabSelectedTextColor="@color/white"
+            app:tabSelectedTextColor="@color/colorAccent"
             android:id="@+id/tabLayout">
         </com.google.android.material.tabs.TabLayout>
 

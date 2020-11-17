@@ -4,7 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/white"
+    android:background="@color/colorPrimaryDark"
     tools:context=".ui.settings.SettingsActivity">
 
     <androidx.constraintlayout.widget.ConstraintLayout
@@ -27,7 +27,7 @@
                 android:layout_width="65dp"
                 android:layout_height="65dp"
                 android:src="@drawable/user"
-                app:civ_circle_background_color="@color/white"
+                app:civ_circle_background_color="@color/colorPrimaryDark"
                 android:transitionName="@string/profile_transition"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent" />
@@ -49,7 +49,7 @@
                     android:layout_height="wrap_content"
                     android:text="Essam Mosbah"
                     android:textAppearance="@style/TextAppearance.AppCompat.Medium"
-                    android:textColor="@android:color/primary_text_light" />
+                    android:textColor="@color/colorPrimaryText" />
 
                 <TextView
                     android:id="@+id/statusTv"
@@ -59,7 +59,7 @@
                     android:maxLines="1"
                     android:text="Hello there, i'm using kroubi,Hello there, i'm using kroubi "
                     android:textAppearance="@style/TextAppearance.AppCompat.Small"
-                    android:textColor="@android:color/secondary_text_light" />
+                    android:textColor="@color/colorSecondaryText" />
             </LinearLayout>
 
         </androidx.constraintlayout.widget.ConstraintLayout>
@@ -120,7 +120,7 @@
                         android:layout_height="wrap_content"
                         android:text="Account"
                         android:textAppearance="@style/TextAppearance.AppCompat.Medium"
-                        android:textColor="@android:color/primary_text_light" />
+                        android:textColor="@color/colorPrimaryText" />
 
                     <TextView
                         android:id="@+id/account_subtitleTv"
@@ -129,7 +129,7 @@
                         android:maxLines="1"
                         android:text="Privacy, security, change number"
                         android:textAppearance="@style/TextAppearance.AppCompat.Small"
-                        android:textColor="@color/dark_gray" />
+                        android:textColor="@color/colorSecondaryText" />
                 </LinearLayout>
 
             </androidx.constraintlayout.widget.ConstraintLayout>
@@ -174,7 +174,7 @@
                         android:layout_height="wrap_content"
                         android:text="Chats"
                         android:textAppearance="@style/TextAppearance.AppCompat.Medium"
-                        android:textColor="@android:color/primary_text_light" />
+                        android:textColor="@color/colorPrimaryText" />
 
                     <TextView
                         android:id="@+id/chat_subtitleTv"
@@ -183,7 +183,7 @@
                         android:maxLines="1"
                         android:text="Theme, Wallpapers, Chat history"
                         android:textAppearance="@style/TextAppearance.AppCompat.Small"
-                        android:textColor="@color/dark_gray" />
+                        android:textColor="@color/colorSecondaryText" />
 
                 </LinearLayout>
 
@@ -229,7 +229,7 @@
                         android:layout_height="wrap_content"
                         android:text="Notifications"
                         android:textAppearance="@style/TextAppearance.AppCompat.Medium"
-                        android:textColor="@android:color/primary_text_light" />
+                        android:textColor="@color/colorPrimaryText" />
 
                     <TextView
                         android:id="@+id/notifications_subtitleTv"
@@ -238,7 +238,7 @@
                         android:maxLines="1"
                         android:text="Message, group, call tones"
                         android:textAppearance="@style/TextAppearance.AppCompat.Small"
-                        android:textColor="@color/dark_gray" />
+                        android:textColor="@color/colorSecondaryText" />
 
                 </LinearLayout>
 
@@ -284,7 +284,7 @@
                         android:layout_height="wrap_content"
                         android:text="Storage and data"
                         android:textAppearance="@style/TextAppearance.AppCompat.Medium"
-                        android:textColor="@android:color/primary_text_light" />
+                        android:textColor="@color/colorPrimaryText" />
 
                     <TextView
                         android:id="@+id/storage_subtitleTv"
@@ -293,7 +293,7 @@
                         android:maxLines="1"
                         android:text="Network usage, auto-download"
                         android:textAppearance="@style/TextAppearance.AppCompat.Small"
-                        android:textColor="@color/dark_gray" />
+                        android:textColor="@color/colorSecondaryText" />
 
                 </LinearLayout>
 
@@ -339,7 +339,7 @@
                         android:layout_height="wrap_content"
                         android:text="Help"
                         android:textAppearance="@style/TextAppearance.AppCompat.Medium"
-                        android:textColor="@android:color/primary_text_light" />
+                        android:textColor="@color/colorPrimaryText" />
 
                     <TextView
                         android:id="@+id/help_subtitleTv"
@@ -348,7 +348,7 @@
                         android:maxLines="1"
                         android:text="FAQ, contact us, privacy policy"
                         android:textAppearance="@style/TextAppearance.AppCompat.Small"
-                        android:textColor="@color/dark_gray" />
+                        android:textColor="@color/colorSecondaryText" />
 
                 </LinearLayout>
 

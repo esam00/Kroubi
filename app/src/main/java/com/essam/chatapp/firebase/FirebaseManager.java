@@ -22,9 +22,6 @@ public class FirebaseManager {
         LOGGED_IN,
         LOGGED_OUT,
     }
-    public boolean isFirstTime = false;
-    private Profile currentUserProfile;
-
     private static FirebaseManager instance;
     private FirebaseAuth mFirebaseAuth;
     private DatabaseReference appUserDb;        //App/user/
@@ -57,14 +54,6 @@ public class FirebaseManager {
         }
     }
 
-    public Profile getCurrentUserProfile() {
-        return currentUserProfile;
-    }
-
-    public void setCurrentUserProfile(Profile currentUserProfile) {
-        this.currentUserProfile = currentUserProfile;
-    }
-
     public String getMyUid() {
         return getFirebaseUser().getUid();
     }
@@ -73,7 +62,11 @@ public class FirebaseManager {
         return getFirebaseUser().getPhoneNumber();
     }
 
-    public void getCurrentUserProfile(ValueEventListener listener){
+    public void updateUserProfile(Profile profile){
+        userProfileDb.setValue(profile);
+    }
+
+    public void listenForCurrentUserProfileChanges(ValueEventListener listener){
         userProfileDb.addValueEventListener(listener);
     }
 
@@ -121,19 +114,20 @@ public class FirebaseManager {
         mUserDb.addListenerForSingleValueEvent(eventListener);
     }
 
-    public void addNewUserToDataBase(Profile userProfile){
-        isFirstTime = true;
-        currentUserProfile = userProfile;
+    /**
+     * Adding new child to app/user db with the basic info we just got like
+     * [Uid, phone and an empty profile]
+     */
+    public void addNewUserToDataBase(){
         User user = new User(
                 getMyUid(),
                 getMyPhone(),
-                userProfile
+                new Profile()
         );
         mUserDb.setValue(user);
     }
 
     public void toggleOnlineState(boolean isOnline){
-        if (isFirstTime) return; // user just signed in and state is online by default
         if (isOnline) {
             userProfileDb.child(Consts.IS_ONLINE).setValue(true);
         } else {

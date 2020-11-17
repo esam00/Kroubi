@@ -17,14 +17,13 @@ import android.widget.Toast;
 import com.bumptech.glide.Glide;
 import com.essam.chatapp.R;
 import com.essam.chatapp.models.Profile;
-import com.essam.chatapp.ui.profile.MyProfileActivity;
-import com.essam.chatapp.utils.Consts;
+import com.essam.chatapp.ui.profile.activity.MyProfileActivity;
+import com.essam.chatapp.utils.SharedPrefrence;
 
 public class SettingsActivity extends AppCompatActivity implements View.OnClickListener {
 
     private ImageView profileIv;
     private TextView userNameTv, statusTv;
-
     private Profile myProfile;
 
     @Override
@@ -37,16 +36,15 @@ public class SettingsActivity extends AppCompatActivity implements View.OnClickL
     }
 
     private void getProfileInfo() {
-        Intent intent = getIntent();
-        if(intent.hasExtra(Consts.PROFILE)){
-            myProfile = intent.getParcelableExtra(Consts.PROFILE);
-            populateProfileData();
-        }
+        myProfile = SharedPrefrence.getInstance(this).getMyProfile();
+        populateProfileData();
     }
 
     private void populateProfileData() {
         userNameTv.setText(myProfile.getUserName());
+
         statusTv.setText(myProfile.getStatus());
+
         Glide.with(this)
                 .load(myProfile.getAvatar())
                 .placeholder(R.drawable.user)
@@ -70,14 +68,11 @@ public class SettingsActivity extends AppCompatActivity implements View.OnClickL
 
     @Override
     public boolean onOptionsItemSelected(@NonNull MenuItem item) {
-        switch (item.getItemId()){
-            case android.R.id.home:
-                onBackPressed();
-                return true;
-            default:
-                return super.onOptionsItemSelected(item);
-
+        if (item.getItemId() == android.R.id.home) {
+            onBackPressed();
+            return true;
         }
+        return super.onOptionsItemSelected(item);
     }
 
     @Override
@@ -93,6 +88,12 @@ public class SettingsActivity extends AppCompatActivity implements View.OnClickL
             case R.id.help:
                 Toast.makeText(this, " Just a design!", Toast.LENGTH_SHORT).show();
         }
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        getProfileInfo();
     }
 
     private void openProfileWithTransition() {

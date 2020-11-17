@@ -3,7 +3,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/colorPrimaryTransparent"
+    android:background="@color/colorPrimaryDark"
     tools:context=".ui.chat.activity.ChatActivity">
 
     <LinearLayout
@@ -45,7 +45,7 @@
                 android:layout_height="wrap_content"
                 android:gravity="center"
                 tools:text="Essam mosbah"
-                android:textColor="@color/white"
+                android:textColor="@color/colorPrimaryText"
                 android:textStyle="bold"
                 android:textAppearance="@style/TextAppearance.AppCompat.Medium"/>
 
@@ -57,7 +57,7 @@
                 android:gravity="center"
                 android:text="@string/online"
                 android:visibility="gone"
-                android:textColor="@color/white"
+                android:textColor="@color/colorPrimaryText"
                 android:textAppearance="@style/TextAppearance.AppCompat.Small"/>
 
         </LinearLayout>
@@ -103,6 +103,7 @@
             android:layout_margin="10dp"
             android:gravity="center"
             android:padding="5dp"
+            android:textColor="@color/colorSecondaryText"
             android:text="@string/msg_no_chat_yet"
             android:textAppearance="@android:style/TextAppearance.DeviceDefault.Small">
 
@@ -118,6 +119,7 @@
         android:layout_centerInParent="true"
         android:gravity="center"
         android:padding="5dp"
+        android:textColor="@color/colorSecondaryText"
         android:text="@string/loading"
         android:textAppearance="@android:style/TextAppearance.DeviceDefault.Small">
 
@@ -292,7 +294,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginEnd="55dp"
-            android:background="@drawable/shape_rounded_white_bg"
+            android:background="@drawable/shape_send_msg_bg"
             android:orientation="horizontal"
             android:padding="2dp">
 
@@ -302,6 +304,8 @@
                 android:layout_height="wrap_content"
                 android:layout_weight="4"
                 android:background="@null"
+                android:textColorHint="@color/colorSecondaryText"
+                android:textColor="@color/colorPrimaryText"
                 android:hint="@string/type_a_message"
                 android:maxHeight="130dp"
                 android:padding="10dp"
@@ -334,7 +338,7 @@
             android:layout_centerVertical="true"
             android:layout_marginStart="5dp"
             android:background="@drawable/shape_send_bg"
-            android:backgroundTint="@color/colorPrimary"
+            android:backgroundTint="@color/colorAccent"
             android:clickable="true"
             android:focusable="true"
             android:padding="12dp"

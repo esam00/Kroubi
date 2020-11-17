@@ -4,7 +4,6 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/white"
     app:layout_behavior="@string/appbar_scrolling_view_behavior"
     tools:context=".ui.home.fragments.chat.HomeChatFragment">
 
@@ -37,9 +36,9 @@
             android:gravity="center"
             android:layout_margin="10dp"
             android:padding="5dp"
-            android:textColor="#949EA6"
+            android:textColor="@color/colorSecondaryText"
             android:textAppearance="@android:style/TextAppearance.DeviceDefault.Small"
-            android:text="No chats here yet, select a friend to start an awesome chat" />
+            android:text="@string/no_chats_here_yet_select_a_friend_to_start_an_awesome_chat" />
 
     </LinearLayout>
 

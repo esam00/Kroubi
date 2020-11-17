@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <menu xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto">
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    >
 
     <!--    <item-->
     <!--        android:id="@+id/new_group"-->
@@ -17,18 +18,18 @@
     <!--    <item-->
     <!--        android:id="@+id/starred_messages"-->
     <!--        android:title="Starred messages" />-->
-        <item
-            android:id="@+id/settings"
-            android:title="@string/settings" />
+    <item
+        android:id="@+id/settings"
+        android:title="@string/settings" />
 
     <item
         android:id="@+id/sign_out"
         android:title="@string/sign_out" />
 
-    <item
-        android:id="@+id/search"
-        android:icon="@drawable/ic_search"
-        android:title="search"
-        app:showAsAction="always" />
+    <!--    <item-->
+    <!--        android:id="@+id/search"-->
+    <!--        android:icon="@drawable/ic_search"-->
+    <!--        android:title="search"-->
+    <!--        app:showAsAction="always" />-->
 
 </menu>

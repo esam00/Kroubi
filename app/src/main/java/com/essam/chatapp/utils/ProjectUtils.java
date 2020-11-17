@@ -437,11 +437,7 @@ public class ProjectUtils {
      * @return True if not null.
      */
     public static boolean isEditTextFilled(EditText text) {
-        if (text.getText() != null && text.getText().toString().trim().length() > 0) {
-            return true;
-        } else {
-            return false;
-        }
+        return text.getText() != null && text.getText().toString().trim().length() > 0;
     }
     public static boolean isTextFilled(TextView text) {
         if (text.getText() != null && text.getText().toString().trim().length() > 0) {

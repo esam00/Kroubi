@@ -1,4 +1,4 @@
-package com.essam.chatapp.ui.login.verification;
+package com.essam.chatapp.ui.verification;
 
 import androidx.appcompat.app.AppCompatActivity;
 
@@ -10,9 +10,8 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.essam.chatapp.R;
-import com.essam.chatapp.ui.home.activity.HomeActivity;
+import com.essam.chatapp.ui.profile.activity.CompleteProfileActivity;
 import com.essam.chatapp.utils.Consts;
-import com.essam.chatapp.utils.SharedPrefrence;
 import com.google.firebase.auth.PhoneAuthCredential;
 import com.google.firebase.auth.PhoneAuthProvider;
 import com.mukesh.OnOtpCompletionListener;
@@ -27,8 +26,7 @@ public class VerificationActivity extends AppCompatActivity implements Verificat
     private TextView headerTv, phoneTv, resendCodeTv;
     private OtpView mOtpView;
     private CountdownView mCountdownView;
-    private SharedPrefrence preference;
-    private String mOtpCode , mEnteredCode;
+    private String mOtpCode = "" , mEnteredCode = "";
     private ProgressBar mProgressBar;
     private VerificationContract.Presenter mPresenter;
     private String mPhoneToValidate;
@@ -39,7 +37,6 @@ public class VerificationActivity extends AppCompatActivity implements Verificat
         setContentView(R.layout.activity_verification);
 
         mPresenter = new VerificationPresenter(this);
-        preference = SharedPrefrence.getInstance(this);
 
         initViews();
         receivePhoneNumber();
@@ -68,10 +65,13 @@ public class VerificationActivity extends AppCompatActivity implements Verificat
         mOtpView.setOtpCompletionListener(new OnOtpCompletionListener() {
             @Override
             public void onOtpCompleted(String otp) {
-                mEnteredCode = otp;
-                mOtpView.setEnabled(false);
-                mProgressBar.setVisibility(View.VISIBLE);
-                signInWithPhoneCredential();
+                if (otp != null){
+                    mEnteredCode = otp;
+                    mOtpView.setEnabled(false);
+                    mProgressBar.setVisibility(View.VISIBLE);
+                    signInWithPhoneCredential();
+                }
+
             }
         });
 
@@ -92,9 +92,9 @@ public class VerificationActivity extends AppCompatActivity implements Verificat
     }
 
     /**
-     * When receiving verification code, we are to make PhoneAuthCredential object that combines the
+     * When receiving verification code, we create PhoneAuthCredential object that combines the
      * code that was sent and the code that entered by user>> then sign in with this Credential
-     * using firebase
+     * using firebase auth
      */
     private void signInWithPhoneCredential() {
         if (mEnteredCode.isEmpty()) {
@@ -116,7 +116,7 @@ public class VerificationActivity extends AppCompatActivity implements Verificat
         }else {
             mCountdownView.setVisibility(View.VISIBLE);
             resendCodeTv.setEnabled(false);
-            resendCodeTv.setTextColor(getResources().getColor(R.color.light_gray));
+            resendCodeTv.setTextColor(getResources().getColor(R.color.colorDisabledText));
             resendCodeTv.setCompoundDrawablesRelativeWithIntrinsicBounds(R.drawable.ic_resend_disabled,0,0,0);
             mCountdownView.start(TimeUnit.SECONDS.toMillis(60));
         }
@@ -141,11 +141,10 @@ public class VerificationActivity extends AppCompatActivity implements Verificat
     }
 
     @Override
-    public void onLoginSuccess(String userName) {
-        preference.setValue(Consts.USER_NAME, userName);
+    public void onLoginSuccess() {
         Toast.makeText(this, R.string.msg_login_success, Toast.LENGTH_SHORT).show();
 
-        Intent intent = new Intent(this, HomeActivity.class);
+        Intent intent = new Intent(this, CompleteProfileActivity.class);
         intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
         startActivity(intent);
     }

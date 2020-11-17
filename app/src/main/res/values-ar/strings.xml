@@ -46,7 +46,7 @@
     <string name="enter_6_digit_code">أدخل الرمز التأكيدي</string>
     <string name="verify">التحقق من %1$s</string>
     <string name="verify_phone_failed">خطأفي التحقق من رقم الهاتف!</string>
-    <string name="resend_sms">Resend SMS</string>
+    <string name="resend_sms">أعد إرسال رسالة SMS</string>
     <string name="intro">intro</string>
     <string name="first_intro_title">أهلا بك في قروبي</string>
     <string name="first_intro_description">استمتع بتجربة جديدة للمحادثات السريعة</string>
@@ -54,4 +54,11 @@
     <string name="second_intro_description">ابحث عن أحد جهات اتصالك المسجلين وارسال لهم العديد من الرسائل والصور</string>
     <string name="third_intro_title">هيا نبدأ</string>
     <string name="third_intro_description">ماذا تنتظر؟ سجل الآن بطريقة سهلة جدا لتبدأ</string>
+    <string name="profile_info">بيانات الصفحة الشخصية</string>
+    <string name="please_provide_your_name_and_an_optional_profile_photo">من فضلك أدخل اسمك وصورتك الشخصية</string>
+    <string name="type_your_name_here">اكتب اسمك هنا</string>
+    <string name="next">التالي</string>
+    <string name="updated_successfully">تم التحديث بنجاح!</string>
+    <string name="upload_profile_failed">حدث خطأ أثناء تحميل الصورة ، من فلك حاول مرة أخرى!</string>
+    <string name="no_chats_here_yet_select_a_friend_to_start_an_awesome_chat">No chats here yet, select a friend to start an awesome chat</string>
 </resources>

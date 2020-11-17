@@ -1,4 +1,4 @@
-package com.essam.chatapp.ui.login.verification;
+package com.essam.chatapp.ui.verification;
 
 import com.google.firebase.auth.PhoneAuthCredential;
 
@@ -18,6 +18,6 @@ public class VerificationContract {
 
         void onVerificationCodeSent(String code);
 
-        void onLoginSuccess(String userName);
+        void onLoginSuccess();
     }
 }

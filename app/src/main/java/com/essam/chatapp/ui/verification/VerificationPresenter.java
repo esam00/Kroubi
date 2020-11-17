@@ -1,4 +1,4 @@
-package com.essam.chatapp.ui.login.verification;
+package com.essam.chatapp.ui.verification;
 
 import android.app.Activity;
 import android.util.Log;
@@ -6,7 +6,6 @@ import android.util.Log;
 import androidx.annotation.NonNull;
 
 import com.essam.chatapp.firebase.FirebaseManager;
-import com.essam.chatapp.models.Profile;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.Task;
@@ -80,7 +79,7 @@ public class VerificationPresenter implements VerificationContract.Presenter {
                     checkIfUserExistInDataBase();
 
                     // update view
-                    mView.onLoginSuccess(mFirebaseManager.getMyPhone());
+                    mView.onLoginSuccess();
                 }
             }
         })
@@ -97,7 +96,8 @@ public class VerificationPresenter implements VerificationContract.Presenter {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                 if (!dataSnapshot.exists()) {
-                    createNewUser();
+                    // If not found in database >> just push new user with basic info [Uid, phone]
+                    addNewUserToDatabase();
                 }
             }
 
@@ -107,16 +107,8 @@ public class VerificationPresenter implements VerificationContract.Presenter {
         });
     }
 
-    private void createNewUser() {
-        Profile myProfile = new Profile(
-                mFirebaseManager.getMyUid(),
-                mFirebaseManager.getMyPhone(),
-                mFirebaseManager.getMyPhone(),
-                "",
-                "Hey there , I'm using Kroubi",
-                true
-                );
-        mFirebaseManager.addNewUserToDataBase(myProfile);
+    private void addNewUserToDatabase() {
+        mFirebaseManager.addNewUserToDataBase();
     }
 
     @Override

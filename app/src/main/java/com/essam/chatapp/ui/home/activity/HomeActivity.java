@@ -12,48 +12,45 @@ import android.view.View;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
+import androidx.core.app.ActivityOptionsCompat;
 import androidx.viewpager2.widget.ViewPager2;
 
+import com.bumptech.glide.Glide;
 import com.essam.chatapp.R;
 import com.essam.chatapp.firebase.FirebaseManager;
-import com.essam.chatapp.models.Profile;
 import com.essam.chatapp.ui.contacts.activity.ContactsActivity;
 import com.essam.chatapp.ui.home.adapter.ViewPagerAdapter;
-import com.essam.chatapp.ui.login.LoginActivity;
+import com.essam.chatapp.ui.LoginPhoneNumberActivity;
+import com.essam.chatapp.ui.profile.activity.MyProfileActivity;
 import com.essam.chatapp.ui.settings.SettingsActivity;
 import com.essam.chatapp.utils.Consts;
 import com.essam.chatapp.utils.ProjectUtils;
+import com.essam.chatapp.utils.SharedPrefrence;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.android.material.tabs.TabLayout;
 import com.google.android.material.tabs.TabLayoutMediator;
 
-public class HomeActivity extends AppCompatActivity implements HomeContract.View {
+import de.hdodenhof.circleimageview.CircleImageView;
+
+public class HomeActivity extends AppCompatActivity{
 
     private ViewPager2 mViewPager2;
     private FloatingActionButton fab;
     private ViewPagerAdapter viewPagerAdapter;
-    private Profile currentUserProfile;
 
     private final static String TAG = HomeActivity.class.getSimpleName();
     private FirebaseManager mFirebaseManager;
-    private HomeContract.Presenter mPresenter = new HomePresenter(this);
+    private SharedPrefrence mPrefrence;
+    private CircleImageView profileIv;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_home);
 
+        mPrefrence = SharedPrefrence.getInstance(this);
         mFirebaseManager = FirebaseManager.getInstance();
-        getCurrentUserProfile();
         initViews();
-    }
-
-    private void getCurrentUserProfile() {
-        if (mFirebaseManager.getCurrentUserProfile() != null){
-            currentUserProfile = mFirebaseManager.getCurrentUserProfile();
-        }else {
-            mPresenter.getProfileInfo();
-        }
     }
 
     private void toggleOnlineState(boolean isOnline) {
@@ -66,6 +63,20 @@ public class HomeActivity extends AppCompatActivity implements HomeContract.View
         setSupportActionBar(toolbar);
         toolbar.inflateMenu(R.menu.home_menu);
 
+        handleViewPager();
+        handleProfileImage();
+
+        // fab button
+        fab = findViewById(R.id.fab);
+        fab.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                onFabClicked();
+            }
+        });
+    }
+
+    private void handleViewPager(){
         // viewPager and tabLayout
         mViewPager2 = findViewById(R.id.view_pager);
         TabLayout tabLayout = findViewById(R.id.tabLayout);
@@ -80,7 +91,7 @@ public class HomeActivity extends AppCompatActivity implements HomeContract.View
 
         viewPagerAdapter = new ViewPagerAdapter(this);
         mViewPager2.setAdapter(viewPagerAdapter);
-        mViewPager2.setOffscreenPageLimit(ViewPager2.OFFSCREEN_PAGE_LIMIT_DEFAULT);
+        mViewPager2.setOffscreenPageLimit(3);
 
         // set tabs text using TabLayoutMediator
         new TabLayoutMediator(tabLayout, mViewPager2, new TabLayoutMediator.TabConfigurationStrategy() {
@@ -101,15 +112,23 @@ public class HomeActivity extends AppCompatActivity implements HomeContract.View
         }).attach();
 
         mViewPager2.registerOnPageChangeCallback(pageChangeListener);
+    }
 
-        // fab button
-        fab = findViewById(R.id.fab);
-        fab.setOnClickListener(new View.OnClickListener() {
+    private void handleProfileImage(){
+        profileIv = findViewById(R.id.profile_iv);
+        profileIv.setOnClickListener(new View.OnClickListener() {
             @Override
-            public void onClick(View view) {
-                onFabClicked();
+            public void onClick(View v) {
+                openProfileWithTransition();
             }
         });
+    }
+
+    private void openProfileWithTransition() {
+        Intent intent = new Intent(this, MyProfileActivity.class);
+        ActivityOptionsCompat optionsCompat = ActivityOptionsCompat
+                .makeSceneTransitionAnimation(this,profileIv, getString(R.string.profile_transition));
+        startActivity(intent,optionsCompat.toBundle());
     }
 
     private void onFabClicked() {
@@ -149,7 +168,6 @@ public class HomeActivity extends AppCompatActivity implements HomeContract.View
 
     private void goToSettings() {
         Intent intent = new Intent(this, SettingsActivity.class);
-        intent.putExtra(Consts.PROFILE, currentUserProfile);
         startActivity(intent);
     }
 
@@ -165,8 +183,9 @@ public class HomeActivity extends AppCompatActivity implements HomeContract.View
     }
 
     private void signOut() {
+        mPrefrence.clearAllPreferences();
         mFirebaseManager.signOutUser();
-        Intent intent = new Intent(this, LoginActivity.class);
+        Intent intent = new Intent(this, LoginPhoneNumberActivity.class);
         intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
         intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK);
         startActivity(intent);
@@ -189,6 +208,7 @@ public class HomeActivity extends AppCompatActivity implements HomeContract.View
     @Override
     protected void onResume() {
         toggleOnlineState(true);
+        Glide.with(this).load(mPrefrence.getValue(Consts.AVATAR)).into(profileIv);
         super.onResume();
     }
 
@@ -202,12 +222,6 @@ public class HomeActivity extends AppCompatActivity implements HomeContract.View
             // Otherwise, select the previous step.
             mViewPager2.setCurrentItem(0);
         }
-    }
-
-    @Override
-    protected void onDestroy() {
-        mPresenter.detachView();
-        super.onDestroy();
     }
 
     @Override
@@ -256,14 +270,5 @@ public class HomeActivity extends AppCompatActivity implements HomeContract.View
                 }
         }
 
-    }
-
-    @Override
-    public void onLoadProfileSuccess(Profile profile) {
-        currentUserProfile = profile;
-    }
-
-    @Override
-    public void onLoadProfileFailed(String msg) {
     }
 }

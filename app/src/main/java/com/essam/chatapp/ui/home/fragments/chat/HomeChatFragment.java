@@ -37,7 +37,7 @@ import java.util.List;
 import java.util.Observable;
 import java.util.Observer;
 
-public class HomeChatFragment extends Fragment implements HomeChatAdapter.ListItemClickListener,
+public class HomeChatFragment extends Fragment implements HomeChatAdapter.HomeChatListener,
         Observer, HomeChatContract.View {
 
     private RecyclerView homeChatRv;

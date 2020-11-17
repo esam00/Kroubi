@@ -55,6 +55,8 @@ public class HomeChatPresenter implements HomeChatContract.Presenter{
                 Chat chat = dataSnapshot.getValue(Chat.class);
                 if (chat != null) {
                     Log.i(TAG, "new chat added");
+                    // TODO: 11/12/2020 Chat model should only holds a reference to last message id
+                    // and user id >> this way we could listen constantly for profile changes like profile image
                     mView.onNewChatAdded(chat);
                 }
             }

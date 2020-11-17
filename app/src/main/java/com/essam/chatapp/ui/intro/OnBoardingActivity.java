@@ -9,7 +9,7 @@ import android.view.View;
 import android.widget.Button;
 
 import com.essam.chatapp.R;
-import com.essam.chatapp.ui.login.LoginActivity;
+import com.essam.chatapp.ui.LoginPhoneNumberActivity;
 import com.rd.PageIndicatorView;
 
 public class OnBoardingActivity extends AppCompatActivity {
@@ -26,7 +26,7 @@ public class OnBoardingActivity extends AppCompatActivity {
         loginButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                startActivity(new Intent(OnBoardingActivity.this, LoginActivity.class));
+                startActivity(new Intent(OnBoardingActivity.this, LoginPhoneNumberActivity.class));
                 finish();
             }
         });

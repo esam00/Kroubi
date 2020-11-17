@@ -35,7 +35,7 @@ import com.essam.chatapp.R;
 import com.essam.chatapp.models.Profile;
 import com.essam.chatapp.ui.chat.adapter.ChatAdapter;
 import com.essam.chatapp.models.Message;
-import com.essam.chatapp.ui.profile.UserProfileActivity;
+import com.essam.chatapp.ui.profile.activity.UserProfileActivity;
 import com.essam.chatapp.utils.ProjectUtils;
 import com.essam.chatapp.utils.SharedPrefrence;
 import com.essam.chatapp.ui.photoEditor.PhotoEditorActivity;
@@ -493,7 +493,7 @@ public class ChatActivity extends AppCompatActivity implements View.OnClickListe
 
     @Override
     protected void onResume() {
-        if (mPresenter != null){
+        if (ProjectUtils.isNetworkConnected(this)){
             mPresenter.toggleOnlineState(true);
         }
         super.onResume();

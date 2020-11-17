@@ -5,6 +5,6 @@
     <corners
         android:radius="20dp"/>
     <solid
-        android:color="#99FFFFFF" />
+        android:color="@color/colorLoadingDialogBackGround" />
 
 </shape>

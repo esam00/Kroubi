@@ -1,4 +1,4 @@
-package com.essam.chatapp.ui.profile;
+package com.essam.chatapp.ui.profile.activity;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;

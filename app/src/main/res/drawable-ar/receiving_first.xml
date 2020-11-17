@@ -9,6 +9,6 @@
         android:bottomRightRadius="5dp"/>
 
     <solid
-        android:color="@color/white"/>
+        android:color="@color/receiving_background_color"/>
 
 </shape>

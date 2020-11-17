@@ -7,12 +7,9 @@
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
-    <uses-permission android:name="android.permission.INTERNET" />
-    <!-- Required to show current location -->
-    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
-    <!-- Permission to use camera - required -->
-    <uses-permission android:name="android.permission.CAMERA" />
-    <!-- Camera features - recommended -->
+    <uses-permission android:name="android.permission.INTERNET" /> <!-- Required to show current location -->
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" /> <!-- Permission to use camera - required -->
+    <uses-permission android:name="android.permission.CAMERA" /> <!-- Camera features - recommended -->
     <uses-permission android:name="android.permission.ACCESS_WIFI_STATE" />
     <uses-permission android:name="android.permission.READ_CONTACTS" />
     <uses-permission android:name="android.permission.WRITE_CONTACTS" />
@@ -37,17 +34,20 @@
         </activity>
         <activity
             android:name=".ui.intro.OnBoardingActivity"
-            android:theme="@style/IntroTheme"
-            android:screenOrientation="portrait"/>
-        <activity
-            android:name=".ui.login.LoginActivity"
             android:screenOrientation="portrait"
-            android:theme="@style/LoginTheme" />
+            android:theme="@style/IntroTheme" />
         <activity
-            android:name=".ui.login.verification.VerificationActivity"
-            android:theme="@style/LoginTheme" />
+            android:name=".ui.LoginPhoneNumberActivity"
+            android:screenOrientation="portrait"
+            android:theme="@style/LoginTheme"
+            android:windowSoftInputMode="adjustPan|stateAlwaysVisible" />
         <activity
-            android:name=".ui.profile.complete_profile.CompleteProfileActivity" />
+            android:name=".ui.verification.VerificationActivity"
+            android:theme="@style/LoginTheme"
+            android:windowSoftInputMode="adjustPan" />
+        <activity
+            android:name=".ui.profile.activity.CompleteProfileActivity"
+            android:theme="@style/AppTheme.NoActionBar" />
         <activity
             android:name=".ui.home.activity.HomeActivity"
             android:label="@string/home_activity_title"
@@ -78,15 +78,22 @@
                 android:value=".ui.home.activity.HomeActivity" />
         </activity>
         <activity
-            android:name=".ui.profile.UserProfileActivity"
+            android:name=".ui.profile.activity.UserProfileActivity"
             android:theme="@style/AppTheme.NoActionBar" />
         <activity
-            android:name=".ui.profile.MyProfileActivity"
+            android:name=".ui.profile.activity.MyProfileActivity"
             android:label="@string/profile"
             android:parentActivityName=".ui.settings.SettingsActivity">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value=".ui.settings.SettingsActivity" />
+        </activity>
+
+        <activity android:name=".ui.profile.activity.EditAboutActivity"
+            android:label="Status"
+            android:parentActivityName=".ui.profile.activity.MyProfileActivity">
+            <meta-data android:name="android.support.PARENT_ACTIVITY"
+                android:value=".ui.profile.activity.MyProfileActivity"/>
         </activity>
 
         <provider
