@@ -6,7 +6,7 @@
     android:layout_height="match_parent"
     android:orientation="vertical"
     android:animateLayoutChanges="true"
-    tools:context=".ui.profile.activity.EditAboutActivity">
+    tools:context=".ui.profile.activity.edit_status.EditStatusActivity">
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
@@ -22,14 +22,13 @@
             app:layout_constraintTop_toTopOf="parent" />
 
         <ImageView
-            android:id="@+id/editNameIv"
+            android:id="@+id/editStatusIv"
             android:layout_width="24dp"
             android:layout_height="24dp"
             android:background="?attr/selectableItemBackground"
             android:src="@drawable/ic_edit"
             app:layout_constraintEnd_toEndOf="@+id/current_status_layout"
-            app:layout_constraintTop_toTopOf="@+id/current_status_layout"
-            app:tint="@color/dark_gray" />
+            app:layout_constraintTop_toTopOf="@+id/current_status_layout" />
 
         <LinearLayout
             android:id="@+id/current_status_layout"
@@ -56,18 +55,19 @@
                 tools:text="Current status is this"
                 android:textAppearance="@style/TextAppearance.AppCompat.Medium"
                 android:textColor="@color/colorPrimaryText" />
+
             <androidx.constraintlayout.widget.ConstraintLayout
                 android:id="@+id/edit_status_cl"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:visibility="visible">
+                android:visibility="gone">
 
                 <EditText
                     android:id="@+id/edit_status_et"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:autofillHints="Add your name"
-                    android:hint="Add your name"
+                    android:hint="What are you thinking?"
                     android:inputType="textCapWords"
                     android:textColor="@color/colorPrimaryText"
                     android:textColorHint="@color/colorSecondaryText"
@@ -77,7 +77,7 @@
                     app:layout_constraintTop_toTopOf="parent" />
 
                 <ImageView
-                    android:id="@+id/confirmEditNameIv"
+                    android:id="@+id/confirmStatusIv"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_margin="5dp"
@@ -94,5 +94,16 @@
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 
+    <View
+        android:layout_width="match_parent"
+        android:layout_height=".7dp"
+        android:background="@color/colorSecondaryText"/>
+
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/statusRv"
+        android:padding="15dp"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        tools:listitem="@layout/item_status" />
 
 </LinearLayout>

@@ -26,6 +26,7 @@ import androidx.constraintlayout.widget.ConstraintLayout;
 import com.bumptech.glide.Glide;
 import com.essam.chatapp.R;
 import com.essam.chatapp.models.Profile;
+import com.essam.chatapp.ui.profile.activity.edit_status.EditStatusActivity;
 import com.essam.chatapp.ui.profile.presenter.ProfileContract;
 import com.essam.chatapp.ui.profile.presenter.ProfilePresenter;
 import com.essam.chatapp.utils.Consts;
@@ -33,7 +34,6 @@ import com.essam.chatapp.utils.ProjectUtils;
 import com.essam.chatapp.utils.SharedPrefrence;
 
 public class MyProfileActivity extends AppCompatActivity implements ProfileContract.View, View.OnClickListener {
-    public static final int EDIT_ABOUT_CODE = 22;
     private ImageView profileIv;
     private ImageView editProfileIcon;
     private ImageView editNameIcon;
@@ -96,10 +96,10 @@ public class MyProfileActivity extends AppCompatActivity implements ProfileContr
         }
     }
 
-    private void openAboutActivity(){
-        Intent intent = new Intent(this, EditAboutActivity.class);
+    private void openEditStatusActivity(){
+        Intent intent = new Intent(this, EditStatusActivity.class);
         intent.putExtra(Consts.STATUS, myProfile.getStatus());
-        startActivityForResult(intent, EDIT_ABOUT_CODE);
+        startActivity(intent);
     }
 
     private void uploadProfileImage(Uri imageUri) {
@@ -199,12 +199,6 @@ public class MyProfileActivity extends AppCompatActivity implements ProfileContr
                 // image has been captured from camera
                 case Consts.CAPTURE_IMAGE_REQUEST:
                     break;
-
-                case EDIT_ABOUT_CODE:
-                    if (data != null){
-                        myProfile.setStatus(data.getStringExtra(Consts.STATUS));
-                        updateProfileInfo();
-                    }
             }
         }
     }
@@ -252,7 +246,7 @@ public class MyProfileActivity extends AppCompatActivity implements ProfileContr
                 break;
 
             case R.id.editAboutIv:
-                openAboutActivity();
+                openEditStatusActivity();
         }
     }
 

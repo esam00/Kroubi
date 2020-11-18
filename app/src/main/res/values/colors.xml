@@ -19,7 +19,7 @@
     <color name="outgoing_background_color">#303DDC84</color>
     <color name="receiving_background_color">#AB2C2C2C</color>
 
-    <color name="colorInfoIcons">#C11C8A45</color>
+    <color name="colorInfoIcons">#99FFFFFF</color>
 
     <color name="colorMain">#075E54</color>
     <color name="colorMainLight">#128C7E</color>

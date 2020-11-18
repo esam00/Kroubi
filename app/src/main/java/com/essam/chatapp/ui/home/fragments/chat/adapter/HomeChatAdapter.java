@@ -37,8 +37,6 @@ public class HomeChatAdapter extends RecyclerView.Adapter<HomeChatAdapter.ViewHo
 
     public interface HomeChatListener {
         void onClick(Chat chat, int adapterPosition);
-
-        void getUpdatedProfileImage(Chat chat);
     }
 
     public HomeChatAdapter(HomeChatFragment homeChatFragment, HomeChatListener listener, Context context) {

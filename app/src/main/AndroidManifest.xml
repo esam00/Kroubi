@@ -89,7 +89,7 @@
                 android:value=".ui.settings.SettingsActivity" />
         </activity>
 
-        <activity android:name=".ui.profile.activity.EditAboutActivity"
+        <activity android:name=".ui.profile.activity.edit_status.EditStatusActivity"
             android:label="Status"
             android:parentActivityName=".ui.profile.activity.MyProfileActivity">
             <meta-data android:name="android.support.PARENT_ACTIVITY"

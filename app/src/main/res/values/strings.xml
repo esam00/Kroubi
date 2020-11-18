@@ -69,4 +69,14 @@
     <string name="upload_profile_failed">Failed to upload profile image, please try again!</string>
     <string name="no_chats_here_yet_select_a_friend_to_start_an_awesome_chat">No chats here yet, select a friend to start an awesome chat</string>
 
+    <array name="status_list">
+        <item>Available</item>
+        <item>Busy</item>
+        <item>Out with friends</item>
+        <item>In class</item>
+        <item>In class</item>
+        <item>In class</item>
+        <item>In class</item>
+        <item>In class</item>
+    </array>
 </resources>

@@ -66,6 +66,10 @@ public class FirebaseManager {
         userProfileDb.setValue(profile);
     }
 
+    public void updateUserStatus(String status){
+        userProfileDb.child(Consts.STATUS).setValue(status);
+    }
+
     public void listenForCurrentUserProfileChanges(ValueEventListener listener){
         userProfileDb.addValueEventListener(listener);
     }

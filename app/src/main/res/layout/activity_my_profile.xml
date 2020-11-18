@@ -1,9 +1,14 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
+    android:layout_height="match_parent">
+
+<LinearLayout
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
     android:orientation="vertical"
     android:background="@color/colorPrimaryDark"
     android:animateLayoutChanges="true"
@@ -74,8 +79,7 @@
             android:background="?attr/selectableItemBackground"
             android:src="@drawable/ic_edit"
             app:layout_constraintEnd_toEndOf="@+id/edit_name_container_ll"
-            app:layout_constraintTop_toTopOf="@+id/edit_name_container_ll"
-            app:tint="@color/dark_gray" />
+            app:layout_constraintTop_toTopOf="@+id/edit_name_container_ll" />
 
         <LinearLayout
             android:id="@+id/edit_name_container_ll"
@@ -170,8 +174,7 @@
             android:layout_height="24dp"
             android:src="@drawable/ic_edit"
             app:layout_constraintEnd_toEndOf="@+id/linearLayout3"
-            app:layout_constraintTop_toTopOf="@+id/linearLayout3"
-            app:tint="@color/dark_gray" />
+            app:layout_constraintTop_toTopOf="@+id/linearLayout3"/>
 
         <LinearLayout
             android:id="@+id/linearLayout3"
@@ -245,3 +248,5 @@
 
 
 </LinearLayout>
+
+</ScrollView>
