@@ -33,7 +33,7 @@
             </intent-filter>
         </activity>
         <activity
-            android:name=".ui.intro.OnBoardingActivity"
+            android:name=".ui.on_boarding.OnBoardingActivity"
             android:screenOrientation="portrait"
             android:theme="@style/IntroTheme" />
         <activity
@@ -89,8 +89,8 @@
                 android:value=".ui.settings.SettingsActivity" />
         </activity>
 
-        <activity android:name=".ui.profile.activity.edit_status.EditStatusActivity"
-            android:label="Status"
+        <activity android:name=".ui.status.EditStatusActivity"
+            android:label="@string/status"
             android:parentActivityName=".ui.profile.activity.MyProfileActivity">
             <meta-data android:name="android.support.PARENT_ACTIVITY"
                 android:value=".ui.profile.activity.MyProfileActivity"/>

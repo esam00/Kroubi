@@ -6,7 +6,6 @@ import androidx.core.content.ContextCompat;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
-import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
 
@@ -37,11 +36,10 @@ public class LoginPhoneNumberActivity extends AppCompatActivity{
     private void initViews() {
         mPhoneNumberEditText = findViewById(R.id.et_phone_number);
         mCountryCodePicker = findViewById(R.id.ccp);
-        Button sendCodeButton = findViewById(R.id.btn_send_code);
         mCountryCodePicker.registerCarrierNumberEditText(mPhoneNumberEditText);
 
         //set click listeners
-        sendCodeButton.setOnClickListener(new View.OnClickListener() {
+        findViewById(R.id.btn_send_code).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 if (isPhoneNumberAccepted()){
@@ -75,7 +73,6 @@ public class LoginPhoneNumberActivity extends AppCompatActivity{
             Toast.makeText(LoginPhoneNumberActivity.this, R.string.invalid_phone_number, Toast.LENGTH_SHORT).show();
             return false;
         }
-
         return true;
     }
 }

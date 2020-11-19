@@ -2,18 +2,18 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-    android:gravity="center"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
     android:layout_marginTop="10dp"
     android:layout_marginBottom="10dp"
-    android:orientation="vertical"
-    android:layout_width="match_parent"
-    android:layout_height="wrap_content">
+    android:gravity="center"
+    android:orientation="vertical">
 
     <ImageView
         android:layout_width="80dp"
         android:layout_height="80dp"
-        android:src="@drawable/ic_sms"/>
-
+        android:src="@drawable/ic_sms"
+        tools:ignore="ContentDescription" />
 
     <TextView
         android:id="@+id/text"
@@ -30,31 +30,31 @@
         android:id="@+id/phoneNumberCl"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layoutDirection="ltr"
         android:layout_marginTop="18dp"
-        android:background="@drawable/shape_login_et_gb">
+        android:background="@drawable/shape_login_et_gb"
+        android:layoutDirection="ltr">
 
         <EditText
             android:id="@+id/et_phone_number"
             android:layout_width="0dp"
             android:layout_height="48dp"
+            android:autofillHints="@string/phone_number"
             android:background="@null"
             android:digits="@string/phone_digits"
             android:gravity="center"
             android:hint="@string/phone_number"
-            android:textColorHint="@color/colorSecondaryText"
             android:imeOptions="actionDone"
             android:inputType="phone"
             android:maxLength="20"
-            android:textSize="13sp"
             android:maxLines="1"
             android:padding="8dp"
             android:textColor="@color/colorPrimaryText"
+            android:textColorHint="@color/colorSecondaryText"
+            android:textSize="13sp"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toEndOf="@+id/ccp"
-            app:layout_constraintTop_toTopOf="parent"
-            android:autofillHints="@string/phone_number" />
+            app:layout_constraintTop_toTopOf="parent" />
 
         <com.hbb20.CountryCodePicker
             android:id="@+id/ccp"
@@ -62,6 +62,10 @@
             android:layout_height="0dp"
             android:layout_margin="6dp"
             android:gravity="center"
+            app:ccpDialog_backgroundColor="@color/colorVerificationCardBackGround"
+            app:ccpDialog_textColor="@color/colorPrimaryText"
+            app:ccp_arrowColor="@color/colorAccent"
+            app:ccp_arrowSize="24dp"
             app:ccp_autoDetectCountry="true"
             app:ccp_autoFormatNumber="false"
             app:ccp_contentColor="@color/colorPrimaryText"
@@ -90,11 +94,11 @@
         android:id="@+id/btn_send_code"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:background="@drawable/ripple_effect_btn_bg"
         android:layout_marginTop="28dp"
+        android:background="@drawable/ripple_effect_btn_bg"
+        android:elevation="4dp"
         android:paddingStart="20dp"
         android:paddingEnd="20dp"
-        android:elevation="4dp"
         android:text="@string/send_verification_code"
         android:textAllCaps="false"
         android:textColor="@color/white" />
@@ -103,8 +107,5 @@
         android:layout_width="match_parent"
         android:layout_height="1dp"
         android:layout_marginTop="5dp"
-        android:background="@android:color/transparent">
-    </View>
-
-
+        android:background="@android:color/transparent"/>
 </LinearLayout>

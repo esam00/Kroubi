@@ -1,4 +1,4 @@
-package com.essam.chatapp.ui.intro;
+package com.essam.chatapp.ui.on_boarding;
 
 import android.content.Context;
 import android.view.LayoutInflater;

@@ -25,7 +25,7 @@
     <string name="verify_sign_in_code">please enter verification Code</string>
     <string name="verification_failed">Verification Failed</string>
     <string name="chats">CHATS</string>
-    <string name="status">STATUS</string>
+    <string name="status">Status</string>
     <string name="calls">CALLS</string>
     <string name="msg_no_chat_yet">No chats here yet, send a message now to start conversation</string>
     <string name="type_a_message">Type a message</string>
@@ -68,15 +68,34 @@
     <string name="updated_successfully">updated successfully!</string>
     <string name="upload_profile_failed">Failed to upload profile image, please try again!</string>
     <string name="no_chats_here_yet_select_a_friend_to_start_an_awesome_chat">No chats here yet, select a friend to start an awesome chat</string>
+    <string name="name">Name</string>
+    <string name="edit_name">Edit name</string>
+    <string name="edit_status">Edit status</string>
+    <string name="add_your_name">Add your name</string>
+    <string name="current_status">Current set to</string>
+    <string name="what_are_you_thinking_of">What are you thinking of?</string>
+    <string name="account">Account</string>
+    <string name="chatss">Chats</string>
+    <string name="theme_wallpapers_chat_history">Theme, Wallpapers, Chat history</string>
+    <string name="privacy_security_change_number">Privacy, security, change number</string>
+    <string name="faq_contact_us_privacy_policy">FAQ, contact us, privacy policy</string>
+    <string name="storage_and_data">Storage and data</string>
+    <string name="network_usage_auto_download">Network usage, auto-download</string>
+    <string name="message_group_call_tones">Message, group, call tones</string>
+    <string name="help">Help</string>
+    <string name="notifications">Notifications</string>
 
     <array name="status_list">
         <item>Available</item>
         <item>Busy</item>
         <item>Out with friends</item>
-        <item>In class</item>
-        <item>In class</item>
-        <item>In class</item>
-        <item>In class</item>
-        <item>In class</item>
+        <item>At school</item>
+        <item>At the movie</item>
+        <item>At work</item>
+        <item>Battery about to die</item>
+        <item>In a meeting</item>
+        <item>At the gym</item>
+        <item>Sleeping</item>
+        <item>Urgent calls only</item>
     </array>
 </resources>

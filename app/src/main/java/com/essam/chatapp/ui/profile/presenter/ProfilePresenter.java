@@ -8,7 +8,7 @@ import com.essam.chatapp.firebase.FirebaseManager;
 import com.essam.chatapp.firebase.FirebaseStorageManager;
 import com.essam.chatapp.firebase.StorageCallbacks;
 import com.essam.chatapp.models.Profile;
-import com.essam.chatapp.ui.profile.presenter.ProfileContract;
+import com.essam.chatapp.utils.Consts;
 import com.essam.chatapp.utils.SharedPrefrence;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
@@ -63,7 +63,11 @@ public class ProfilePresenter implements ProfileContract.Presenter, StorageCallb
         profile.setOnline(true);
         profile.setId(mFirebaseManager.getMyUid());
         profile.setPhone(mFirebaseManager.getMyPhone());
-        profile.setStatus("Hey there, I'm using Kroubi");
+
+        if (profile.getStatus() == null){
+            profile.setStatus("Hey there, I'm using Kroubi");
+        }
+
         if (profile.getUserName() == null)
             profile.setUserName(mFirebaseManager.getMyPhone());
 
@@ -71,6 +75,7 @@ public class ProfilePresenter implements ProfileContract.Presenter, StorageCallb
             profile.setAvatar("");
         }
         mFirebaseManager.updateUserProfile(profile);
+        mPreference.setBooleanValue(Consts.PROFILE_COMPLETED, true);
     }
 
     @Override

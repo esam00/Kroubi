@@ -7,7 +7,6 @@ import androidx.core.app.ActivityOptionsCompat;
 
 import android.content.Intent;
 import android.os.Bundle;
-import android.transition.Fade;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.ImageView;
@@ -30,7 +29,6 @@ public class SettingsActivity extends AppCompatActivity implements View.OnClickL
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_settings);
-
         initViews();
         getProfileInfo();
     }
@@ -42,9 +40,7 @@ public class SettingsActivity extends AppCompatActivity implements View.OnClickL
 
     private void populateProfileData() {
         userNameTv.setText(myProfile.getUserName());
-
         statusTv.setText(myProfile.getStatus());
-
         Glide.with(this)
                 .load(myProfile.getAvatar())
                 .placeholder(R.drawable.user)
@@ -77,7 +73,7 @@ public class SettingsActivity extends AppCompatActivity implements View.OnClickL
 
     @Override
     public void onClick(View v) {
-        switch (v.getId()){
+        switch (v.getId()) {
             case R.id.profile_header:
                 openProfileWithTransition();
                 break;
@@ -99,18 +95,18 @@ public class SettingsActivity extends AppCompatActivity implements View.OnClickL
     private void openProfileWithTransition() {
         Intent intent = new Intent(this, MyProfileActivity.class);
         ActivityOptionsCompat optionsCompat = ActivityOptionsCompat
-                .makeSceneTransitionAnimation(this,profileIv, getString(R.string.profile_transition));
-        startActivity(intent,optionsCompat.toBundle());
+                .makeSceneTransitionAnimation(this, profileIv, getString(R.string.profile_transition));
+        startActivity(intent, optionsCompat.toBundle());
     }
 
-    private void excludeFadeWhenTransition(){
-        Fade fade = new Fade();
-        View decor = getWindow().getDecorView();
-        fade.excludeTarget(decor.findViewById(R.id.action_bar_container),true);
-        fade.excludeTarget(decor.findViewById(android.R.id.statusBarBackground),true);
-        fade.excludeTarget(decor.findViewById(android.R.id.navigationBarBackground),true);
-
-        getWindow().setEnterTransition(fade);
-        getWindow().setExitTransition(fade);
-    }
+//    private void excludeFadeWhenTransition(){
+//        Fade fade = new Fade();
+//        View decor = getWindow().getDecorView();
+//        fade.excludeTarget(decor.findViewById(R.id.action_bar_container),true);
+//        fade.excludeTarget(decor.findViewById(android.R.id.statusBarBackground),true);
+//        fade.excludeTarget(decor.findViewById(android.R.id.navigationBarBackground),true);
+//
+//        getWindow().setEnterTransition(fade);
+//        getWindow().setExitTransition(fade);
+//    }
 }

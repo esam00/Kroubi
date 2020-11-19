@@ -1,19 +1,21 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <color name="colorPrimary">#252525</color>
-    <color name="colorPrimaryDark">#171717</color>
-    <color name="colorAccent">#C125D366</color>
+    <color name="colorPrimary">#AD000000</color>
+    <color name="colorPrimaryDark">#000000</color>
+    <color name="colorAccent">#3CB881</color>
 
-    <color name="colorMainBackGround">#212121</color>
+    <color name="colorMainBackGround">#23050505</color>
 
     <color name="colorPrimaryText">#D9FFFFFF</color>
     <color name="colorSecondaryText">#99FFFFFF</color>
     <color name="colorDisabledText">#66FFFFFF</color>
 
-    <color name="colorOnBoardingBackground">#303030</color>
-    <color name="colorVerificationCardBackGround">#2C2C2C</color>
-    <color name="colorVerificationLightBackGround">#FA2C2C2C</color>
-    <color name="colorLoadingDialogBackGround">#AB2C2C2C</color>
+    <color name="colorOnBoardingBackground">#000000</color>
+    <color name="colorVerificationCardBackGround">#252525</color>
+    <color name="colorVerificationLightBackGround">#252525</color>
+
+    <color name="colorLoadingDialogBackGround">#66FFFFFF</color>
+    <color name="colorSeparatorBackground">#DF728E73</color>
 
     <color name="colorSendMessageBackground">#AB2C2C2C</color>
     <color name="outgoing_background_color">#303DDC84</color>

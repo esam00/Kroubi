@@ -4,8 +4,8 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:orientation="vertical"
     android:background="@color/colorVerificationCardBackGround"
+    android:orientation="vertical"
     tools:context=".ui.LoginPhoneNumberActivity">
 
     <androidx.constraintlayout.widget.ConstraintLayout
@@ -21,15 +21,16 @@
         android:id="@+id/cardView2"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        app:cardBackgroundColor="@color/colorVerificationCardBackGround"
         android:layout_margin="16dp"
-        app:contentPadding="16dp"
+        app:cardBackgroundColor="@color/colorVerificationCardBackGround"
         app:cardCornerRadius="8dp"
         app:cardElevation="9dp"
+        app:contentPadding="16dp"
         app:layout_constraintBottom_toBottomOf="@+id/guideline3"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="@+id/guideline3">
+        app:layout_constraintTop_toTopOf="@+id/guideline3"
+        app:layout_constraintVertical_bias="0.50">
 
         <include
             android:id="@+id/layout_phone_entry"

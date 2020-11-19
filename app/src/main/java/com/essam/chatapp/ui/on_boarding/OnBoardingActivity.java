@@ -1,4 +1,4 @@
-package com.essam.chatapp.ui.intro;
+package com.essam.chatapp.ui.on_boarding;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.viewpager2.widget.ViewPager2;
@@ -22,8 +22,7 @@ public class OnBoardingActivity extends AppCompatActivity {
 
         setUpViewPager();
 
-        Button loginButton = findViewById(R.id.login_btn);
-        loginButton.setOnClickListener(new View.OnClickListener() {
+        findViewById(R.id.login_btn).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 startActivity(new Intent(OnBoardingActivity.this, LoginPhoneNumberActivity.class));
@@ -36,7 +35,7 @@ public class OnBoardingActivity extends AppCompatActivity {
         mPageIndicatorView = findViewById(R.id.pageIndicatorView);
         ViewPager2 onBoardingViewPager = findViewById(R.id.introViewPager);
 
-        onBoardingViewPager.setAdapter(new OnBoardingAdapter(Intro.getIntroItems()));
+        onBoardingViewPager.setAdapter(new OnBoardingAdapter(OnBoardingUtils.getOnBoardingItems()));
 
         onBoardingViewPager.registerOnPageChangeCallback(new ViewPager2.OnPageChangeCallback() {
             @Override

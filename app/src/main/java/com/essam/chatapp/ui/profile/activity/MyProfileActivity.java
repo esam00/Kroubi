@@ -5,10 +5,9 @@ import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.net.Uri;
 import android.os.Bundle;
+import android.os.Handler;
 import android.text.Editable;
 import android.text.TextWatcher;
-import android.transition.Transition;
-import android.transition.TransitionValues;
 import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
@@ -26,7 +25,7 @@ import androidx.constraintlayout.widget.ConstraintLayout;
 import com.bumptech.glide.Glide;
 import com.essam.chatapp.R;
 import com.essam.chatapp.models.Profile;
-import com.essam.chatapp.ui.profile.activity.edit_status.EditStatusActivity;
+import com.essam.chatapp.ui.status.EditStatusActivity;
 import com.essam.chatapp.ui.profile.presenter.ProfileContract;
 import com.essam.chatapp.ui.profile.presenter.ProfilePresenter;
 import com.essam.chatapp.utils.Consts;
@@ -51,17 +50,15 @@ public class MyProfileActivity extends AppCompatActivity implements ProfileContr
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_my_profile);
-
         initViews();
 
-        // display the cached profile data first to give the user a fast experience then listen
-        // for remote data source changes
+        // display the cached profile data first to give the user a fast experience
         myProfile = SharedPrefrence.getInstance(this).getMyProfile();
         populateProfileInfo();
 
+        // then listen for remote data source changes
         mPresenter = new ProfilePresenter(this, SharedPrefrence.getInstance(this));
         getProfileInfo();
-
     }
 
     private void initViews(){
@@ -81,6 +78,13 @@ public class MyProfileActivity extends AppCompatActivity implements ProfileContr
         editAboutIcon.setOnClickListener(this);
         confirmEditNameIcon.setOnClickListener(this);
         editProfileIcon.setOnClickListener(this);
+
+        new Handler().postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                ProjectUtils.revealViewIn(editProfileIcon);
+            }
+        }, 500);
     }
 
     private void openGalleryChooser() {
@@ -121,11 +125,8 @@ public class MyProfileActivity extends AppCompatActivity implements ProfileContr
 
     private void populateProfileInfo(){
         userNameTv.setText(myProfile.getUserName());
-
         statusTv.setText(myProfile.getStatus());
-
         phoneTv.setText(myProfile.getPhone());
-
         Glide.with(this)
                 .load(myProfile.getAvatar())
                 .placeholder(R.drawable.user)
@@ -170,7 +171,6 @@ public class MyProfileActivity extends AppCompatActivity implements ProfileContr
             myProfile.setUserName(editNameEt.getText().toString());
             updateProfileInfo();
         }
-
         handleEditNameLayout(false);
     }
 
@@ -250,26 +250,32 @@ public class MyProfileActivity extends AppCompatActivity implements ProfileContr
         }
     }
 
-    private void excludeFadeWhenTransition(){
-        View decor = getWindow().getDecorView();
-        android.transition.Transition transition = new Transition() {
-            @Override
-            public void captureStartValues(TransitionValues transitionValues) {
-
-            }
-
-            @Override
-            public void captureEndValues(TransitionValues transitionValues) {
-
-            }
-        };
-        transition.excludeChildren(decor.findViewById(R.id.action_bar_container),true);
-        transition.excludeChildren(decor.findViewById(android.R.id.statusBarBackground),true);
-        transition.excludeChildren(decor.findViewById(android.R.id.navigationBarBackground),true);
-
-        getWindow().setEnterTransition(transition);
-        getWindow().setExitTransition(transition);
+    @Override
+    public void onBackPressed() {
+        ProjectUtils.revealViewOut(editProfileIcon);
+        super.onBackPressed();
     }
+
+    //    private void excludeFadeWhenTransition(){
+//        View decor = getWindow().getDecorView();
+//        android.transition.Transition transition = new Transition() {
+//            @Override
+//            public void captureStartValues(TransitionValues transitionValues) {
+//
+//            }
+//
+//            @Override
+//            public void captureEndValues(TransitionValues transitionValues) {
+//
+//            }
+//        };
+//        transition.excludeChildren(decor.findViewById(R.id.action_bar_container),true);
+//        transition.excludeChildren(decor.findViewById(android.R.id.statusBarBackground),true);
+//        transition.excludeChildren(decor.findViewById(android.R.id.navigationBarBackground),true);
+//
+//        getWindow().setEnterTransition(transition);
+//        getWindow().setExitTransition(transition);
+//    }
 
     /* ------------------------------------ Presenter callbacks --------------------------------*/
 

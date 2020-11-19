@@ -19,6 +19,7 @@
             app:tabIndicatorColor="@color/colorAccent"
             app:tabIndicatorHeight="3dp"
             android:elevation="4dp"
+            android:visibility="gone"
             app:tabSelectedTextColor="@color/colorAccent"
             android:id="@+id/tabLayout">
         </com.google.android.material.tabs.TabLayout>

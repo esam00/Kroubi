@@ -1,4 +1,4 @@
-package com.essam.chatapp.ui.profile.activity.edit_status;
+package com.essam.chatapp.ui.status;
 
 import com.essam.chatapp.firebase.FirebaseManager;
 

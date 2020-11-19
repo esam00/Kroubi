@@ -41,4 +41,5 @@ public class Consts {
     public static final String CHAT_ID = "chatID";
     public static final String AVATAR = "avatar" ;
     public static final String STATUS = "status";
+    public static final String PROFILE_COMPLETED = "profile_updated";
 }

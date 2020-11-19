@@ -10,10 +10,11 @@
     <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/constraintLayout3"
         android:layout_width="match_parent"
-        android:layout_height="250dp"
+        android:layout_height="0dp"
         android:background="@drawable/shape_bottom_rounded_green_bg"
         android:paddingStart="30dp"
         android:paddingEnd="30dp"
+        app:layout_constraintBottom_toTopOf="@+id/guideline4"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent">
@@ -23,8 +24,8 @@
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="vertical"
         android:gravity="center"
+        android:orientation="vertical"
         app:layout_constraintBottom_toTopOf="@+id/cardView"
         app:layout_constraintTop_toTopOf="parent">
 
@@ -35,7 +36,7 @@
             android:text="@string/profile_info"
             android:textAppearance="@style/TextAppearance.AppCompat.Medium"
             android:textColor="@color/colorPrimaryText"
-            android:textSize="18sp"
+            android:textSize="20sp"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
@@ -43,12 +44,14 @@
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginTop="24dp"
+            android:layout_marginTop="10dp"
             android:gravity="center"
+            android:paddingStart="16dp"
+            android:paddingEnd="16dp"
             android:text="@string/please_provide_your_name_and_an_optional_profile_photo"
             android:textAppearance="@style/TextAppearance.AppCompat.Small"
             android:textColor="@color/colorSecondaryText"
-            android:textSize="15sp"
+            android:textSize="16sp"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/textViewProfile" />
@@ -60,10 +63,10 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_margin="30dp"
-        app:contentPadding="10dp"
+        app:cardBackgroundColor="@color/colorVerificationCardBackGround"
         app:cardCornerRadius="9dp"
         app:cardElevation="5dp"
-        app:cardBackgroundColor="@color/colorVerificationCardBackGround"
+        app:contentPadding="10dp"
         app:layout_constraintBottom_toBottomOf="@+id/constraintLayout3"
         app:layout_constraintTop_toBottomOf="@+id/constraintLayout3">
 
@@ -77,19 +80,20 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="20dp">
+
                 <de.hdodenhof.circleimageview.CircleImageView
                     android:id="@+id/profile_iv"
                     android:layout_width="100dp"
                     android:layout_height="100dp"
                     android:src="@drawable/user"
-                    app:civ_circle_background_color="@color/colorPrimaryDark"/>
+                    app:civ_circle_background_color="@color/colorPrimaryDark" />
 
                 <ProgressBar
                     android:id="@+id/progress_bar"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_centerInParent="true"
-                    android:visibility="gone"/>
+                    android:visibility="gone" />
             </RelativeLayout>
 
 
@@ -99,15 +103,15 @@
                 android:layout_height="wrap_content"
                 android:layout_marginTop="30dp"
                 android:layout_marginBottom="20dp"
-                android:paddingStart="5dp"
-                android:paddingEnd="5dp"
+                android:autofillHints="@string/type_your_name_here"
+                android:hint="@string/type_your_name_here"
                 android:inputType="textCapWords"
                 android:maxLength="20"
-                android:textSize="15sp"
-                android:hint="@string/type_your_name_here"
+                android:paddingStart="5dp"
+                android:paddingEnd="5dp"
                 android:textColor="@color/colorPrimaryText"
                 android:textColorHint="@color/colorSecondaryText"
-                android:autofillHints="@string/type_your_name_here" />
+                android:textSize="15sp" />
         </LinearLayout>
 
     </androidx.cardview.widget.CardView>
@@ -117,14 +121,21 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginBottom="32dp"
-        android:text="@string/next"
+        android:background="@drawable/ripple_effect_btn_bg"
         android:paddingStart="40dp"
         android:paddingEnd="40dp"
+        android:text="@string/next"
         android:textAllCaps="false"
         android:textColor="@color/white"
-        android:background="@drawable/ripple_effect_btn_bg"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent" />
+
+    <androidx.constraintlayout.widget.Guideline
+        android:id="@+id/guideline4"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        app:layout_constraintGuide_percent="0.4" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

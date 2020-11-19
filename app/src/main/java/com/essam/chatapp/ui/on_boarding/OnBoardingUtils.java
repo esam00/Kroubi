@@ -1,13 +1,13 @@
-package com.essam.chatapp.ui.intro;
+package com.essam.chatapp.ui.on_boarding;
 
 import com.essam.chatapp.R;
 
 import java.util.ArrayList;
 import java.util.List;
 
-public class Intro {
+public class OnBoardingUtils {
 
-    public static List<OnBoardingItem> getIntroItems() {
+    public static List<OnBoardingItem> getOnBoardingItems() {
         List<OnBoardingItem> onBoardingItems = new ArrayList<>();
         onBoardingItems.add(firstIntro);
         onBoardingItems.add(secondIntro);

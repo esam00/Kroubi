@@ -1,4 +1,4 @@
-package com.essam.chatapp.ui.intro;
+package com.essam.chatapp.ui.on_boarding;
 
 public class OnBoardingItem {
     private int titleSrcId;

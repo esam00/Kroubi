@@ -4,8 +4,8 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:orientation="vertical"
     android:background="@color/colorVerificationLightBackGround"
+    android:orientation="vertical"
     tools:context=".ui.verification.VerificationActivity">
 
     <androidx.constraintlayout.widget.ConstraintLayout
@@ -22,10 +22,10 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_margin="16dp"
-        app:contentPadding="16dp"
+        app:cardBackgroundColor="@color/colorVerificationCardBackGround"
         app:cardCornerRadius="8dp"
         app:cardElevation="9dp"
-        app:cardBackgroundColor="@color/colorVerificationCardBackGround"
+        app:contentPadding="16dp"
         app:layout_constraintBottom_toBottomOf="@+id/guideline3"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
@@ -44,11 +44,11 @@
         android:textAppearance="@style/TextAppearance.AppCompat.Medium"
         android:textColor="@color/white"
         android:textStyle="bold"
-        tools:text="@string/verify"
         app:layout_constraintBottom_toTopOf="@+id/cardView2"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintTop_toTopOf="parent"
+        tools:text="@string/verify" />
 
     <androidx.constraintlayout.widget.Guideline
         android:id="@+id/guideline3"
@@ -68,6 +68,5 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintVertical_bias="0.945" />
-
 
 </androidx.constraintlayout.widget.ConstraintLayout>

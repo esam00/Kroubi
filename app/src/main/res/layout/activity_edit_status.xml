@@ -5,27 +5,22 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
-    android:animateLayoutChanges="true"
-    tools:context=".ui.profile.activity.edit_status.EditStatusActivity">
+    tools:context=".ui.status.EditStatusActivity">
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:padding="16dp">
-
-        <ImageView
-            android:id="@+id/imageView"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:src="@drawable/ic_person"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent" />
+        android:paddingStart="16dp"
+        android:paddingTop="30dp"
+        android:paddingEnd="16dp"
+        android:paddingBottom="30dp">
 
         <ImageView
             android:id="@+id/editStatusIv"
             android:layout_width="24dp"
             android:layout_height="24dp"
             android:background="?attr/selectableItemBackground"
+            android:contentDescription="@string/edit_status"
             android:src="@drawable/ic_edit"
             app:layout_constraintEnd_toEndOf="@+id/current_status_layout"
             app:layout_constraintTop_toTopOf="@+id/current_status_layout" />
@@ -34,27 +29,30 @@
             android:id="@+id/current_status_layout"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
+            android:animateLayoutChanges="true"
             android:orientation="vertical"
-            android:paddingStart="16dp"
-            android:paddingEnd="16dp"
+
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toEndOf="@+id/imageView"
+            app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent">
 
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Current status:"
+                android:layout_marginBottom="20dp"
+                android:text="@string/current_status"
                 android:textAppearance="@style/TextAppearance.AppCompat.Small"
-                android:textColor="@color/colorAccent" />
+                android:textColor="@color/colorPrimaryText" />
 
             <TextView
                 android:id="@+id/tv_status"
-                android:layout_width="wrap_content"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                tools:text="Current status is this"
+                android:paddingTop="10dp"
+                android:paddingBottom="10dp"
                 android:textAppearance="@style/TextAppearance.AppCompat.Medium"
-                android:textColor="@color/colorPrimaryText" />
+                android:textColor="@color/colorAccent"
+                tools:text="Current status is this" />
 
             <androidx.constraintlayout.widget.ConstraintLayout
                 android:id="@+id/edit_status_cl"
@@ -67,7 +65,7 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:autofillHints="Add your name"
-                    android:hint="What are you thinking?"
+                    android:hint="@string/what_are_you_thinking_of"
                     android:inputType="textCapWords"
                     android:textColor="@color/colorPrimaryText"
                     android:textColorHint="@color/colorSecondaryText"
@@ -86,7 +84,7 @@
                     app:layout_constraintBottom_toBottomOf="parent"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintTop_toTopOf="parent"
-                    android:contentDescription="confirm name" />
+                    tools:ignore="ContentDescription" />
 
             </androidx.constraintlayout.widget.ConstraintLayout>
 
@@ -96,12 +94,11 @@
 
     <View
         android:layout_width="match_parent"
-        android:layout_height=".7dp"
-        android:background="@color/colorSecondaryText"/>
+        android:layout_height=".3dp"
+        android:background="@color/colorSeparatorBackground" />
 
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/statusRv"
-        android:padding="15dp"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         tools:listitem="@layout/item_status" />

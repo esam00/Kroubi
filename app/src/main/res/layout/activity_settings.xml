@@ -27,8 +27,8 @@
                 android:layout_width="65dp"
                 android:layout_height="65dp"
                 android:src="@drawable/user"
-                app:civ_circle_background_color="@color/colorPrimaryDark"
                 android:transitionName="@string/profile_transition"
+                app:civ_circle_background_color="@color/colorPrimaryDark"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent" />
 
@@ -47,9 +47,9 @@
                     android:id="@+id/name_tv"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:text="Essam Mosbah"
                     android:textAppearance="@style/TextAppearance.AppCompat.Medium"
-                    android:textColor="@color/colorPrimaryText" />
+                    android:textColor="@color/colorPrimaryText"
+                    tools:text="Essam Mosbah" />
 
                 <TextView
                     android:id="@+id/statusTv"
@@ -57,9 +57,9 @@
                     android:layout_height="wrap_content"
                     android:ellipsize="end"
                     android:maxLines="1"
-                    android:text="Hello there, i'm using kroubi,Hello there, i'm using kroubi "
                     android:textAppearance="@style/TextAppearance.AppCompat.Small"
-                    android:textColor="@color/colorSecondaryText" />
+                    android:textColor="@color/colorSecondaryText"
+                    tools:text="Hello there, i'm using kroubi,Hello there, i'm using kroubi " />
             </LinearLayout>
 
         </androidx.constraintlayout.widget.ConstraintLayout>
@@ -68,7 +68,7 @@
             android:id="@+id/view"
             android:layout_width="0dp"
             android:layout_height=".3dp"
-            android:background="@color/light_gray"
+            android:background="@color/colorSeparatorBackground"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/profile_header" />
@@ -86,8 +86,8 @@
                 android:layout_height="wrap_content"
                 android:background="?attr/selectableItemBackground"
                 android:paddingStart="36dp"
-                android:paddingEnd="36dp"
                 android:paddingTop="16dp"
+                android:paddingEnd="36dp"
                 android:paddingBottom="16dp"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
@@ -106,8 +106,8 @@
                 <LinearLayout
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
-                    android:gravity="center_vertical"
                     android:layout_marginStart="36dp"
+                    android:gravity="center_vertical"
                     android:orientation="vertical"
                     app:layout_constraintBottom_toBottomOf="parent"
                     app:layout_constraintEnd_toEndOf="parent"
@@ -118,7 +118,7 @@
                         android:id="@+id/account_tv"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:text="Account"
+                        android:text="@string/account"
                         android:textAppearance="@style/TextAppearance.AppCompat.Medium"
                         android:textColor="@color/colorPrimaryText" />
 
@@ -127,7 +127,7 @@
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:maxLines="1"
-                        android:text="Privacy, security, change number"
+                        android:text="@string/privacy_security_change_number"
                         android:textAppearance="@style/TextAppearance.AppCompat.Small"
                         android:textColor="@color/colorSecondaryText" />
                 </LinearLayout>
@@ -140,8 +140,8 @@
                 android:layout_height="wrap_content"
                 android:background="?attr/selectableItemBackground"
                 android:paddingStart="36dp"
-                android:paddingEnd="36dp"
                 android:paddingTop="16dp"
+                android:paddingEnd="36dp"
                 android:paddingBottom="16dp"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
@@ -160,8 +160,8 @@
                 <LinearLayout
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
-                    android:gravity="center_vertical"
                     android:layout_marginStart="36dp"
+                    android:gravity="center_vertical"
                     android:orientation="vertical"
                     app:layout_constraintBottom_toBottomOf="parent"
                     app:layout_constraintEnd_toEndOf="parent"
@@ -172,7 +172,7 @@
                         android:id="@+id/chat_tv"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:text="Chats"
+                        android:text="@string/chatss"
                         android:textAppearance="@style/TextAppearance.AppCompat.Medium"
                         android:textColor="@color/colorPrimaryText" />
 
@@ -181,7 +181,7 @@
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:maxLines="1"
-                        android:text="Theme, Wallpapers, Chat history"
+                        android:text="@string/theme_wallpapers_chat_history"
                         android:textAppearance="@style/TextAppearance.AppCompat.Small"
                         android:textColor="@color/colorSecondaryText" />
 
@@ -195,8 +195,8 @@
                 android:layout_height="wrap_content"
                 android:background="?attr/selectableItemBackground"
                 android:paddingStart="36dp"
-                android:paddingEnd="36dp"
                 android:paddingTop="16dp"
+                android:paddingEnd="36dp"
                 android:paddingBottom="16dp"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
@@ -215,8 +215,8 @@
                 <LinearLayout
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
-                    android:gravity="center_vertical"
                     android:layout_marginStart="36dp"
+                    android:gravity="center_vertical"
                     android:orientation="vertical"
                     app:layout_constraintBottom_toBottomOf="parent"
                     app:layout_constraintEnd_toEndOf="parent"
@@ -227,7 +227,7 @@
                         android:id="@+id/notifications_tv"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:text="Notifications"
+                        android:text="@string/notifications"
                         android:textAppearance="@style/TextAppearance.AppCompat.Medium"
                         android:textColor="@color/colorPrimaryText" />
 
@@ -236,7 +236,7 @@
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:maxLines="1"
-                        android:text="Message, group, call tones"
+                        android:text="@string/message_group_call_tones"
                         android:textAppearance="@style/TextAppearance.AppCompat.Small"
                         android:textColor="@color/colorSecondaryText" />
 
@@ -250,8 +250,8 @@
                 android:layout_height="wrap_content"
                 android:background="?attr/selectableItemBackground"
                 android:paddingStart="36dp"
-                android:paddingEnd="36dp"
                 android:paddingTop="16dp"
+                android:paddingEnd="36dp"
                 android:paddingBottom="16dp"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
@@ -270,8 +270,8 @@
                 <LinearLayout
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
-                    android:gravity="center_vertical"
                     android:layout_marginStart="36dp"
+                    android:gravity="center_vertical"
                     android:orientation="vertical"
                     app:layout_constraintBottom_toBottomOf="parent"
                     app:layout_constraintEnd_toEndOf="parent"
@@ -282,7 +282,7 @@
                         android:id="@+id/storage_tv"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:text="Storage and data"
+                        android:text="@string/storage_and_data"
                         android:textAppearance="@style/TextAppearance.AppCompat.Medium"
                         android:textColor="@color/colorPrimaryText" />
 
@@ -291,7 +291,7 @@
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:maxLines="1"
-                        android:text="Network usage, auto-download"
+                        android:text="@string/network_usage_auto_download"
                         android:textAppearance="@style/TextAppearance.AppCompat.Small"
                         android:textColor="@color/colorSecondaryText" />
 
@@ -305,8 +305,8 @@
                 android:layout_height="wrap_content"
                 android:background="?attr/selectableItemBackground"
                 android:paddingStart="36dp"
-                android:paddingEnd="36dp"
                 android:paddingTop="16dp"
+                android:paddingEnd="36dp"
                 android:paddingBottom="16dp"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
@@ -325,8 +325,8 @@
                 <LinearLayout
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
-                    android:gravity="center_vertical"
                     android:layout_marginStart="36dp"
+                    android:gravity="center_vertical"
                     android:orientation="vertical"
                     app:layout_constraintBottom_toBottomOf="parent"
                     app:layout_constraintEnd_toEndOf="parent"
@@ -337,7 +337,7 @@
                         android:id="@+id/help_tv"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:text="Help"
+                        android:text="@string/help"
                         android:textAppearance="@style/TextAppearance.AppCompat.Medium"
                         android:textColor="@color/colorPrimaryText" />
 
@@ -346,7 +346,7 @@
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:maxLines="1"
-                        android:text="FAQ, contact us, privacy policy"
+                        android:text="@string/faq_contact_us_privacy_policy"
                         android:textAppearance="@style/TextAppearance.AppCompat.Small"
                         android:textColor="@color/colorSecondaryText" />
 
@@ -357,6 +357,5 @@
         </LinearLayout>
 
     </androidx.constraintlayout.widget.ConstraintLayout>
-
 
 </ScrollView>

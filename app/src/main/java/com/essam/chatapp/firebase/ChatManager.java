@@ -23,11 +23,11 @@ import com.google.firebase.storage.UploadTask;
 import java.util.ArrayList;
 import java.util.List;
 
-/** ChatManager is a simple class that created with every [one to one] chat room
+/** ChatManager is a simple class created with every [one to one] chat room
  * It holds A three basic database references [ChatDb, MySideDb, OtherSideDb]
  * So this class is responsible for :
- * 1- Creating the chat room at top level app/chat/chatId that holds and listens for new messages
- * 2- Creating the chat snippet in both current user and other user chat node to update last message that displayed in home
+ * 1- Creating the chat room reference at top level app/chat/chatId that holds and listens for new messages
+ * 2- Creating the chat snippet reference in both current user and other user chat node to update last message that displayed in home
  * 3- ChatManager is considered as a bridge between chatPresenter and FirebaseManager class
  * */
 public class ChatManager {

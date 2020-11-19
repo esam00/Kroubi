@@ -8,12 +8,19 @@ import android.util.Log;
 
 import com.essam.chatapp.firebase.FirebaseManager;
 import com.essam.chatapp.ui.home.activity.HomeActivity;
-import com.essam.chatapp.ui.intro.OnBoardingActivity;
+import com.essam.chatapp.ui.on_boarding.OnBoardingActivity;
+import com.essam.chatapp.ui.profile.activity.CompleteProfileActivity;
+import com.essam.chatapp.utils.Consts;
+import com.essam.chatapp.utils.SharedPrefrence;
 import com.google.firebase.FirebaseApp;
 
 public class SplashActivity extends AppCompatActivity {
 
     private static final String TAG = SplashActivity.class.getSimpleName();
+    // 1- User is already logged in :
+    //      * if profile not completed >> Go to complete profile
+    //      * else  >> Go to Home
+    // 2- User not logged in   >> Go to OnBoarding
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -26,10 +33,13 @@ public class SplashActivity extends AppCompatActivity {
             e.printStackTrace();
         }
 
-        boolean isUserLoggedIn = FirebaseManager.getInstance().isUserLoggedIn();
-        if(isUserLoggedIn){
+        if(FirebaseManager.getInstance().isUserLoggedIn()){
             Log.i(TAG, "isUserLoggedIn: YES");
-            startActivity(new Intent(SplashActivity.this,HomeActivity.class));
+            if (SharedPrefrence.getInstance(this).getBooleanValue(Consts.PROFILE_COMPLETED)){
+                startActivity(new Intent(SplashActivity.this, HomeActivity.class));
+            }else {
+                startActivity(new Intent(SplashActivity.this, CompleteProfileActivity.class));
+            }
         }
         else{
             Log.i(TAG, "isUserLoggedIn: No");
