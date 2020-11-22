@@ -71,7 +71,6 @@ public class VerificationActivity extends AppCompatActivity implements Verificat
                     mProgressBar.setVisibility(View.VISIBLE);
                     signInWithPhoneCredential();
                 }
-
             }
         });
 

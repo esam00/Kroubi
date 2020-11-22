@@ -6,7 +6,7 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
 import com.essam.chatapp.firebase.FirebaseManager;
-import com.essam.chatapp.models.Chat;
+import com.essam.chatapp.models.HomeChat;
 import com.google.firebase.database.ChildEventListener;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
@@ -34,7 +34,7 @@ public class HomeChatPresenter implements HomeChatContract.Presenter{
 
     private void checkChatHistoryForCurrentUser(){
         //single value event listener to check if user has any previous chats
-        mFirebaseManager.checkChatHistoryForCurrentUser(new ValueEventListener() {
+        mFirebaseManager.getAllChatHistory(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                 mView.onCheckExistingChats(dataSnapshot.exists());
@@ -52,7 +52,7 @@ public class HomeChatPresenter implements HomeChatContract.Presenter{
         mHomeChatsEventListener = new ChildEventListener() {
             @Override
             public void onChildAdded(@NonNull DataSnapshot dataSnapshot, @Nullable String s) {
-                Chat chat = dataSnapshot.getValue(Chat.class);
+                HomeChat chat = dataSnapshot.getValue(HomeChat.class);
                 if (chat != null) {
                     Log.i(TAG, "new chat added");
                     // TODO: 11/12/2020 Chat model should only holds a reference to last message id
@@ -63,7 +63,7 @@ public class HomeChatPresenter implements HomeChatContract.Presenter{
 
             @Override
             public void onChildChanged(@NonNull DataSnapshot dataSnapshot, @Nullable String s) {
-                Chat chat = dataSnapshot.getValue(Chat.class);
+                HomeChat chat = dataSnapshot.getValue(HomeChat.class);
                 if (chat != null) {
                     Log.i(TAG, " new message Arrived to an existing chat");
                     mView.onChatUpdated(chat);
@@ -83,7 +83,7 @@ public class HomeChatPresenter implements HomeChatContract.Presenter{
                 Log.e(TAG, "onCancelled: " + databaseError);
             }
         };
-        mFirebaseManager.getUserChatList(mHomeChatsEventListener);
+        mFirebaseManager.getAllChatHistory(mHomeChatsEventListener);
     }
 
     public void detachView(){
@@ -92,7 +92,9 @@ public class HomeChatPresenter implements HomeChatContract.Presenter{
     }
 
     private void removeHomeChatListeners() {
-        mFirebaseManager.removeHomeChatListeners(mHomeChatsEventListener);
+        if (mHomeChatsEventListener != null) {
+            mFirebaseManager.removeHomeChatListeners(mHomeChatsEventListener);
+        }
     }
 
 }

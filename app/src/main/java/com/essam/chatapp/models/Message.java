@@ -5,15 +5,15 @@ public class Message {
     private String message;
     private String creatorId;
     private String createdAt;
-    private long timeStamp;
+    private Long timeStamp;
     private String media;
     private boolean seen;
 
     public Message() {
-        // Default constructor required for calls to DataSnapshot.getValue(User.class)
+        // Default constructor required for calls to DataSnapshot.getValue(Message.class)
     }
 
-    public Message(String messageId, String message, String creatorId, String createdAt, long timeStamp, boolean seen) {
+    public Message(String messageId, String message, String creatorId, String createdAt, Long timeStamp, boolean seen) {
         this.messageId = messageId;
         this.message = message;
         this.creatorId = creatorId;
@@ -80,11 +80,11 @@ public class Message {
         this.message = message;
     }
 
-    public long getTimeStamp() {
+    public Long getTimeStamp() {
         return timeStamp;
     }
 
-    public void setTimeStamp(long timeStamp) {
+    public void setTimeStamp(Long timeStamp) {
         this.timeStamp = timeStamp;
     }
 }

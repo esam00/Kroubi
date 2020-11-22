@@ -1,6 +1,6 @@
 package com.essam.chatapp.ui.home.fragments.chat;
 
-import com.essam.chatapp.models.Chat;
+import com.essam.chatapp.models.HomeChat;
 
 public class HomeChatContract {
 
@@ -9,9 +9,9 @@ public class HomeChatContract {
     }
 
     interface View {
-        void onNewChatAdded(Chat chat);
+        void onNewChatAdded(HomeChat chat);
 
-        void onChatUpdated(Chat chat);
+        void onChatUpdated(HomeChat chat);
 
         void onCheckExistingChats(boolean hasPreviousChats);
 

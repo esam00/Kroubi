@@ -12,6 +12,7 @@ public class Profile implements Parcelable {
     private boolean isOnline;
 
     public Profile() {
+        // Default constructor required for calls to DataSnapshot.getValue(Profile.class)
     }
 
     public Profile(String id, String userName, String phone, String avatar, String status, boolean isOnline) {

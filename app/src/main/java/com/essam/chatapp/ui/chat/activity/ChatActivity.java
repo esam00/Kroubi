@@ -79,7 +79,7 @@ public class ChatActivity extends AppCompatActivity implements View.OnClickListe
 
         mPresenter = new ChatPresenter(this);
         initViews();
-        receiveIntents();
+        getProfileFromIntent();
     }
 
     private void initViews() {
@@ -131,12 +131,12 @@ public class ChatActivity extends AppCompatActivity implements View.OnClickListe
 
             @Override
             public void onTextChanged(CharSequence s, int start, int before, int count) {
-                if (s.length() > 0){
-                    if (!isTyping){
+                if (s.length() > 0) {
+                    if (!isTyping) {
                         isTyping = true;
                         mPresenter.toggleIsTypingState(true);
                     }
-                }else {
+                } else {
                     isTyping = false;
                     mPresenter.toggleIsTypingState(false);
                 }
@@ -150,30 +150,41 @@ public class ChatActivity extends AppCompatActivity implements View.OnClickListe
     }
 
     /**
-     * there are two scenarios to open this chat activity :
-     * 1- from home chats >> means this is not the first time
-     * 2- from contacts activity >> then we need to check if there is a previous chat with this user
+     * We could just pass the user id through an intent then request its info,
+     * But this will give a bad user experience if network fails..
+     * So we initially display user profile as we receive from intent then later
+     * we can subscribe to listen for profile changes such as online state
      */
-    private void receiveIntents() {
-        Intent intent = getIntent();
-        if ((intent.hasExtra(Consts.PROFILE))){
-            mOtherUserProfile = intent.getParcelableExtra(Consts.PROFILE);
-            if (mOtherUserProfile != null){
+    private void getProfileFromIntent() {
+        if ((getIntent().hasExtra(Consts.PROFILE))) {
+            mOtherUserProfile = getIntent().getParcelableExtra(Consts.PROFILE);
+            if (mOtherUserProfile != null) {
+                // populate ui with other user profile
                 onUpdateProfileInfo(mOtherUserProfile);
-                fetchChatMessages();
-            }
 
+                // init chat room to be ready for doing the work
+                mPresenter.initChatRoom(SharedPrefrence.getInstance(this).getMyProfile(), mOtherUserProfile);
+
+                //Now we have a starting point of chat experience.. getChat history
+                getChatHistory();
+            }
+        } else {
+            Log.e(TAG, "getProfileFromIntent: NO PROFILE FOUND!! ");
+            finish();
         }
     }
 
-    private void fetchChatMessages(){
+    private void listenForOtherProfileChanges(){
+        mPresenter.getUserProfileInfo(mOtherUserProfile.getId());
+    }
+
+    private void getChatHistory() {
         if (!ProjectUtils.isNetworkConnected(this)) {
             ProjectUtils.showToast(this, getString(R.string.check_network));
             loadingTv.setText(R.string.check_network);
             return;
         }
-
-        mPresenter.checkForPreviousChatWith(mOtherUserProfile);
+        mPresenter.getChatHistory();
     }
 
     private void preSendMessage() {
@@ -182,7 +193,7 @@ public class ChatActivity extends AppCompatActivity implements View.OnClickListe
         if (TextUtils.isEmpty(inputMessage)) {
             Toast.makeText(this, "Please type a message to be sent", Toast.LENGTH_SHORT).show();
         } else {
-            mPresenter.sendMessage(inputMessage,mediaUriList);
+            mPresenter.sendMessage(inputMessage, mediaUriList);
             messageEt.setText("");
         }
     }
@@ -191,22 +202,35 @@ public class ChatActivity extends AppCompatActivity implements View.OnClickListe
 
     @Override
     public void onCheckFirstTimeChat(boolean isFirstTime) {
-        if (isFirstTime)
+        if (isFirstTime){
             emptyLayout.setVisibility(View.VISIBLE);
-        else
+            loadingTv.setVisibility(View.GONE);
+            listenForOtherProfileChanges();
+        }
+        else{
             emptyLayout.setVisibility(View.GONE);
-
-        loadingTv.setVisibility(View.GONE);
+            loadingTv.setVisibility(View.VISIBLE);
+            // Wait 1 second and then listen for profile changes
+            new Handler().postDelayed(new Runnable() {
+                @Override
+                public void run() {
+                    listenForOtherProfileChanges();
+                }
+            },1000);
+        }
     }
 
     @Override
     public void onNewMessageAdded(Message message) {
-        if (loadingTv.getVisibility() == View.VISIBLE){
+        if (loadingTv.getVisibility() == View.VISIBLE || emptyLayout.getVisibility() == View.VISIBLE ) {
             loadingTv.setVisibility(View.GONE);
+            emptyLayout.setVisibility(View.GONE);
         }
+
         listMessages.add(message);
         adapter.setMessagesData(listMessages);
-        recyclerView.smoothScrollToPosition(adapter.getItemCount() - 1);    }
+        recyclerView.smoothScrollToPosition(adapter.getItemCount() - 1);
+    }
 
     @Override
     public void onMessageSeen(String messageId) {
@@ -234,9 +258,9 @@ public class ChatActivity extends AppCompatActivity implements View.OnClickListe
                 .placeholder(R.drawable.user)
                 .into(profileIv);
 
-        if (profile.isOnline()){
+        if (profile.isOnline()) {
             isTypingTv.setVisibility(View.VISIBLE);
-        }else {
+        } else {
             isTypingTv.setVisibility(View.GONE);
         }
     }
@@ -397,7 +421,7 @@ public class ChatActivity extends AppCompatActivity implements View.OnClickListe
                     } else {
                         Log.i(TAG, "onActivityResult: no Image was retrived ");
                         mediaUriList.clear();
-                        if (data!=null && data.getIntExtra("requestCode", -1) == Consts.PICK_IMAGES_REQUEST)
+                        if (data != null && data.getIntExtra("requestCode", -1) == Consts.PICK_IMAGES_REQUEST)
                             openGalleryChooser();
                     }
 
@@ -462,7 +486,7 @@ public class ChatActivity extends AppCompatActivity implements View.OnClickListe
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        if(item.getItemId() == android.R.id.home) {
+        if (item.getItemId() == android.R.id.home) {
             onBackPressed(); // make up button behave like back button
             return true;
         }
@@ -488,14 +512,13 @@ public class ChatActivity extends AppCompatActivity implements View.OnClickListe
     @Override
     protected void onPause() {
         mPresenter.toggleOnlineState(false);
+        mPresenter.toggleIsTypingState(false);
         super.onPause();
     }
 
     @Override
     protected void onResume() {
-        if (ProjectUtils.isNetworkConnected(this)){
-            mPresenter.toggleOnlineState(true);
-        }
+        mPresenter.toggleOnlineState(true);
         super.onResume();
     }
 
@@ -510,13 +533,13 @@ public class ChatActivity extends AppCompatActivity implements View.OnClickListe
 //        AlertDialog.Builder builder = new AlertDialog.Builder(this);
 //        // Get the layout inflater
 //        LayoutInflater inflater = getLayoutInflater();
-//        View filePicker = inflater.inflate(R.layout.file_picker, null);
+//        View filePicker = inflater.inflate(R.layout.layout_file_picker, null);
 //
 //
 //        // Inflate and set the layout for the dialog
 //        // Pass null as the parent view because its going in the
 //        // dialog layout
-//        builder.setView(inflater.inflate(R.layout.file_picker, null));
+//        builder.setView(inflater.inflate(R.layout.layout_file_picker, null));
 //
 //        builder.create();
 //        builder.show();

@@ -184,7 +184,7 @@ public class HomeActivity extends AppCompatActivity{
 
     private void signOut() {
         mPrefrence.clearAllPreferences();
-        mFirebaseManager.signOutUser();
+        mFirebaseManager.updateUserAuthState(FirebaseManager.UserAuthState.LOGGED_OUT);
         Intent intent = new Intent(this, LoginPhoneNumberActivity.class);
         intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
         intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK);

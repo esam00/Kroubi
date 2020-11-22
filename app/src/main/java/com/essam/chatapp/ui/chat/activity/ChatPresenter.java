@@ -6,7 +6,7 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
 import com.essam.chatapp.firebase.ChatManager;
-import com.essam.chatapp.models.Chat;
+import com.essam.chatapp.models.HomeChat;
 import com.essam.chatapp.models.Message;
 import com.essam.chatapp.models.Profile;
 import com.google.firebase.database.ChildEventListener;
@@ -21,14 +21,13 @@ public class ChatPresenter implements ChatContract.Presenter {
     private ChatManager mChatManager;
 
     //firebase
-    private ChildEventListener newMessageEventListener;
+    private ChildEventListener mNewMessageEventListener;
     private ValueEventListener mIsTypingListener;
     private ValueEventListener mUserProfileEventListener;
 
     // vars
     private boolean isFirstTime = true;
     private Profile otherProfile; // the profile of the other user
-    private String chatID;
 
     private static final String TAG = ChatPresenter.class.getSimpleName();
 
@@ -36,19 +35,19 @@ public class ChatPresenter implements ChatContract.Presenter {
         mView = view;
     }
 
+    @Override
+    public void initChatRoom(Profile myProfile, Profile otherProfile) {
+        this.otherProfile = otherProfile;
+        mChatManager = new ChatManager(myProfile, otherProfile);
+    }
+
     /**
      * The entry point of chat room is to check if current user has any chat with any other user
-     * if current user has any previous chat, we loop through the chat list to check if any of thees
-     * chats is with the passed user
-     *
-     * @param userProfile: profile of other end user
+     * if dataSnapshot.exists() == false >> means No chat found at all
      */
     @Override
-    public void checkForPreviousChatWith(final Profile userProfile) {
-        this.otherProfile = userProfile;
-        mChatManager = new ChatManager(otherProfile);
-
-        mChatManager.checkForPreviousChatWith(new ValueEventListener() {
+    public void getChatHistory() {
+        mChatManager.getAllChatHistory(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                 if (dataSnapshot.exists()) {
@@ -59,11 +58,6 @@ public class ChatPresenter implements ChatContract.Presenter {
                     mView.onCheckFirstTimeChat(true);
                     Log.i(TAG, "User has no previous chat with any other user yet");
                 }
-
-                // we already have the profile info passed through intent to activity,
-                // But this listener will update online state and any other changes like profile image
-                // will be immediately updated in real time
-                 getUserProfileInfo(otherProfile.getId());
             }
 
             @Override
@@ -92,17 +86,11 @@ public class ChatPresenter implements ChatContract.Presenter {
 
     @Override
     public void sendMessage(String inputMessage, List<String> mMediaUriList) {
-        if (isFirstTime) {
-            chatID = mChatManager.pushNewTopLevelChat(); // app/chat/chatId
-            if (chatID != null) {
-                mChatManager = new ChatManager(chatID, otherProfile);
-                mChatManager.sendFirstMessage(mMediaUriList, inputMessage);
+        mChatManager.pushNewMessage(mMediaUriList, inputMessage);
 
-                listenForTyping();
-                listenForMessages();
-            }
-        } else {
-            mChatManager.pushNewMessage(mMediaUriList, inputMessage, false);
+        if (isFirstTime) {
+            listenForTyping();
+            getAllMessages();
         }
     }
 
@@ -113,9 +101,7 @@ public class ChatPresenter implements ChatContract.Presenter {
 
     @Override
     public void toggleIsTypingState(boolean isTyping) {
-        if (mChatManager != null) {
-            mChatManager.toggleIsTypingState(isTyping);
-        }
+        mChatManager.toggleIsTypingState(isTyping);
     }
 
     @Override
@@ -123,23 +109,27 @@ public class ChatPresenter implements ChatContract.Presenter {
         mChatManager.toggleOnlineState(isOnline);
     }
 
+    @Override
+    public void detachView() {
+        mView = null;
+        unSubScribeAllListeners();
+    }
+
     private void checkChatHistoryBetweenTheesTwoUsers(DataSnapshot dataSnapshot) {
         for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
-            Chat chat = snapshot.getValue(Chat.class);
-            if (chat != null && otherProfile.getId().equals(chat.getUserUid())) {
+            HomeChat chat = snapshot.getValue(HomeChat.class);
+            if (chat != null && otherProfile.getId().equals(chat.getUserProfile().getId())) {
                 // Found previous chat between the two users
                 isFirstTime = false;
-                chatID = chat.getChatId();
-                mChatManager = new ChatManager(chatID, otherProfile);
+                mChatManager.setChatID(chat.getChatId());
 
                 listenForTyping();
-                listenForMessages();
+                getAllMessages();
                 break;
             }
         }
 
-        if (isFirstTime)
-            mView.onCheckFirstTimeChat(true);
+        mView.onCheckFirstTimeChat(isFirstTime);
     }
 
     private void listenForTyping() {
@@ -158,9 +148,9 @@ public class ChatPresenter implements ChatContract.Presenter {
         mChatManager.listenForTyping(mIsTypingListener);
     }
 
-    private void listenForMessages() {
+    private void getAllMessages() {
         // this listener is basically listening for a new message added to this conversation
-        newMessageEventListener = new ChildEventListener() {
+        mNewMessageEventListener = new ChildEventListener() {
             @Override
             public void onChildAdded(@NonNull DataSnapshot dataSnapshot, @Nullable String s) {
                 if (dataSnapshot.exists()) {
@@ -168,7 +158,6 @@ public class ChatPresenter implements ChatContract.Presenter {
                     if (message != null) {
                         if (isFirstTime) {
                             isFirstTime = false;
-                            mView.onCheckFirstTimeChat(false);
                         }
 
                         mView.onNewMessageAdded(message);
@@ -196,7 +185,7 @@ public class ChatPresenter implements ChatContract.Presenter {
             public void onCancelled(@NonNull DatabaseError databaseError) {
             }
         };
-        mChatManager.listenForMessages(newMessageEventListener);
+        mChatManager.getAllMessages(mNewMessageEventListener);
     }
 
     private void unSubScribeAllListeners() {
@@ -204,21 +193,15 @@ public class ChatPresenter implements ChatContract.Presenter {
         mChatManager.removeLastUnseenCountListener();
 
         // remove firebase eventListener .. no need for them since activity is shutting down
-        if (newMessageEventListener != null)
-            mChatManager.reMoveChatListener(newMessageEventListener);
+        if (mNewMessageEventListener != null)
+            mChatManager.removeChatMessagesListener(mNewMessageEventListener);
 
         if (mIsTypingListener != null) {
-            mChatManager.removeIsTypingListener(mIsTypingListener);
+            mChatManager.removeTypingListener(mIsTypingListener);
         }
 
         if (mUserProfileEventListener != null) {
             mChatManager.removeUserProfileListener(mUserProfileEventListener);
         }
-    }
-
-    @Override
-    public void detachView() {
-        mView = null;
-        unSubScribeAllListeners();
     }
 }

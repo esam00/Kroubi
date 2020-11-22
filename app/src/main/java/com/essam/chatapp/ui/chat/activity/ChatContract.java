@@ -8,7 +8,9 @@ import java.util.List;
 public class ChatContract {
 
     interface Presenter {
-        void checkForPreviousChatWith(Profile userProfile);
+        void initChatRoom(Profile myProfile, Profile otherProfile);
+
+        void getChatHistory();
 
         void getUserProfileInfo(String userId);
 

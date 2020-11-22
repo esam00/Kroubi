@@ -8,7 +8,6 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
-import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.recyclerview.widget.SortedList;
 import androidx.recyclerview.widget.SortedListAdapterCallback;
@@ -16,9 +15,9 @@ import androidx.recyclerview.widget.SortedListAdapterCallback;
 import com.bumptech.glide.Glide;
 import com.essam.chatapp.R;
 import com.essam.chatapp.firebase.FirebaseManager;
+import com.essam.chatapp.models.HomeChat;
 import com.essam.chatapp.ui.contacts.utils.ContactsHelper;
 import com.essam.chatapp.ui.home.fragments.chat.HomeChatFragment;
-import com.essam.chatapp.models.Chat;
 import com.essam.chatapp.utils.DateTimeUtils;
 
 import java.text.NumberFormat;
@@ -32,11 +31,11 @@ public class HomeChatAdapter extends RecyclerView.Adapter<HomeChatAdapter.ViewHo
 
     private Context context;
     private HomeChatListener mHomeChatListener;
-    private SortedList<Chat> mChatList;
+    private SortedList<HomeChat> mChatList;
     private HomeChatFragment mHomeChatFragment;
 
     public interface HomeChatListener {
-        void onClick(Chat chat, int adapterPosition);
+        void onClick(HomeChat chat, int adapterPosition);
     }
 
     public HomeChatAdapter(HomeChatFragment homeChatFragment, HomeChatListener listener, Context context) {
@@ -47,26 +46,26 @@ public class HomeChatAdapter extends RecyclerView.Adapter<HomeChatAdapter.ViewHo
     }
 
     private void sort() {
-        mChatList = new SortedList<>(Chat.class, new SortedListAdapterCallback<Chat>(this) {
+        mChatList = new SortedList<>(HomeChat.class, new SortedListAdapterCallback<HomeChat>(this) {
             @Override
-            public int compare(Chat o1, Chat o2) {
+            public int compare(HomeChat o1, HomeChat o2) {
                 // we want to sort conversations by the newest
-                return o2.getTimeStamp().compareTo(o1.getTimeStamp());
+                return o2.getLastMessage().getTimeStamp().compareTo(o1.getLastMessage().getTimeStamp());
             }
 
             @Override
-            public boolean areContentsTheSame(Chat oldItem, Chat newItem) {
+            public boolean areContentsTheSame(HomeChat oldItem, HomeChat newItem) {
                 // What are the scenarios of home chat to be updated?
                 //1- last message updated >> check for time stamp
                 //2- last message was sent by current user and message has seen >> check for seen
                 //3- isTyping state changed
-                return oldItem.getTimeStamp().equals(newItem.getTimeStamp()) &&
-                        oldItem.isSeen() == newItem.isSeen() &&
-                        oldItem.isTyping() == newItem.isTyping();
+                return oldItem.getLastMessage().getTimeStamp().equals(newItem.getLastMessage().getTimeStamp()) &&
+                        oldItem.getLastMessage().isSeen() == newItem.getLastMessage().isSeen() &&
+                        oldItem.isOtherTyping() == newItem.isOtherTyping();
             }
 
             @Override
-            public boolean areItemsTheSame(Chat item1, Chat item2) {
+            public boolean areItemsTheSame(HomeChat item1, HomeChat item2) {
                 return item1.getChatId().equals(item2.getChatId());
             }
 
@@ -111,21 +110,13 @@ public class HomeChatAdapter extends RecyclerView.Adapter<HomeChatAdapter.ViewHo
 
         }
 
-        void bind(Chat chat, int position) {
+        void bind(HomeChat chat, int position) {
             // update ui [name, messageText, date]
-            senderNameTV.setText(chat.getUserPhone());
-            dateTv.setText(DateTimeUtils.getDisplayableDateOfGivenTimeStamp(context, chat.getTimeStamp(), false));
-            Glide.with(context).load(chat.getUserPhoto()).error(R.drawable.user).placeholder(R.drawable.user).into(profileImv);
+            senderNameTV.setText(chat.getUserProfile().getUserName());
+            dateTv.setText(DateTimeUtils.getDisplayableDateOfGivenTimeStamp(context, chat.getLastMessage().getTimeStamp(), false));
+            Glide.with(context).load(chat.getUserProfile().getAvatar()).error(R.drawable.user).placeholder(R.drawable.user).into(profileImv);
 
-            //last message
-            if (chat.isTyping()) {
-                lastMessageTv.setText(context.getText(R.string.typing));
-                lastMessageTv.setTextColor(context.getResources().getColor(R.color.colorAccent));
-            } else {
-                lastMessageTv.setText(chat.getMessage());
-                lastMessageTv.setTextColor(context.getResources().getColor(R.color.colorSecondaryText));
-            }
-            //colors
+            //unseen messages
             if (chat.getUnSeenCount() > 0) {
                 counterTv.setVisibility(View.VISIBLE);
                 dateTv.setTextColor(context.getResources().getColor(R.color.colorAccent));
@@ -137,11 +128,14 @@ public class HomeChatAdapter extends RecyclerView.Adapter<HomeChatAdapter.ViewHo
 //                parentView.setBackground(ContextCompat.getDrawable(context, R.drawable.ripple_effect_basic));
             }
 
-            if (chat.getCreatorId().equals(FirebaseManager.getInstance().getMyUid())) {
-                messageStateIv.setVisibility(View.VISIBLE);
-                handleSeenUi(chat.isSeen());
-            } else {
+            if (chat.isOtherTyping()) {
+                lastMessageTv.setText(context.getText(R.string.typing));
+                lastMessageTv.setTextColor(context.getResources().getColor(R.color.colorAccent));
                 messageStateIv.setVisibility(View.GONE);
+            } else {
+                lastMessageTv.setText(chat.getLastMessage().getMessage());
+                lastMessageTv.setTextColor(context.getResources().getColor(R.color.colorSecondaryText));
+                handleMessageState(chat);
             }
 
             // hide separator for last item in the list
@@ -149,6 +143,15 @@ public class HomeChatAdapter extends RecyclerView.Adapter<HomeChatAdapter.ViewHo
                 separator.setVisibility(View.GONE);
             else
                 separator.setVisibility(View.VISIBLE);
+        }
+
+        void handleMessageState(HomeChat chat){
+            if (chat.getLastMessage().getCreatorId().equals(FirebaseManager.getInstance().getMyUid())) {
+                messageStateIv.setVisibility(View.VISIBLE);
+                handleSeenUi(chat.getLastMessage().isSeen());
+            } else {
+                messageStateIv.setVisibility(View.GONE);
+            }
         }
 
         void handleSeenUi(boolean isSeen) {
@@ -174,7 +177,7 @@ public class HomeChatAdapter extends RecyclerView.Adapter<HomeChatAdapter.ViewHo
 
     @Override
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
-        Chat chat = mChatList.get(position);
+        HomeChat chat = mChatList.get(position);
         holder.bind(chat, position);
     }
 
@@ -186,26 +189,26 @@ public class HomeChatAdapter extends RecyclerView.Adapter<HomeChatAdapter.ViewHo
         return mChatList.size();
     }
 
-    public void addAll(List<Chat> chats) {
+    public void addAll(List<HomeChat> chats) {
         mChatList.beginBatchedUpdates();
-        for (Chat chat : chats) {
+        for (HomeChat chat : chats) {
             mChatList.add(chat);
         }
         mChatList.endBatchedUpdates();
     }
 
-    public void updateItem(Chat chat) {
+    public void updateItem(HomeChat chat) {
         mChatList.beginBatchedUpdates();
         for (int i = 0; i < mChatList.size(); i++) {
             if (mChatList.get(i).getChatId().equals(chat.getChatId())) {
-                chat.setUserPhone(ContactsHelper.getContactName(mHomeChatFragment.getActivity(), chat.getUserPhone()));
+                chat.getUserProfile().setUserName(ContactsHelper.getContactName(mHomeChatFragment.getActivity(), chat.getUserProfile().getPhone()));
                 mChatList.updateItemAt(i, chat);
             }
         }
         mChatList.endBatchedUpdates();
     }
 
-    public void clearUnSeenCount(Chat chat, int adapterPosition) {
+    public void clearUnSeenCount(HomeChat chat, int adapterPosition) {
         chat.setUnSeenCount(0);
         mChatList.updateItemAt(adapterPosition, chat);
     }

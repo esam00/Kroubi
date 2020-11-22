@@ -24,11 +24,10 @@ import android.widget.Toast;
 
 import com.airbnb.lottie.LottieAnimationView;
 import com.essam.chatapp.R;
-import com.essam.chatapp.models.Profile;
+import com.essam.chatapp.models.HomeChat;
 import com.essam.chatapp.ui.contacts.utils.ContactsHelper;
 import com.essam.chatapp.ui.home.fragments.chat.adapter.HomeChatAdapter;
 import com.essam.chatapp.utils.ProjectUtils;
-import com.essam.chatapp.models.Chat;
 import com.essam.chatapp.ui.chat.activity.ChatActivity;
 import com.essam.chatapp.utils.Consts;
 
@@ -43,7 +42,7 @@ public class HomeChatFragment extends Fragment implements HomeChatAdapter.HomeCh
     private RecyclerView homeChatRv;
     private HomeChatAdapter homeChatAdapter;
     private LinearLayout welcomeLl;
-    private List<Chat> chatList = new ArrayList<>();
+    private List<HomeChat> chatList = new ArrayList<>();
     private Dialog loadingDialog;
 
     private Context mContext;
@@ -175,20 +174,12 @@ public class HomeChatFragment extends Fragment implements HomeChatAdapter.HomeCh
      * @param chat : selected item
      */
     @Override
-    public void onClick(Chat chat, int adapterPosition) {
+    public void onClick(HomeChat chat, int adapterPosition) {
         // clear un seen count for this conversation
         homeChatAdapter.clearUnSeenCount(chat, adapterPosition);
 
-        //Chat Activity only accepts User object as extras..
-        Profile profile = new Profile(
-                chat.getUserUid(),
-                chat.getUserPhone(),
-                chat.getUserPhone(),
-                chat.getUserPhoto(),
-                "",
-                false);
         Intent intent = new Intent(this.getActivity(), ChatActivity.class);
-        intent.putExtra(Consts.PROFILE, profile);
+        intent.putExtra(Consts.PROFILE, chat.getUserProfile());
         startActivity(intent);
     }
 
@@ -198,9 +189,9 @@ public class HomeChatFragment extends Fragment implements HomeChatAdapter.HomeCh
     }
 
     @Override
-    public void onNewChatAdded(Chat chat) {
+    public void onNewChatAdded(HomeChat chat) {
         // if this user name is already saved into my contacts replace user name with this saved name
-        chat.setUserPhone(ContactsHelper.getContactName(getActivity(), chat.getUserPhone()));
+        chat.getUserProfile().setUserName(ContactsHelper.getContactName(getActivity(), chat.getUserProfile().getPhone()));
 
         chatList.add(chat);
         homeChatAdapter.addAll(chatList);
@@ -208,7 +199,7 @@ public class HomeChatFragment extends Fragment implements HomeChatAdapter.HomeCh
     }
 
     @Override
-    public void onChatUpdated(Chat chat) {
+    public void onChatUpdated(HomeChat chat) {
         //update this chat with the new data
         homeChatAdapter.updateItem(chat);
     }

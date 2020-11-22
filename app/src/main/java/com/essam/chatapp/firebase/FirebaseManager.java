@@ -10,18 +10,20 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
-/** FirebaseManager is a Singleton class that holds all firebase database references
+/**
+ * FirebaseManager is a Singleton class that holds all firebase database references
  * Also holds UserAuth state and manages other cases ..
  * This is a very helpful class as we don't have to create DatabaseReference object every time.
  * we just declare and initialize those references once, and use the helper methods that attache and
  * remove eventListeners to them. YAAi ^_^
- * */
+ */
 
 public class FirebaseManager {
-    public enum UserAuthState{
+    public enum UserAuthState {
         LOGGED_IN,
         LOGGED_OUT,
     }
+
     private static FirebaseManager instance;
     private FirebaseAuth mFirebaseAuth;
     private DatabaseReference appUserDb;        //App/user/
@@ -47,41 +49,25 @@ public class FirebaseManager {
         appUserDb = rootDbReference.child(Consts.USER);
         appChatDb = rootDbReference.child(Consts.CHAT);
 
-        if (isUserLoggedIn()){
+        if (isUserLoggedIn()) {
             mUserDb = appUserDb.child(getMyUid());
             userChatDb = mUserDb.child(Consts.CHAT);
             userProfileDb = mUserDb.child(Consts.PROFILE);
         }
     }
 
-    public String getMyUid() {
-        return getFirebaseUser().getUid();
-    }
-
-    public String getMyPhone() {
-        return getFirebaseUser().getPhoneNumber();
-    }
-
-    public void updateUserProfile(Profile profile){
-        userProfileDb.setValue(profile);
-    }
-
-    public void updateUserStatus(String status){
-        userProfileDb.child(Consts.STATUS).setValue(status);
-    }
-
-    public void listenForCurrentUserProfileChanges(ValueEventListener listener){
-        userProfileDb.addValueEventListener(listener);
-    }
-
-    public void removeCurrentUserProfileListener(ValueEventListener listener){
-        userProfileDb.removeEventListener(listener);
-    }
-
     /* ---------------------------------- Authentication ----------------------------------------*/
 
-    public void updateUserAuthState(UserAuthState state){
-        switch (state){
+    public FirebaseUser getFirebaseUser() {
+        return getFirebaseAuth().getCurrentUser();
+    }
+
+    public FirebaseAuth getFirebaseAuth() {
+        return mFirebaseAuth;
+    }
+
+    public void updateUserAuthState(UserAuthState state) {
+        switch (state) {
             case LOGGED_IN:
                 logInUser();
                 break;
@@ -94,27 +80,83 @@ public class FirebaseManager {
         return getFirebaseUser() != null;
     }
 
-    public FirebaseUser getFirebaseUser() {
-        return getFirebaseAuth().getCurrentUser();
-    }
-
-    public FirebaseAuth getFirebaseAuth() {
-        return mFirebaseAuth;
-    }
-
-    public void signOutUser() {
-        getFirebaseAuth().signOut();
+    private void signOutUser() {
         toggleOnlineState(false);
+        getFirebaseAuth().signOut();
         instance = null;
     }
 
-    private void logInUser(){
+    private void logInUser() {
         initFirebase();
     }
 
-    /* -------------------------------------- Login ---------------------------------------------*/
+    /* ----------------------------------- One To One Chat --------------------------------------*/
 
-    public void checkIfUserExistInDataBase(ValueEventListener eventListener){
+    /**
+     * We just need to check if user has any previous chat history
+     *
+     * @param eventListener So add a single value event listener to userCharDb reference
+     */
+    public void getAllChatHistory(ValueEventListener eventListener) {
+        userChatDb.addListenerForSingleValueEvent(eventListener);
+    }
+
+    /**
+     * Here we need to Get all chat history and be notified whenever a new child added updated
+     *
+     * @param eventListener so we add a child listener to userCharDb reference
+     */
+    public void getAllChatHistory(ChildEventListener eventListener) {
+        userChatDb.addChildEventListener(eventListener);
+    }
+
+    public void removeHomeChatListeners(ChildEventListener eventListener) {
+        userChatDb.removeEventListener(eventListener);
+    }
+
+    /**
+     * Push new chat child to top level app/chat database reference
+     * @return unique id of the new child
+     */
+    public String pushNewTopLevelChat() {
+        return appChatDb.push().getKey();
+    }
+
+    /**
+     * @param chatId unique id of chat child
+     * @return app/chat/chatId database reference in firebase database
+     */
+    public DatabaseReference getReferenceToSpecificAppChat(String chatId) {
+        return appChatDb.child(chatId);
+    }
+
+    /** We need a reference to this chat within current user
+     * @param chatId unique id of chat child
+     * @return app/user/myUid/chat/chatId database reference in firebase database
+     */
+    public DatabaseReference getReferenceToSpecificUserChat(String chatId) {
+        return userChatDb.child(chatId);
+    }
+
+    /** get a reference to this chat within a provided user
+     * @param chatId unique id of chat child
+     * @return app/user/{userUid}/chat/chatId database reference in firebase database
+     */
+    public DatabaseReference getReferenceToSpecificUserChat(String userUid, String chatId) {
+        return appUserDb.child(userUid).child(Consts.CHAT).child(chatId);
+    }
+
+    /*------------------------------------- User ---------------------------------------------*/
+
+    public String getMyUid() {
+        return getFirebaseUser().getUid();
+    }
+
+    public String getMyPhone() {
+        return getFirebaseUser().getPhoneNumber();
+    }
+
+    public void checkIfUserExistInDataBase(ValueEventListener eventListener) {
         mUserDb.addListenerForSingleValueEvent(eventListener);
     }
 
@@ -122,7 +164,7 @@ public class FirebaseManager {
      * Adding new child to app/user db with the basic info we just got like
      * [Uid, phone and an empty profile]
      */
-    public void addNewUserToDataBase(){
+    public void addNewUserToDataBase() {
         User user = new User(
                 getMyUid(),
                 getMyPhone(),
@@ -131,61 +173,33 @@ public class FirebaseManager {
         mUserDb.setValue(user);
     }
 
-    public void toggleOnlineState(boolean isOnline){
-        if (isOnline) {
-            userProfileDb.child(Consts.IS_ONLINE).setValue(true);
-        } else {
-            if (isUserLoggedIn()) // user just signed out and state updated to offline
-                userProfileDb.child(Consts.IS_ONLINE).setValue(false);
+    public void toggleOnlineState(boolean isOnline) {
+        if (isUserLoggedIn()){
+            userProfileDb.child(Consts.IS_ONLINE).setValue(isOnline);
         }
     }
 
-    public void getUserProfileInfo(String userId, ValueEventListener listener){
+    public void getUserProfileInfo(String userId, ValueEventListener listener) {
         appUserDb.child(userId).child(Consts.PROFILE).addValueEventListener(listener);
     }
 
-    public void removeUserProfileListener(String userId, ValueEventListener listener){
+    public void removeUserProfileListener(String userId, ValueEventListener listener) {
         appUserDb.child(userId).child(Consts.PROFILE).removeEventListener(listener);
     }
 
-    /* -------------------------------------- Home Chat ----------------------------------------*/
-
-    /**
-     * Check if current user has any chat history
-     */
-    public void checkChatHistoryForCurrentUser (ValueEventListener eventListener){
-        userChatDb.addListenerForSingleValueEvent(eventListener);
+    public void updateUserProfile(Profile profile) {
+        userProfileDb.setValue(profile);
     }
 
-    /**
-     * fetch previous chats AND listen for new messages
-     */
-    public void getUserChatList(ChildEventListener eventListener){
-        userChatDb.addChildEventListener(eventListener);
+    public void updateUserStatus(String status) {
+        userProfileDb.child(Consts.STATUS).setValue(status);
     }
 
-    public void removeHomeChatListeners(ChildEventListener eventListener) {
-        if (eventListener != null){
-            userChatDb.removeEventListener(eventListener);
-        }
+    public void listenForCurrentUserProfileChanges(ValueEventListener listener) {
+        userProfileDb.addValueEventListener(listener);
     }
 
-    /* ----------------------------------- One To One Chat -------------------------------------*/
-
-    public String pushNewTopLevelChat(){
-        return appChatDb.push().getKey();
+    public void removeCurrentUserProfileListener(ValueEventListener listener) {
+        userProfileDb.removeEventListener(listener);
     }
-
-    public DatabaseReference getReferenceToSpecificAppChat(String chatId){
-        return appChatDb.child(chatId);
-    }
-
-    public DatabaseReference getReferenceToSpecificUserChat(String chatId){
-        return userChatDb.child(chatId);
-    }
-
-    public DatabaseReference getReferenceToSpecificUserChat(String userUid, String chatId){
-        return appUserDb.child(userUid).child(Consts.CHAT).child(chatId);
-    }
-
 }
