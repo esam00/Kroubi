@@ -8,6 +8,8 @@ public class Message {
     private Long timeStamp;
     private String media;
     private boolean seen;
+    private Content content = Content.TEXT;
+    private boolean isLoading;
 
     public Message() {
         // Default constructor required for calls to DataSnapshot.getValue(Message.class)
@@ -30,6 +32,8 @@ public class Message {
         this.media = media;
         this.timeStamp = timeStamp;
         this.seen = seen;
+        this.isLoading = true;
+        this.content = Content.IMAGE;
     }
 
     public String getMedia() {
@@ -86,5 +90,21 @@ public class Message {
 
     public void setTimeStamp(Long timeStamp) {
         this.timeStamp = timeStamp;
+    }
+
+    public Content getContent() {
+        return content;
+    }
+
+    public void setContent(Content content) {
+        this.content = content;
+    }
+
+    public boolean isLoading() {
+        return isLoading;
+    }
+
+    public void setLoading(boolean loading) {
+        isLoading = loading;
     }
 }

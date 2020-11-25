@@ -1,4 +1,6 @@
-package com.essam.chatapp.ui.chat.activity;
+package com.essam.chatapp.ui.chat.presenter;
+
+import android.net.Uri;
 
 import com.essam.chatapp.models.Message;
 import com.essam.chatapp.models.Profile;
@@ -7,14 +9,16 @@ import java.util.List;
 
 public class ChatContract {
 
-    interface Presenter {
+    public interface Presenter {
         void initChatRoom(Profile myProfile, Profile otherProfile);
 
         void getChatHistory();
 
         void getUserProfileInfo(String userId);
 
-        void sendMessage(String inputMessage, List<String> mMediaUriList);
+        void sendTextMessage(String inputMessage);
+
+        void sendMediaMessages(String inputMessage, List<Uri> mMediaUriList);
 
         void toggleIsTypingState(boolean isTyping);
 
@@ -25,12 +29,12 @@ public class ChatContract {
         void detachView();
     }
 
-    interface View{
+    public interface View{
         void onCheckFirstTimeChat(boolean isFirstTime);
 
         void onNewMessageAdded(Message message);
 
-        void onMessageSeen(String messageId);
+        void onMessageUpdated(Message message);
 
         void onToggleIsTyping(boolean isTyping);
 

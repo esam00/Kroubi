@@ -1,11 +1,13 @@
-package com.essam.chatapp.ui.chat.activity;
+package com.essam.chatapp.ui.chat.presenter;
 
+import android.net.Uri;
 import android.util.Log;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
 import com.essam.chatapp.firebase.ChatManager;
+import com.essam.chatapp.firebase.StorageCallbacks;
 import com.essam.chatapp.models.HomeChat;
 import com.essam.chatapp.models.Message;
 import com.essam.chatapp.models.Profile;
@@ -16,7 +18,7 @@ import com.google.firebase.database.ValueEventListener;
 
 import java.util.List;
 
-public class ChatPresenter implements ChatContract.Presenter {
+public class ChatPresenter implements ChatContract.Presenter, StorageCallbacks.ChatCallBacks {
     private ChatContract.View mView;
     private ChatManager mChatManager;
 
@@ -81,12 +83,30 @@ public class ChatPresenter implements ChatContract.Presenter {
 
             }
         };
-        mChatManager.listenForUserProfileChanges(userId, mUserProfileEventListener);
+        if (mView != null){
+            mChatManager.listenForUserProfileChanges(userId, mUserProfileEventListener);
+        }
     }
 
     @Override
-    public void sendMessage(String inputMessage, List<String> mMediaUriList) {
-        mChatManager.pushNewMessage(mMediaUriList, inputMessage);
+    public void sendTextMessage(String inputMessage) {
+        mChatManager.sendTextMessage(inputMessage);
+
+        if (isFirstTime) {
+            listenForTyping();
+            getAllMessages();
+        }
+    }
+
+    @Override
+    public void sendMediaMessages(String inputMessage, List<Uri> mMediaUriList) {
+            for (Uri uri : mMediaUriList){
+                Message message = mChatManager.getImageMessagePlaceholder(inputMessage, uri.toString());
+                inputMessage = "";
+                if (message != null){
+                    mChatManager.sendMediaMessage(message, uri, this);
+                }
+        }
 
         if (isFirstTime) {
             listenForTyping();
@@ -170,7 +190,12 @@ public class ChatPresenter implements ChatContract.Presenter {
 
             @Override
             public void onChildChanged(@NonNull DataSnapshot dataSnapshot, @Nullable String s) {
-                mView.onMessageSeen(s);
+                if (dataSnapshot.exists()){
+                    Message message = dataSnapshot.getValue(Message.class);
+                    if (message != null){
+                        mView.onMessageUpdated(message);
+                    }
+                }
             }
 
             @Override
@@ -203,5 +228,15 @@ public class ChatPresenter implements ChatContract.Presenter {
         if (mUserProfileEventListener != null) {
             mChatManager.removeUserProfileListener(mUserProfileEventListener);
         }
+    }
+
+    @Override
+    public void onUploadImageMessageSuccess(String imageUrl, String messageId) {
+        mChatManager.updateImageMessage(imageUrl, messageId);
+    }
+
+    @Override
+    public void onUploadImageMessageFailed() {
+
     }
 }

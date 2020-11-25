@@ -44,4 +44,5 @@ public class Consts {
     public static final String PROFILE_COMPLETED = "profile_updated";
     public static final String LAST_MESSAGE = "lastMessage" ;
     public static final String OTHER_TYPING = "otherTyping" ;
+    public static final String LOADING = "loading";
 }

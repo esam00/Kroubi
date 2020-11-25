@@ -63,7 +63,7 @@ public class FirebaseStorageManager {
         });
     }
 
-    public void uploadMessageImage(Uri imageUri, String chatId, final StorageCallbacks.ChatCallBacks callBack){
+    public void uploadMessageImage(Uri imageUri, String chatId, final String messageId, final StorageCallbacks.ChatCallBacks callBack){
         final StorageReference imageRef = mChatImagesReference.child(chatId).child(Objects.requireNonNull(imageUri.getLastPathSegment()));
 
         UploadTask uploadTask = imageRef.putFile(imageUri);
@@ -79,7 +79,7 @@ public class FirebaseStorageManager {
                 if (task.isSuccessful()){
                     Uri downloadUri = task.getResult();
                     if (downloadUri != null) {
-                        callBack.onUploadImageMessageSuccess(downloadUri.toString());
+                        callBack.onUploadImageMessageSuccess(downloadUri.toString(), messageId);
                     }
                 }
 

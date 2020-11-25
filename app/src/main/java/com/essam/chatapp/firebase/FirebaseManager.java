@@ -110,10 +110,6 @@ public class FirebaseManager {
         userChatDb.addChildEventListener(eventListener);
     }
 
-    public void removeHomeChatListeners(ChildEventListener eventListener) {
-        userChatDb.removeEventListener(eventListener);
-    }
-
     /**
      * Push new chat child to top level app/chat database reference
      * @return unique id of the new child
@@ -144,6 +140,10 @@ public class FirebaseManager {
      */
     public DatabaseReference getReferenceToSpecificUserChat(String userUid, String chatId) {
         return appUserDb.child(userUid).child(Consts.CHAT).child(chatId);
+    }
+
+    public void removeHomeChatListener(ChildEventListener eventListener) {
+        userChatDb.removeEventListener(eventListener);
     }
 
     /*------------------------------------- User ---------------------------------------------*/

@@ -9,7 +9,7 @@ public class StorageCallbacks {
     }
 
     public interface ChatCallBacks{
-        void onUploadImageMessageSuccess(String imageUrl);
+        void onUploadImageMessageSuccess(String imageUrl, String messageId);
 
         void onUploadImageMessageFailed();
     }

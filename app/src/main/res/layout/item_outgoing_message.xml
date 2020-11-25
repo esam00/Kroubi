@@ -32,8 +32,9 @@
                 android:layout_width="250dp"
                 android:layout_height="250dp"
                 android:contentDescription="@string/message_image"
+                android:background="@android:color/transparent"
                 android:scaleType="centerCrop"
-                android:src="@drawable/my_picture"
+                android:src="@drawable/shape_image_place_holder_bg"
                 android:visibility="gone" />
 
         </androidx.cardview.widget.CardView>
@@ -73,6 +74,13 @@
                 android:textSize="15sp"
                 android:visibility="gone"
                 tools:text="This short message" />
+
+            <ProgressBar
+                android:id="@+id/loading_progress"
+                android:layout_width="20dp"
+                android:layout_height="20dp"
+                android:layout_marginTop="5dp"
+                android:visibility="gone"/>
 
             <TextView
                 android:id="@+id/tv_time"

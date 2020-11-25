@@ -16,6 +16,7 @@ import com.bumptech.glide.Glide;
 import com.essam.chatapp.R;
 import com.essam.chatapp.firebase.FirebaseManager;
 import com.essam.chatapp.models.HomeChat;
+import com.essam.chatapp.models.Profile;
 import com.essam.chatapp.ui.contacts.utils.ContactsHelper;
 import com.essam.chatapp.ui.home.fragments.chat.HomeChatFragment;
 import com.essam.chatapp.utils.DateTimeUtils;
@@ -26,9 +27,7 @@ import java.util.List;
 /*
   Created by esammosbah1@gmail.com on 01/10/19.
  */
-
 public class HomeChatAdapter extends RecyclerView.Adapter<HomeChatAdapter.ViewHolder> {
-
     private Context context;
     private HomeChatListener mHomeChatListener;
     private SortedList<HomeChat> mChatList;
@@ -92,13 +91,14 @@ public class HomeChatAdapter extends RecyclerView.Adapter<HomeChatAdapter.ViewHo
     }
 
     public class ViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
-        private TextView senderNameTV, lastMessageTv, dateTv, counterTv;
+        private TextView senderNameTV, nonContactNAmeTv, lastMessageTv, dateTv, counterTv;
         private View separator;
         private ImageView profileImv, messageStateIv;
 
         private ViewHolder(@NonNull View itemView) {
             super(itemView);
             senderNameTV = itemView.findViewById(R.id.tv_sender_name);
+            nonContactNAmeTv = itemView.findViewById(R.id.non_contact_name);
             lastMessageTv = itemView.findViewById(R.id.tv_sender_last_message);
             dateTv = itemView.findViewById(R.id.tv_last_message_date);
             counterTv = itemView.findViewById(R.id.tv_unseen_count);
@@ -107,14 +107,11 @@ public class HomeChatAdapter extends RecyclerView.Adapter<HomeChatAdapter.ViewHo
             profileImv = itemView.findViewById(R.id.profile_img);
 
             itemView.setOnClickListener(this);
-
         }
 
         void bind(HomeChat chat, int position) {
-            // update ui [name, messageText, date]
-            senderNameTV.setText(chat.getUserProfile().getUserName());
+            handleUserProfile(chat.getUserProfile());
             dateTv.setText(DateTimeUtils.getDisplayableDateOfGivenTimeStamp(context, chat.getLastMessage().getTimeStamp(), false));
-            Glide.with(context).load(chat.getUserProfile().getAvatar()).error(R.drawable.user).placeholder(R.drawable.user).into(profileImv);
 
             //unseen messages
             if (chat.getUnSeenCount() > 0) {
@@ -161,6 +158,25 @@ public class HomeChatAdapter extends RecyclerView.Adapter<HomeChatAdapter.ViewHo
                 messageStateIv.setImageResource(R.drawable.ic_sent);
         }
 
+        void handleUserProfile(Profile profile){
+            // if this user name is already saved into my contacts replace user name with this saved name
+            String name = ContactsHelper.getContactName(mHomeChatFragment.getActivity(), profile.getPhone());
+            senderNameTV.setText(name);
+
+            if (profile.getPhone().equals(name) && !profile.getUserName().equals(profile.getPhone())){
+                // this user is not in my contacts list
+                nonContactNAmeTv.setVisibility(View.VISIBLE);
+                nonContactNAmeTv.setText(String.format("~ %s", profile.getUserName()));
+            }else {
+                nonContactNAmeTv.setVisibility(View.GONE);
+            }
+
+            Glide.with(context).load(profile.getAvatar())
+                    .error(R.drawable.user)
+                    .placeholder(R.drawable.user)
+                    .into(profileImv);
+        }
+
         @Override
         public void onClick(View view) {
             mHomeChatListener.onClick(mChatList.get(getAdapterPosition()), getAdapterPosition());
@@ -201,7 +217,6 @@ public class HomeChatAdapter extends RecyclerView.Adapter<HomeChatAdapter.ViewHo
         mChatList.beginBatchedUpdates();
         for (int i = 0; i < mChatList.size(); i++) {
             if (mChatList.get(i).getChatId().equals(chat.getChatId())) {
-                chat.getUserProfile().setUserName(ContactsHelper.getContactName(mHomeChatFragment.getActivity(), chat.getUserProfile().getPhone()));
                 mChatList.updateItemAt(i, chat);
             }
         }
@@ -216,5 +231,4 @@ public class HomeChatAdapter extends RecyclerView.Adapter<HomeChatAdapter.ViewHo
     private boolean isLastItem(int position) {
         return position == getItemCount() - 1;
     }
-
 }

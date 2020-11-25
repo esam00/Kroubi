@@ -1,10 +1,5 @@
 package com.essam.chatapp.ui.chat.adapter;
 
-
-/*
-  Created by esammosbah1@gmail.com on 01/10/19.
- */
-
 import android.app.Dialog;
 import android.content.Context;
 import android.graphics.Color;
@@ -17,6 +12,7 @@ import android.view.ViewGroup;
 import android.view.Window;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.ProgressBar;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
@@ -27,12 +23,17 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.load.engine.DiskCacheStrategy;
 import com.essam.chatapp.R;
+import com.essam.chatapp.firebase.FirebaseManager;
+import com.essam.chatapp.models.Content;
 import com.essam.chatapp.models.Message;
 import com.essam.chatapp.utils.DateTimeUtils;
 import com.google.firebase.auth.FirebaseAuth;
 
 import java.util.List;
 
+/*
+  Created by esammosbah1@gmail.com on 01/10/19.
+ */
 public class ChatAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
     private List<Message> mMessages;
     private Context mContext;
@@ -41,25 +42,22 @@ public class ChatAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
     private static final int VIEW_TYPE_OUTGOING = 1;
     private static final int VIEW_TYPE_RECEIVED = 2;
 
-    public ChatAdapter(ChatListener listener,Context context) {
+    public ChatAdapter(ChatListener listener, Context context) {
         this.mContext = context;
         this.mListener = listener;
     }
 
-    public interface ChatListener{
+    public interface ChatListener {
         void onUpdateComingMessageAsSeen(String messageId);
     }
 
-    // Determine the appropriate ViewType according to the sender of the message.
     @Override
     public int getItemViewType(int position) {
-        Message message = mMessages.get(position);
-        boolean isReceiving = !message.getCreatorId().equals(FirebaseAuth.getInstance().getUid());
-
-        if (isReceiving) {
-            return VIEW_TYPE_RECEIVED;
-        } else {
+        // getItemViewType according to the message creator.
+        if (mMessages.get(position).getCreatorId().equals(FirebaseManager.getInstance().getMyUid())) {
             return VIEW_TYPE_OUTGOING;
+        } else {
+            return VIEW_TYPE_RECEIVED;
         }
     }
 
@@ -68,7 +66,6 @@ public class ChatAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
     public RecyclerView.ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         View view;
         LayoutInflater inflater = LayoutInflater.from(parent.getContext());
-
         if (viewType == VIEW_TYPE_OUTGOING) {
             view = inflater.inflate(R.layout.item_outgoing_message, parent, false);
             return new SenderViewHolder(view);
@@ -82,10 +79,10 @@ public class ChatAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
     public void onBindViewHolder(@NonNull RecyclerView.ViewHolder holder, int position) {
         switch (holder.getItemViewType()) {
             case VIEW_TYPE_OUTGOING:
-                ((SenderViewHolder) holder).bind(position);
+                ((SenderViewHolder) holder).bind(mMessages.get(position));
                 break;
             case VIEW_TYPE_RECEIVED:
-                ((ReceiverViewHolder) holder).bind(position);
+                ((ReceiverViewHolder) holder).bind(mMessages.get(position));
                 break;
         }
     }
@@ -99,70 +96,71 @@ public class ChatAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
     }
 
     class SenderViewHolder extends RecyclerView.ViewHolder {
-
-        private TextView messageTextView;
-        private TextView smallMessageTv;
-        private TextView sentAtTextView;
-        private ImageView messageStateIV;
-        private ImageView imageMessageIv;
+        private TextView messageTv, smallMessageTv, sentAtTv;
+        private ImageView messageStateIV, imageMessageIv;
         private LinearLayout llMessageBody;
+        private ProgressBar loadingProgress;
 
         SenderViewHolder(View itemView) {
             super(itemView);
-            messageTextView = itemView.findViewById(R.id.tv_message);
+            messageTv = itemView.findViewById(R.id.tv_message);
             smallMessageTv = itemView.findViewById(R.id.tv_small_message);
-            sentAtTextView = itemView.findViewById(R.id.tv_time);
+            sentAtTv = itemView.findViewById(R.id.tv_time);
             messageStateIV = itemView.findViewById(R.id.iv_message_state);
             imageMessageIv = itemView.findViewById(R.id.image_message_iv);
             llMessageBody = itemView.findViewById(R.id.ll_message_body);
+            loadingProgress = itemView.findViewById(R.id.loading_progress);
         }
 
-        void bind(final int position) {
-            final Message message = mMessages.get(position);
-
-            // set background
-            setItemLayoutBackground(position);
-
-            //bind message sent time
-            sentAtTextView.setText(DateTimeUtils.getDisplayableDateOfGivenTimeStamp(mContext,message.getTimeStamp(),true));
-
-            //bind message text
-            bindMessageText(message);
-
-            //bind message image
-            bindMessageMedia(message);
-
-            //bind seen
+        void bind(final Message message) {
+            setItemLayoutBackground();
+            handleMessageText(message);
+            handleMessageMedia(message);
             handleSeenUi(message.isSeen());
+            sentAtTv.setText(DateTimeUtils.getDisplayableDateOfGivenTimeStamp(
+                    mContext, message.getTimeStamp(), true));
+
+            imageMessageIv.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    dialogZoom(Uri.parse(message.getMedia()));
+                }
+            });
         }
 
-        void bindMessageText(Message message) {
-            String textMinimumLong = "This is a short message";
-            String messageText = message.getMessage();
-            int messageLength = messageText.length();
-
-            if (messageLength <= textMinimumLong.length()) {
-                messageTextView.setVisibility(View.GONE);
-                smallMessageTv.setVisibility(View.VISIBLE);
-                smallMessageTv.setText(message.getMessage());
-            } else {
-                messageTextView.setVisibility(View.VISIBLE);
-                smallMessageTv.setVisibility(View.GONE);
-                messageTextView.setText(message.getMessage());
+        void handleMessageText(Message message) {
+            String messageText = "";
+            if (message.getContent() == Content.TEXT) {
+                messageText = message.getMessage();
             }
 
+            String textMinimumLong = "This is a short message";
+            int messageLength = messageText.length();
+            if (messageLength <= textMinimumLong.length()) {
+                messageTv.setVisibility(View.GONE);
+                smallMessageTv.setVisibility(View.VISIBLE);
+                smallMessageTv.setText(messageText);
+            } else {
+                messageTv.setVisibility(View.VISIBLE);
+                smallMessageTv.setVisibility(View.GONE);
+                messageTv.setText(messageText);
+            }
         }
 
-        void bindMessageMedia(final Message message) {
-            if (message.getMedia() != null && !message.getMedia().isEmpty()) {
+        void handleMessageMedia(final Message message) {
+            if (message.getContent() == Content.IMAGE) {
                 imageMessageIv.setVisibility(View.VISIBLE);
-                Glide.with(mContext).load(Uri.parse(message.getMedia())).into(imageMessageIv);
-                imageMessageIv.setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View view) {
-                        dialogZoom(Uri.parse(message.getMedia()));
-                    }
-                });
+                Glide.with(mContext).load(Uri.parse(message.getMedia()))
+                        .placeholder(R.drawable.shape_image_place_holder_bg).into(imageMessageIv);
+                if (message.isLoading()) {
+                    messageStateIV.setVisibility(View.GONE);
+                    sentAtTv.setVisibility(View.GONE);
+                    loadingProgress.setVisibility(View.VISIBLE);
+                } else {
+                    messageStateIV.setVisibility(View.VISIBLE);
+                    sentAtTv.setVisibility(View.VISIBLE);
+                    loadingProgress.setVisibility(View.GONE);
+                }
             } else {
                 imageMessageIv.setVisibility(View.GONE);
             }
@@ -175,7 +173,8 @@ public class ChatAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
                 messageStateIV.setImageResource(R.drawable.ic_sent);
         }
 
-        void setItemLayoutBackground(int position) {
+        void setItemLayoutBackground() {
+            int position = getAdapterPosition();
             RelativeLayout.LayoutParams params = new RelativeLayout.LayoutParams(
                     RelativeLayout.LayoutParams.WRAP_CONTENT,
                     RelativeLayout.LayoutParams.WRAP_CONTENT
@@ -192,54 +191,50 @@ public class ChatAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
             if (prevMessage != null && !isPreviousMessageReceivingType) {
                 params.setMargins(3, 5, 3, 8);
                 llMessageBody.setLayoutParams(params);
-                llMessageBody.setBackground(ResourcesCompat.getDrawable(mContext.getResources(),R.drawable.outgoing_second, null));
+                llMessageBody.setBackground(ResourcesCompat.getDrawable(mContext.getResources(), R.drawable.outgoing_second, null));
 
             } else {
-                // If some other user sent the message
                 params.setMargins(3, 25, 3, 8);
                 llMessageBody.setLayoutParams(params);
-                llMessageBody.setBackground(ResourcesCompat.getDrawable(mContext.getResources(),R.drawable.outgoing_first, null));
+                llMessageBody.setBackground(ResourcesCompat.getDrawable(mContext.getResources(), R.drawable.outgoing_first, null));
             }
         }
     }
 
     class ReceiverViewHolder extends RecyclerView.ViewHolder {
-
-        private TextView messageTextView;
-        private TextView smallMessageTv;
-        private TextView sentAtTextView;
+        private TextView messageTv, smallMessageTv, sentAtTv;
         private ImageView imageMessageIv;
         private LinearLayout llMessageBody;
+        private ProgressBar loadingProgress;
 
         ReceiverViewHolder(View itemView) {
             super(itemView);
-            messageTextView = itemView.findViewById(R.id.tv_message);
+            messageTv = itemView.findViewById(R.id.tv_message);
             smallMessageTv = itemView.findViewById(R.id.tv_small_message);
-            sentAtTextView = itemView.findViewById(R.id.tv_time);
+            sentAtTv = itemView.findViewById(R.id.tv_time);
             imageMessageIv = itemView.findViewById(R.id.image_message_iv);
             llMessageBody = itemView.findViewById(R.id.ll_message_body);
+            loadingProgress = itemView.findViewById(R.id.loading_progress);
         }
 
-        void bind(final int position) {
-            final Message message = mMessages.get(position);
-
-            // set background
-            setItemLayoutBackground(position);
-
-            //bind message time
-            sentAtTextView.setText(DateTimeUtils.getDisplayableDateOfGivenTimeStamp(mContext,message.getTimeStamp(),true));
-
+        void bind(final Message message) {
+            setItemLayoutBackground();
+            handleMessageText(message);
+            handleMediaMessage(message);
+            sentAtTv.setText(DateTimeUtils.getDisplayableDateOfGivenTimeStamp(mContext, message.getTimeStamp(), true));
             //update message seen = true
             mListener.onUpdateComingMessageAsSeen(message.getMessageId());
 
-            //bind message text
-            bindMessageText(message);
-
-            //bind message image
-            bindMessageMedia(message);
+            imageMessageIv.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    dialogZoom(Uri.parse(message.getMedia()));
+                }
+            });
         }
 
-        void setItemLayoutBackground(int position) {
+        void setItemLayoutBackground() {
+            int position = getAdapterPosition();
             RelativeLayout.LayoutParams params = new RelativeLayout.LayoutParams(
                     RelativeLayout.LayoutParams.WRAP_CONTENT,
                     RelativeLayout.LayoutParams.WRAP_CONTENT
@@ -256,57 +251,70 @@ public class ChatAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
             if (prevMessage != null && isPreviousMessageReceivingType) {
                 params.setMargins(3, 5, 3, 8);
                 llMessageBody.setLayoutParams(params);
-                llMessageBody.setBackground(ResourcesCompat.getDrawable(mContext.getResources(),R.drawable.receiving_second, null));
+                llMessageBody.setBackground(ResourcesCompat.getDrawable(mContext.getResources(), R.drawable.receiving_second, null));
 
             } else {
                 // If some other user sent the message
                 params.setMargins(3, 25, 3, 8);
                 llMessageBody.setLayoutParams(params);
-                llMessageBody.setBackground(ResourcesCompat.getDrawable(mContext.getResources(),R.drawable.receiving_first, null));
+                llMessageBody.setBackground(ResourcesCompat.getDrawable(mContext.getResources(), R.drawable.receiving_first, null));
             }
         }
 
-        void bindMessageText(Message message) {
+        void handleMessageText(Message message) {
+            String messageText = "";
+            if (message.getContent() == Content.TEXT) {
+                messageText = message.getMessage();
+            }
+
             String textMinimumLong = "This is a short message";
-            String messageText = message.getMessage();
             int messageLength = messageText.length();
-
             if (messageLength <= textMinimumLong.length()) {
-                messageTextView.setVisibility(View.GONE);
+                messageTv.setVisibility(View.GONE);
                 smallMessageTv.setVisibility(View.VISIBLE);
-                smallMessageTv.setText(message.getMessage());
+                smallMessageTv.setText(messageText);
             } else {
-                messageTextView.setVisibility(View.VISIBLE);
+                messageTv.setVisibility(View.VISIBLE);
                 smallMessageTv.setVisibility(View.GONE);
-                messageTextView.setText(message.getMessage());
+                messageTv.setText(messageText);
             }
         }
 
-        void bindMessageMedia(final Message message) {
-            if (message.getMedia() != null && !message.getMedia().isEmpty()) {
+        void handleMediaMessage(final Message message) {
+            if (message.getContent() == Content.IMAGE) {
                 imageMessageIv.setVisibility(View.VISIBLE);
-                Glide.with(mContext).load(Uri.parse(message.getMedia())).into(imageMessageIv);
-                imageMessageIv.setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View view) {
-                        dialogZoom(Uri.parse(message.getMedia()));
-                    }
-                });
+                if (message.isLoading()) {
+                    imageMessageIv.setEnabled(false);
+                    Glide.with(mContext).load(R.drawable.shape_image_place_holder_bg).into(imageMessageIv);
+                    sentAtTv.setVisibility(View.GONE);
+                    loadingProgress.setVisibility(View.VISIBLE);
+                } else {
+                    Glide.with(mContext).load(Uri.parse(message.getMedia()))
+                            .placeholder(R.drawable.shape_image_place_holder_bg).into(imageMessageIv);
+                    imageMessageIv.setEnabled(true);
+                    sentAtTv.setVisibility(View.VISIBLE);
+                    loadingProgress.setVisibility(View.GONE);
+                }
             } else {
+                loadingProgress.setVisibility(View.GONE);
                 imageMessageIv.setVisibility(View.GONE);
             }
         }
     }
 
-    public void setMessagesData(List<Message> messages) {
+    public void addAllMessages(List<Message> messages) {
         mMessages = messages;
         notifyDataSetChanged();
     }
 
-    public void updateSeen(int index) {
-        mMessages.get(index).setSeen(true);
-        mMessages.get(mMessages.size() - 1).setSeen(true);
-        notifyDataSetChanged();
+    public void updateMessage(Message message) {
+        for (int i = 0; i < mMessages.size(); i++) {
+            if (mMessages.get(i).getMessageId().equals(message.getMessageId())) {
+                mMessages.set(i, message);
+                notifyDataSetChanged();
+                break;
+            }
+        }
     }
 
     private void dialogZoom(Uri imgUrl) {

@@ -9,18 +9,11 @@ import com.essam.chatapp.models.Message;
 import com.essam.chatapp.models.Profile;
 import com.essam.chatapp.utils.Consts;
 import com.essam.chatapp.utils.ProjectUtils;
-import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.database.ChildEventListener;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.ValueEventListener;
-import com.google.firebase.storage.FirebaseStorage;
-import com.google.firebase.storage.StorageReference;
-import com.google.firebase.storage.UploadTask;
-
-import java.util.ArrayList;
-import java.util.List;
 
 /**
  * ChatManager is a simple class created with every [one to one] chat room
@@ -34,14 +27,9 @@ public class ChatManager {
     private String chatID;
     private Profile otherProfile, myProfile;
     private DatabaseReference mChatDb; //App/chat/chatId/
-    private DatabaseReference mySideDb, otherSideDb; // reference to this chat in both current user and other user
-
-    // vars
-    private String messageId;
-    private String currentFormatDate;
+    // reference to this chat in both current user and other user
+    private DatabaseReference mySideDb, otherSideDb;
     private int otherUnseenCount;
-    private List<String> messageIdList;
-    private int mediaUploaded;
     private FirebaseManager mManager;
     private ValueEventListener mLastUnseenCountListener;
     private HomeChat mySideChat, otherSideChat;
@@ -71,6 +59,17 @@ public class ChatManager {
         //initialize reference to chat node at other user in database >> app/user/otherUid/chat/chatID
         otherSideDb = mManager.getReferenceToSpecificUserChat(otherProfile.getId(), chatID);
         otherSideChat = new HomeChat(chatID, myProfile);
+    }
+
+    private void updateLastMessage(Message message){
+        // update home chat in mySide
+        mySideChat.setLastMessage(message);
+        mySideDb.setValue(mySideChat);
+
+        // update home chat in other side
+        otherSideChat.setLastMessage(message);
+        otherSideChat.setUnSeenCount(otherUnseenCount + 1);
+        otherSideDb.setValue(otherSideChat);
     }
 
     /* ---------------------------------------- [Read] ------------------------------------------*/
@@ -128,7 +127,41 @@ public class ChatManager {
         }
     }
 
-    /*--------------------------------------- [Write] ---------------------------------------------*/
+    /*--------------------------------------- [Write] -------------------------------------------*/
+
+    public void sendTextMessage(String inputMessage) {
+        // Top level chat creation if not created yet
+        if (chatID == null) {
+            chatID = mManager.pushNewTopLevelChat();
+            InitChatRoomInfo(chatID);
+        }
+
+        // push new child at the top level app/chat and get the message id
+        String messageId = mChatDb.push().getKey();
+        if (messageId != null) {
+            DatabaseReference newMessageDb = mChatDb.child(messageId);
+
+            Message message = new Message(messageId,
+                    inputMessage,
+                    myProfile.getId(), // creatorId
+                    ProjectUtils.getDisplayableCurrentDateTime(), // createdAt
+                    System.currentTimeMillis(), // timeٍٍٍٍٍٍٍStamp
+                    false
+            );
+
+            newMessageDb.setValue(message);
+            updateLastMessage(message);
+        }
+    }
+
+    public void sendMediaMessage(Message message, Uri uri,
+                                 StorageCallbacks.ChatCallBacks chatCallBacks) {
+
+        mChatDb.child(message.getMessageId()).setValue(message);
+        updateLastMessage(message);
+
+        FirebaseStorageManager.getInstance().uploadMessageImage(uri, chatID, message.getMessageId(), chatCallBacks);
+    }
 
     public void toggleIsTypingState(boolean isTyping) {
         if (chatID != null) {
@@ -153,52 +186,13 @@ public class ChatManager {
         otherSideDb.child(Consts.LAST_MESSAGE).child(Consts.SEEN).setValue(true);
     }
 
-    /* -----------------------------------Send Message logic[Private]---------------------------------*/
-
-    public void pushNewMessage(List<String> mediaUriList, String inputMessage) {
-        if (!mediaUriList.isEmpty()) {
-            pushMediaMessages(mediaUriList, inputMessage);
-        } else {
-            sendMessage(inputMessage);
-        }
-
+    public void updateImageMessage(String url, String messageId) {
+        mChatDb.child(messageId).child(Consts.MEDIA).setValue(url);
+        mChatDb.child(messageId).child(Consts.LOADING).setValue(false);
     }
 
-    private void pushMediaMessages(final List<String> mediaUriList, final String inputMessage) {
-        mediaUploaded = 0;
-        messageIdList = new ArrayList<>();
 
-        for (String mediaUri : mediaUriList) {
-            messageId = mChatDb.push().getKey();
-            messageIdList.add(messageId);
-
-            final StorageReference filePath = FirebaseStorage.getInstance().getReference().child(Consts.CHAT).child(chatID).child(messageId);
-            UploadTask uploadTask = filePath.putFile(Uri.parse(mediaUri));
-            uploadTask.addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
-                @Override
-                public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
-                    filePath.getDownloadUrl().addOnSuccessListener(new OnSuccessListener<Uri>() {
-                        @Override
-                        public void onSuccess(Uri uri) {
-
-                            currentFormatDate = ProjectUtils.getDisplayableCurrentDateTime();
-                            Message message = new Message(messageIdList.get(mediaUploaded), inputMessage, myProfile.getId(), currentFormatDate, uri.toString(), System.currentTimeMillis(), false);
-                            DatabaseReference newMessageDb = mChatDb.child(messageIdList.get(mediaUploaded));
-                            newMessageDb.setValue(message);
-//                            if (!isFirstTime) updateLastMessage(inputMessage,mediaUriList);
-//                            inputMessage = "";
-                            mediaUploaded++;
-                            if (mediaUriList.size() == mediaUploaded) {
-                                mediaUriList.clear();
-                            }
-                        }
-                    });
-                }
-            });
-        }
-    }
-
-    private void sendMessage(String inputMessage) {
+    public Message getImageMessagePlaceholder(String inputMessage, String imageUrl) {
         // Top level chat creation
         if (chatID == null) {
             chatID = mManager.pushNewTopLevelChat();
@@ -206,28 +200,18 @@ public class ChatManager {
         }
 
         // push new child at the top level app/chat and get the message id
-        messageId = mChatDb.push().getKey();
+        String messageId = mChatDb.push().getKey();
         if (messageId != null) {
-            DatabaseReference newMessageDb = mChatDb.child(messageId);
-
-            Message message = new Message(messageId,
+            return new Message(
+                    messageId,
                     inputMessage,
                     myProfile.getId(), // creatorId
                     ProjectUtils.getDisplayableCurrentDateTime(), // createdAt
-                    System.currentTimeMillis(), // time stamp
+                    imageUrl,
+                    System.currentTimeMillis(), // timeٍٍٍٍٍٍٍStamp
                     false
             );
-
-            newMessageDb.setValue(message);
-
-            // update home chat in mySide
-            mySideChat.setLastMessage(message);
-            mySideDb.setValue(mySideChat);
-
-            // update home chat in other side
-            otherSideChat.setLastMessage(message);
-            otherSideChat.setUnSeenCount(otherUnseenCount + 1);
-            otherSideDb.setValue(otherSideChat);
         }
+        return null;
     }
 }

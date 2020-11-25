@@ -168,10 +168,7 @@ public class HomeChatFragment extends Fragment implements HomeChatAdapter.HomeCh
     }
 
     /**
-     * onClick method of listItemClickListener interface in chats adapter
-     * if a chat is clicked this listener will be triggered and it will  return the index of the item that was clicked
-     *
-     * @param chat : selected item
+     * @param chat : selected chat item
      */
     @Override
     public void onClick(HomeChat chat, int adapterPosition) {
@@ -179,6 +176,7 @@ public class HomeChatFragment extends Fragment implements HomeChatAdapter.HomeCh
         homeChatAdapter.clearUnSeenCount(chat, adapterPosition);
 
         Intent intent = new Intent(this.getActivity(), ChatActivity.class);
+        chat.getUserProfile().setOnline(false);
         intent.putExtra(Consts.PROFILE, chat.getUserProfile());
         startActivity(intent);
     }
@@ -190,9 +188,6 @@ public class HomeChatFragment extends Fragment implements HomeChatAdapter.HomeCh
 
     @Override
     public void onNewChatAdded(HomeChat chat) {
-        // if this user name is already saved into my contacts replace user name with this saved name
-        chat.getUserProfile().setUserName(ContactsHelper.getContactName(getActivity(), chat.getUserProfile().getPhone()));
-
         chatList.add(chat);
         homeChatAdapter.addAll(chatList);
         displayChatList();

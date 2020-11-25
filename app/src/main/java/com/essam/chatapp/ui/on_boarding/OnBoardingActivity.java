@@ -35,7 +35,9 @@ public class OnBoardingActivity extends AppCompatActivity {
         mPageIndicatorView = findViewById(R.id.pageIndicatorView);
         ViewPager2 onBoardingViewPager = findViewById(R.id.introViewPager);
 
-        onBoardingViewPager.setAdapter(new OnBoardingAdapter(OnBoardingUtils.getOnBoardingItems()));
+        onBoardingViewPager.setAdapter(new OnBoardingAdapter(
+                OnBoardingUtils.getOnBoardingItems()
+        ));
 
         onBoardingViewPager.registerOnPageChangeCallback(new ViewPager2.OnPageChangeCallback() {
             @Override

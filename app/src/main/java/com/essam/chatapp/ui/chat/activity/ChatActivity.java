@@ -17,7 +17,6 @@ import android.os.Environment;
 import android.os.Handler;
 import android.provider.MediaStore;
 import android.text.Editable;
-import android.text.TextUtils;
 import android.text.TextWatcher;
 import android.util.Log;
 import android.view.MenuItem;
@@ -33,6 +32,8 @@ import com.daimajia.androidanimations.library.Techniques;
 import com.daimajia.androidanimations.library.YoYo;
 import com.essam.chatapp.R;
 import com.essam.chatapp.models.Profile;
+import com.essam.chatapp.ui.chat.presenter.ChatContract;
+import com.essam.chatapp.ui.chat.presenter.ChatPresenter;
 import com.essam.chatapp.ui.chat.adapter.ChatAdapter;
 import com.essam.chatapp.models.Message;
 import com.essam.chatapp.ui.profile.activity.UserProfileActivity;
@@ -57,13 +58,12 @@ public class ChatActivity extends AppCompatActivity implements View.OnClickListe
     private LinearLayout emptyLayout;
     private ChatAdapter adapter;
     private List<Message> listMessages;
-    private TextView titleTv, isTypingTv, loadingTv;
+    private TextView titleTv, subTitleTv, loadingTv;
     private ImageView profileIv;
 
     //vars
-    private String inputMessage;
-    private List<String> mediaUriList;
-    private SharedPrefrence prefrence;
+    private List<Uri> mediaUriList;
+    private SharedPrefrence preference;
     private Uri picUri;
     private boolean isTyping = false;
 
@@ -94,13 +94,13 @@ public class ChatActivity extends AppCompatActivity implements View.OnClickListe
         ImageView openGalleryIv = findViewById(R.id.open_gallery_iv);
         emptyLayout = findViewById(R.id.empty_ll);
         titleTv = findViewById(R.id.user_name_tv);
-        isTypingTv = findViewById(R.id.is_typing_tv);
+        subTitleTv = findViewById(R.id.subtitle_tv);
         profileIv = findViewById(R.id.profile_iv);
         LinearLayout userInfoLl = findViewById(R.id.user_info_ll);
         loadingTv = findViewById(R.id.loading_tv);
 
         mediaUriList = new ArrayList<>();
-        prefrence = SharedPrefrence.getInstance(this);
+        preference = SharedPrefrence.getInstance(this);
 
         //recyclerView
         adapter = new ChatAdapter(this, this);
@@ -109,7 +109,7 @@ public class ChatActivity extends AppCompatActivity implements View.OnClickListe
         LinearLayoutManager layoutManager = new LinearLayoutManager(this);
         layoutManager.setStackFromEnd(true);
         recyclerView.setLayoutManager(layoutManager);
-        adapter.setMessagesData(listMessages);
+        adapter.addAllMessages(listMessages);
 
         //onClickListener
         List<View> onClickViews = new ArrayList<>();
@@ -174,10 +174,6 @@ public class ChatActivity extends AppCompatActivity implements View.OnClickListe
         }
     }
 
-    private void listenForOtherProfileChanges(){
-        mPresenter.getUserProfileInfo(mOtherUserProfile.getId());
-    }
-
     private void getChatHistory() {
         if (!ProjectUtils.isNetworkConnected(this)) {
             ProjectUtils.showToast(this, getString(R.string.check_network));
@@ -187,15 +183,26 @@ public class ChatActivity extends AppCompatActivity implements View.OnClickListe
         mPresenter.getChatHistory();
     }
 
-    private void preSendMessage() {
+    private void sendTextMessage() {
         //get message that has been input by user
-        inputMessage = messageEt.getText().toString().trim();
-        if (TextUtils.isEmpty(inputMessage)) {
-            Toast.makeText(this, "Please type a message to be sent", Toast.LENGTH_SHORT).show();
+        if (!ProjectUtils.isEditTextFilled(messageEt)) {
+            Toast.makeText(this, R.string.type_message, Toast.LENGTH_SHORT).show();
         } else {
-            mPresenter.sendMessage(inputMessage, mediaUriList);
+            String inputMessage = messageEt.getText().toString().trim();
+            mPresenter.sendTextMessage(inputMessage);
             messageEt.setText("");
         }
+    }
+
+    private void sendMediaMessages(String inputMessage){
+        if (inputMessage.isEmpty())
+            inputMessage = getString(R.string.photo);
+
+        mPresenter.sendMediaMessages(inputMessage, mediaUriList);
+    }
+
+    private void listenForOtherProfileChanges(){
+        mPresenter.getUserProfileInfo(mOtherUserProfile.getId());
     }
 
     // ----------------------------------- Presenter CallBacks -----------------------------------------
@@ -216,7 +223,7 @@ public class ChatActivity extends AppCompatActivity implements View.OnClickListe
                 public void run() {
                     listenForOtherProfileChanges();
                 }
-            },1000);
+            },2000);
         }
     }
 
@@ -226,27 +233,22 @@ public class ChatActivity extends AppCompatActivity implements View.OnClickListe
             loadingTv.setVisibility(View.GONE);
             emptyLayout.setVisibility(View.GONE);
         }
-
         listMessages.add(message);
-        adapter.setMessagesData(listMessages);
+        adapter.addAllMessages(listMessages);
         recyclerView.smoothScrollToPosition(adapter.getItemCount() - 1);
     }
 
     @Override
-    public void onMessageSeen(String messageId) {
-        for (int i = 0; i < listMessages.size(); i++) {
-            if (listMessages.get(i).getMessageId().equals(messageId)) {
-                adapter.updateSeen(i);
-            }
-        }
+    public void onMessageUpdated(Message message) {
+        adapter.updateMessage(message);
     }
 
     @Override
     public void onToggleIsTyping(boolean isTyping) {
         if (isTyping)
-            isTypingTv.setText(R.string.typing);
+            subTitleTv.setText(R.string.typing);
         else
-            isTypingTv.setText(R.string.online);
+            subTitleTv.setText(R.string.online);
     }
 
     @Override
@@ -259,9 +261,9 @@ public class ChatActivity extends AppCompatActivity implements View.OnClickListe
                 .into(profileIv);
 
         if (profile.isOnline()) {
-            isTypingTv.setVisibility(View.VISIBLE);
+            subTitleTv.setVisibility(View.VISIBLE);
         } else {
-            isTypingTv.setVisibility(View.GONE);
+            subTitleTv.setVisibility(View.GONE);
         }
     }
 
@@ -305,7 +307,7 @@ public class ChatActivity extends AppCompatActivity implements View.OnClickListe
                     picUri = Uri.fromFile(file); // create
                 }
 
-                prefrence.setValue(Consts.IMAGE_URI_CAMERA, picUri.toString());
+                preference.setValue(Consts.IMAGE_URI_CAMERA, picUri.toString());
                 intent.putExtra(MediaStore.EXTRA_OUTPUT, picUri); // set the image file
                 startActivityForResult(intent, Consts.CAPTURE_IMAGE_REQUEST);
             } catch (Exception e) {
@@ -386,13 +388,12 @@ public class ChatActivity extends AppCompatActivity implements View.OnClickListe
                     if (data != null && data.getData() != null) {
                         if (data.getClipData() == null) {
                             mediaUriList = new ArrayList<>();
-                            String uri = data.getData().toString();
-                            openPhotoEditor(uri, Consts.PICK_IMAGES_REQUEST);
+                            Uri uri = data.getData();
+                            openPhotoEditor(uri.toString(), Consts.PICK_IMAGES_REQUEST);
                             mediaUriList.add(uri);
-//                            mediaUriList.add(uri);
                         } else {
                             for (int i = 0; i < data.getClipData().getItemCount(); i++) {
-                                mediaUriList.add(data.getClipData().getItemAt(i).toString());
+                                mediaUriList.add(data.getClipData().getItemAt(i).getUri());
                             }
                         }
                     }
@@ -401,23 +402,24 @@ public class ChatActivity extends AppCompatActivity implements View.OnClickListe
                 // image has been captured from camera
                 case Consts.CAPTURE_IMAGE_REQUEST:
                     if (picUri != null) {
-                        picUri = Uri.parse(prefrence.getValue(Consts.IMAGE_URI_CAMERA));
+                        picUri = Uri.parse(preference.getValue(Consts.IMAGE_URI_CAMERA));
                         mediaUriList = new ArrayList<>();
                         openPhotoEditor(picUri.toString(), Consts.CAPTURE_IMAGE_REQUEST);
-                        mediaUriList.add(picUri.toString());
+                        mediaUriList.add(picUri);
                     } else {
-                        picUri = Uri.parse(prefrence.getValue(Consts.IMAGE_URI_CAMERA));
+                        picUri = Uri.parse(preference.getValue(Consts.IMAGE_URI_CAMERA));
                         mediaUriList = new ArrayList<>();
                         openPhotoEditor(picUri.toString(), Consts.CAPTURE_IMAGE_REQUEST);
-                        mediaUriList.add(picUri.toString());
+                        mediaUriList.add(picUri);
                     }
                     break;
 
                 // resulting photo and caption from photo editor
                 case Consts.EDIT_PHOTO_REQUEST:
                     if (data != null && data.getExtras() != null && data.getStringExtra("message") != null) {
-                        inputMessage = data.getStringExtra("message");
-                        mPresenter.sendMessage(inputMessage, mediaUriList);
+                        String inputMessage = data.getStringExtra("message");
+                        assert inputMessage != null;
+                        sendMediaMessages(inputMessage);
                     } else {
                         Log.i(TAG, "onActivityResult: no Image was retrived ");
                         mediaUriList.clear();
@@ -462,7 +464,7 @@ public class ChatActivity extends AppCompatActivity implements View.OnClickListe
                 break;
 
             case R.id.send_iv:
-                preSendMessage();
+                sendTextMessage();
                 break;
 
             case R.id.send_msg_et:
@@ -498,7 +500,6 @@ public class ChatActivity extends AppCompatActivity implements View.OnClickListe
         if (filePickerLl.getVisibility() == View.VISIBLE) {
             animateFilePickerDown();
         } else {
-            mPresenter.detachView();
             super.onBackPressed();
         }
     }

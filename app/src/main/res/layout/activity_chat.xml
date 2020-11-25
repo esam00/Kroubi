@@ -50,7 +50,7 @@
                 android:textAppearance="@style/TextAppearance.AppCompat.Medium"/>
 
             <TextView
-                android:id="@+id/is_typing_tv"
+                android:id="@+id/subtitle_tv"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:background="?attr/selectableItemBackground"
