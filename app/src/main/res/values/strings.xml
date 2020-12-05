@@ -67,7 +67,7 @@
     <string name="next">Next</string>
     <string name="updated_successfully">updated successfully!</string>
     <string name="upload_profile_failed">Failed to upload profile image, please try again!</string>
-    <string name="no_chats_here_yet_select_a_friend_to_start_an_awesome_chat">No chats here yet, select a friend to start an awesome chat</string>
+    <string name="no_chat_yet">No chats here yet, Sync your contacts now to start chatting</string>
     <string name="name">Name</string>
     <string name="edit_name">Edit name</string>
     <string name="edit_status">Edit status</string>
@@ -86,6 +86,9 @@
     <string name="notifications">Notifications</string>
     <string name="type_message">Please type a message to be sent</string>
     <string name="photo">Photo</string>
+    <string name="enter_name">Please enter your full name!</string>
+    <string name="Sync_contacts">Sync Contacts</string>
+    <string name="welcome">Welcome</string>
 
     <array name="status_list">
         <item>Available</item>

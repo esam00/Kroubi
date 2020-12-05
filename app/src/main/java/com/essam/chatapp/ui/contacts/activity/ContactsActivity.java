@@ -41,7 +41,7 @@ public class ContactsActivity extends AppCompatActivity implements ContactsAdapt
     private List<User> users, contacts;
 
     // firebase
-    private  DatabaseReference appUserDb;
+    private DatabaseReference appUserDb;
 
     private static final String TAG = ContactsContract.class.getSimpleName();
 
@@ -56,7 +56,7 @@ public class ContactsActivity extends AppCompatActivity implements ContactsAdapt
         getContactsList();
     }
 
-    private void initFirebase(){
+    private void initFirebase() {
         FirebaseDatabase mDatabase = FirebaseDatabase.getInstance();
         DatabaseReference mReference = mDatabase.getReference();
         // Database reference to user/ node in firebaseDatabase
@@ -115,7 +115,7 @@ public class ContactsActivity extends AppCompatActivity implements ContactsAdapt
                 }
             }
             cursor.close();
-        }else {
+        } else {
             Log.i(TAG, "contacts list size=0");
             noUsersState();
         }
@@ -125,6 +125,7 @@ public class ContactsActivity extends AppCompatActivity implements ContactsAdapt
      * In some cases contacts application repeats phone number which is assigned
      * to more than one application [whatsAap , telegram ..]
      * So we want to display a contact only one time
+     *
      * @param phone of contact that we want to check if we already parsed it
      * @return true if contacts list contains this one
      */
@@ -141,20 +142,18 @@ public class ContactsActivity extends AppCompatActivity implements ContactsAdapt
      * For every contact of this user we will check if this contact is a user of our application
      * So we make query by phone number to check if this phone number is in our database
      * and if so add this to users list and display it
+     *
      * @param mContact item of contacts list
      */
     private void checkIfThisContactIsUser(final User mContact) {
-        Query query = appUserDb.orderByChild(Consts.PHONE).equalTo(mContact.getPhone());
-        query.addValueEventListener(new ValueEventListener() {
+        ValueEventListener eventListener = new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                 if (dataSnapshot.exists()) {
                     for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
                         User mUser = snapshot.getValue(User.class);
-                        if(mUser !=null){
-                            if (mUser.getProfile().getUserName().equals(mUser.getPhone())) {
-                                mUser.getProfile().setUserName(mContact.getProfile().getUserName());
-                            }
+                        if (mUser != null && mUser.getProfile()!= null) {
+                            mUser.getProfile().setUserName(mContact.getProfile().getUserName());
                             users.add(mUser);
                         }
                         contactsAdapter.notifyDataSetChanged();
@@ -164,15 +163,18 @@ public class ContactsActivity extends AppCompatActivity implements ContactsAdapt
             }
 
             @Override
-            public void onCancelled(@NonNull DatabaseError databaseError) {
+            public void onCancelled(@NonNull DatabaseError error) {
             }
-        });
+        };
+        Query query = appUserDb.orderByChild(Consts.PHONE).equalTo(mContact.getPhone());
+        query.addListenerForSingleValueEvent(eventListener);
     }
 
     /**
      * isoPrefix is country code before each number like [+20, +966 ..]
      * this must be added to the phone number because all numbers in
      * firebase database starts with this iso code
+     *
      * @return iso according to country
      */
     private String getCountryIso() {
@@ -188,7 +190,7 @@ public class ContactsActivity extends AppCompatActivity implements ContactsAdapt
         return ContactsHelper.getPhone(iso);
     }
 
-    private void noUsersState(){
+    private void noUsersState() {
         emptyTextView.setVisibility(View.VISIBLE);
         progressBar.setVisibility(View.GONE);
         contactsRv.setVisibility(View.GONE);
@@ -197,14 +199,14 @@ public class ContactsActivity extends AppCompatActivity implements ContactsAdapt
     @Override
     public void onClick(final int index) {
         Intent intent = new Intent(ContactsActivity.this, ChatActivity.class);
-        intent.putExtra(Consts.PROFILE,users.get(index).getProfile());
+        intent.putExtra(Consts.PROFILE, users.get(index).getProfile());
         startActivity(intent);
         finish();
     }
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        if(item.getItemId() == android.R.id.home){
+        if (item.getItemId() == android.R.id.home) {
             onBackPressed(); // make up button behave like back button
             return true;
         }

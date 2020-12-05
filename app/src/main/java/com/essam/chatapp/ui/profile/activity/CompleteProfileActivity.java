@@ -97,10 +97,12 @@ public class CompleteProfileActivity extends AppCompatActivity implements Profil
     }
 
     private void updateProfile() {
-        if (ProjectUtils.isEditTextFilled(nameEt)) {
-            myProfile.setUserName(nameEt.getText().toString());
+        if (!ProjectUtils.isEditTextFilled(nameEt)) {
+            Toast.makeText(this, R.string.enter_name, Toast.LENGTH_SHORT).show();
+            nameEt.requestFocus();
+            return;
         }
-
+        myProfile.setUserName(nameEt.getText().toString());
         mPresenter.updateProfile(myProfile);
         gotoHome();
     }

@@ -31,7 +31,6 @@
             android:layout_height="wrap_content"
             android:animateLayoutChanges="true"
             android:orientation="vertical"
-
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent">
@@ -65,6 +64,8 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:autofillHints="Add your name"
+                    android:paddingEnd="35dp"
+                    android:paddingStart="15dp"
                     android:hint="@string/what_are_you_thinking_of"
                     android:inputType="textCapWords"
                     android:textColor="@color/colorPrimaryText"

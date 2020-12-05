@@ -1,47 +1,93 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools"
-    android:layout_width="wrap_content"
-    android:layout_height="wrap_content"
+
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    android:layout_marginStart="15dp"
-    android:layout_marginTop="15dp"
-    android:layout_marginEnd="15dp">
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/parent_view"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_marginBottom=".3dp"
+    android:background="@drawable/ripple_effect_basic"
+    android:clickable="true"
+    android:focusable="true">
 
-    <de.hdodenhof.circleimageview.CircleImageView
-        android:id="@+id/contact_img"
-        android:layout_width="60dp"
-        android:layout_height="60dp"
-        android:layout_marginEnd="14dp"
-        android:layout_marginRight="14dp"
-        app:civ_circle_background_color="@color/colorPrimaryDark"
-        android:src="@drawable/user" />
-
-    <LinearLayout
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/profileLayout"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_toEndOf="@+id/contact_img"
-        android:layout_centerVertical="true"
-        android:layout_toRightOf="@+id/contact_img"
-        android:orientation="vertical">
+        android:padding="12dp"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent">
+
+        <de.hdodenhof.circleimageview.CircleImageView
+            android:id="@+id/profile_iv"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:src="@drawable/user"
+            app:civ_circle_background_color="@color/colorPrimary"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/constraintLayout"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:paddingStart="0dp"
+        android:paddingEnd="12dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toEndOf="@+id/profileLayout"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.47000003">
 
         <TextView
-            android:id="@+id/tv_contact_name"
+            android:id="@+id/contact_name_tv"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginBottom="5dp"
-            android:textAppearance="@android:style/TextAppearance.DeviceDefault.Large"
             android:textColor="@color/colorPrimaryText"
-            android:textSize="18sp"
-            tools:text="احمد محمد"/>
+            android:textSize="16sp"
+            android:maxLines="1"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            tools:text="Ahmed Rashed" />
 
         <TextView
-            android:id="@+id/tv_status"
+            android:id="@+id/non_contact_name"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:textColor="@color/colorSecondaryText"
-            android:textSize="15sp"
-            tools:text="ألحياة روح والموسيقى روح الحياة"/>
+            android:layout_marginStart="5dp"
+            android:textColor="@color/colorAccent"
+            android:textSize="12sp"
+            android:visibility="gone"
+            android:maxLines="1"
+            app:layout_constraintStart_toStartOf="@+id/contact_name_tv"
+            app:layout_constraintTop_toBottomOf="@+id/contact_name_tv"
+            tools:text="Essam mosbah" />
 
-    </LinearLayout>
-</RelativeLayout>
+        <LinearLayout
+            android:id="@+id/linearLayout"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="2dp"
+            android:gravity="center_vertical"
+            android:orientation="horizontal"
+            app:layout_constraintStart_toStartOf="@+id/non_contact_name"
+            app:layout_constraintTop_toBottomOf="@+id/non_contact_name">
+
+            <TextView
+                android:id="@+id/status_tv"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:ellipsize="end"
+                android:maxLines="1"
+                android:textColor="@color/colorSecondaryText"
+                android:textSize="15sp"
+                tools:text="Hello, how are you? i hope you are doing well" />
+
+        </LinearLayout>
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+</androidx.constraintlayout.widget.ConstraintLayout>

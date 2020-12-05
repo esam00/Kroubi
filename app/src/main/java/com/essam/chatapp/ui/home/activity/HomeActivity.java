@@ -144,7 +144,7 @@ public class HomeActivity extends AppCompatActivity{
         }
     }
 
-    private void openContactsActivity() {
+    public void openContactsActivity() {
         if (ProjectUtils.hasPermissionInManifest(this, Consts.DISPLAY_CONTACTS_ACTIVITY, Manifest.permission.READ_CONTACTS))
             startActivity(new Intent(HomeActivity.this, ContactsActivity.class));
     }

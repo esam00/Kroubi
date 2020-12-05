@@ -3,11 +3,13 @@ package com.essam.chatapp.ui.contacts.adapter;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.bumptech.glide.Glide;
 import com.essam.chatapp.R;
 import com.essam.chatapp.models.User;
 
@@ -16,9 +18,7 @@ import java.util.List;
 public class ContactsAdapter extends RecyclerView.Adapter<ContactsAdapter.ViewHolder> {
 
     private List<User> mUsers;
-
     private ListItemClickListener listItemClickListener;
-
     public interface ListItemClickListener {
         void onClick(int index);
     }
@@ -30,17 +30,24 @@ public class ContactsAdapter extends RecyclerView.Adapter<ContactsAdapter.ViewHo
 
     public class ViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
         private TextView contactNameTV, statusTv;
+        private ImageView profileIv;
 
         ViewHolder(@NonNull View itemView) {
             super(itemView);
-            contactNameTV = itemView.findViewById(R.id.tv_contact_name);
-            statusTv = itemView.findViewById(R.id.tv_status);
+            contactNameTV = itemView.findViewById(R.id.contact_name_tv);
+            statusTv = itemView.findViewById(R.id.status_tv);
+            profileIv = itemView.findViewById(R.id.profile_iv);
             itemView.setOnClickListener(this);
 
         }
         void bind (User user){
             contactNameTV.setText(user.getProfile().getUserName());
-            statusTv.setText(user.getPhone());
+            statusTv.setText(user.getProfile().getStatus());
+
+            Glide.with(itemView.getContext()).load(user.getProfile().getAvatar())
+                    .error(R.drawable.user)
+                    .placeholder(R.drawable.user)
+                    .into(profileIv);
         }
 
         @Override
@@ -48,7 +55,6 @@ public class ContactsAdapter extends RecyclerView.Adapter<ContactsAdapter.ViewHo
             listItemClickListener.onClick(getAdapterPosition());
         }
     }
-
 
     @NonNull
     @Override

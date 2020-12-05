@@ -8,38 +8,25 @@
     tools:context=".ui.home.fragments.chat.HomeChatFragment">
 
     <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/my_messages_rv"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:paddingBottom="70dp"
         android:clipToPadding="false"
-        android:id="@+id/my_messages_rv"/>
+        android:paddingBottom="70dp" />
 
-    <LinearLayout
-        android:id="@+id/welcome_ll"
+    <com.facebook.shimmer.ShimmerFrameLayout
+        android:id="@+id/shimmer_view_container"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="vertical"
         android:visibility="gone"
-        android:layout_centerInParent="true">
+        android:layout_height="wrap_content">
+        <include layout="@layout/layout_shimmer_loading"/>
+    </com.facebook.shimmer.ShimmerFrameLayout>
 
-        <ImageView
-            android:id="@+id/welcome_animation"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:src="@drawable/ic_logo_disabled"
-            android:layout_gravity="center"
-            android:contentDescription="@string/app_name"/>
+    <include layout="@layout/layout_first_time"
+        android:id="@+id/first_time_layout"
+        android:visibility="gone"/>
 
-        <TextView
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:gravity="center"
-            android:layout_margin="10dp"
-            android:padding="5dp"
-            android:textColor="@color/colorSecondaryText"
-            android:textAppearance="@android:style/TextAppearance.DeviceDefault.Small"
-            android:text="@string/no_chats_here_yet_select_a_friend_to_start_an_awesome_chat" />
-
-    </LinearLayout>
-
+    <include layout="@layout/layout_no_internet"
+        android:id="@+id/no_internet_layout"
+        android:visibility="gone"/>
 </RelativeLayout>

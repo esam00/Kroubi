@@ -18,18 +18,18 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.Window;
+import android.widget.Button;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.airbnb.lottie.LottieAnimationView;
 import com.essam.chatapp.R;
 import com.essam.chatapp.models.HomeChat;
-import com.essam.chatapp.ui.contacts.utils.ContactsHelper;
 import com.essam.chatapp.ui.home.fragments.chat.adapter.HomeChatAdapter;
 import com.essam.chatapp.utils.ProjectUtils;
 import com.essam.chatapp.ui.chat.activity.ChatActivity;
 import com.essam.chatapp.utils.Consts;
+import com.facebook.shimmer.ShimmerFrameLayout;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -38,17 +38,15 @@ import java.util.Observer;
 
 public class HomeChatFragment extends Fragment implements HomeChatAdapter.HomeChatListener,
         Observer, HomeChatContract.View {
-
     private RecyclerView homeChatRv;
     private HomeChatAdapter homeChatAdapter;
-    private LinearLayout welcomeLl;
     private List<HomeChat> chatList = new ArrayList<>();
-    private Dialog loadingDialog;
-
     private Context mContext;
     private boolean showNotification;
+    private LinearLayout firstTimeLayout, noInternetLayout;
+    private ShimmerFrameLayout loadingLayout;
 
-    private HomeChatPresenter mPresenter = new HomeChatPresenter(this);
+    private HomeChatPresenter mPresenter;
     private final static String TAG = HomeChatFragment.class.getSimpleName();
 
     public HomeChatFragment() {
@@ -65,17 +63,18 @@ public class HomeChatFragment extends Fragment implements HomeChatAdapter.HomeCh
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
+        mPresenter = new HomeChatPresenter(this);
         // Inflate the layout for this fragment
         View view = inflater.inflate(R.layout.fragment_chats, container, false);
-
         initViews(view);
         checkContactsPermission();
         return view;
     }
 
     private void initViews(View view) {
-        welcomeLl = view.findViewById(R.id.welcome_ll);
-
+        firstTimeLayout = view.findViewById(R.id.first_time_layout);
+        noInternetLayout= view.findViewById(R.id.no_internet_layout);
+        loadingLayout= view.findViewById(R.id.shimmer_view_container);
         // recyclerView
         chatList = new ArrayList<>();
         homeChatRv = view.findViewById(R.id.my_messages_rv);
@@ -83,6 +82,14 @@ public class HomeChatFragment extends Fragment implements HomeChatAdapter.HomeCh
         homeChatRv.setAdapter(homeChatAdapter);
         LinearLayoutManager layoutManager = new LinearLayoutManager(this.getContext());
         homeChatRv.setLayoutManager(layoutManager);
+
+        Button refreshButton = view.findViewById(R.id.refresh_btn);
+        refreshButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                checkContactsPermission();
+            }
+        });
     }
 
     /**
@@ -98,57 +105,35 @@ public class HomeChatFragment extends Fragment implements HomeChatAdapter.HomeCh
             getUserChatList();
     }
 
-    /**
-     * fetching previous chats AND listen for new messages
-     */
     private void getUserChatList() {
         if (!ProjectUtils.isNetworkConnected(mContext)) {
-            ProjectUtils.showToast(getActivity(), "Check your network connection!");
+            noInternetLayout.setVisibility(View.VISIBLE);
             return;
         }
-        showLoadingDialog();
+
+        noInternetLayout.setVisibility(View.GONE);
+        loadingLayout.setVisibility(View.VISIBLE);
         mPresenter.getUserChatList();
     }
 
-    /**
-     * hide loading and display user chats list as soon as they are successfully fetched
-     */
     private void displayChatList() {
         hideLoading();
         homeChatRv.setVisibility(View.VISIBLE);
-        welcomeLl.setVisibility(View.GONE);
+        firstTimeLayout.setVisibility(View.GONE);
     }
 
     /**
      * If this is the first time for user display a nice welcome view or animation
      */
-    private void hideChatListAndDisplayWelcomeAnimation() {
+    private void hideChatListAndDisplayWelcomeView() {
         hideLoading();
         homeChatRv.setVisibility(View.GONE);
-        welcomeLl.setVisibility(View.VISIBLE);
-    }
-
-    private void showLoadingDialog() {
-        loadingDialog = new Dialog(mContext);
-        loadingDialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
-        loadingDialog.setContentView(R.layout.dialog_loading);
-        loadingDialog.setCancelable(false);
-
-        LottieAnimationView lottieAnimationView = loadingDialog.findViewById(R.id.loading_animation);
-        lottieAnimationView.playAnimation();
-
-        loadingDialog.show();
-        Window window = loadingDialog.getWindow();
-        if (window != null) {
-            loadingDialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
-            window.setLayout(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);
-        }
+        firstTimeLayout.setVisibility(View.VISIBLE);
     }
 
     private void hideLoading() {
         Log.i(TAG, "hideLoading: ");
-        loadingDialog.dismiss();
-        if (showNotification) showNotificationDialog();
+        loadingLayout.setVisibility(View.GONE);
     }
 
     private void showNotificationDialog() {
@@ -172,7 +157,7 @@ public class HomeChatFragment extends Fragment implements HomeChatAdapter.HomeCh
      */
     @Override
     public void onClick(HomeChat chat, int adapterPosition) {
-        // clear un seen count for this conversation
+        // clear unseen count for this conversation
         homeChatAdapter.clearUnSeenCount(chat, adapterPosition);
 
         Intent intent = new Intent(this.getActivity(), ChatActivity.class);
@@ -182,9 +167,17 @@ public class HomeChatFragment extends Fragment implements HomeChatAdapter.HomeCh
     }
 
     @Override
+    public void onDestroy() {
+        super.onDestroy();
+        mPresenter.detachView();
+    }
+
+    @Override
     public void update(Observable o, Object arg) {
         getUserChatList();
     }
+
+    /* ----------------------------------- Presenter Callbacks -----------------------------------*/
 
     @Override
     public void onNewChatAdded(HomeChat chat) {
@@ -201,20 +194,14 @@ public class HomeChatFragment extends Fragment implements HomeChatAdapter.HomeCh
 
     @Override
     public void onCheckExistingChats(boolean hasPreviousChats) {
-        if (!hasPreviousChats){
+        if (!hasPreviousChats) {
             // no conversations yet
-            hideChatListAndDisplayWelcomeAnimation();
+            hideChatListAndDisplayWelcomeView();
         }
     }
 
     @Override
     public void onNetworkError() {
         Toast.makeText(mContext, R.string.network_error_msg, Toast.LENGTH_SHORT).show();
-    }
-
-    @Override
-    public void onDestroy() {
-        super.onDestroy();
-        mPresenter.detachView();
     }
 }
