@@ -6,8 +6,8 @@ import android.util.Log;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
-import com.essam.chatapp.firebase.ChatManager;
-import com.essam.chatapp.firebase.StorageCallbacks;
+import com.essam.chatapp.firebase.data.ChatManager;
+import com.essam.chatapp.firebase.data.StorageCallbacks;
 import com.essam.chatapp.models.HomeChat;
 import com.essam.chatapp.models.Message;
 import com.essam.chatapp.models.Profile;

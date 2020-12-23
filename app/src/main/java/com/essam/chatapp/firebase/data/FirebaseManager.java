@@ -1,4 +1,4 @@
-package com.essam.chatapp.firebase;
+package com.essam.chatapp.firebase.data;
 
 import com.essam.chatapp.models.Profile;
 import com.essam.chatapp.models.User;
@@ -28,6 +28,7 @@ public class FirebaseManager {
     private FirebaseAuth mFirebaseAuth;
     private DatabaseReference appUserDb;        //App/user/
     private DatabaseReference appChatDb;        //App/chat/
+    private DatabaseReference appServerDb;        //App/server/
     private DatabaseReference mUserDb;          //App/user/uid/
     private DatabaseReference userChatDb;       //App/user/uid/chat/
     private DatabaseReference userProfileDb;    //App/user/uid/profile/
@@ -48,12 +49,17 @@ public class FirebaseManager {
         DatabaseReference rootDbReference = FirebaseDatabase.getInstance().getReference();
         appUserDb = rootDbReference.child(Consts.USER);
         appChatDb = rootDbReference.child(Consts.CHAT);
+        appServerDb = rootDbReference.child(Consts.SERVER);
 
         if (isUserLoggedIn()) {
             mUserDb = appUserDb.child(getMyUid());
             userChatDb = mUserDb.child(Consts.CHAT);
             userProfileDb = mUserDb.child(Consts.PROFILE);
         }
+    }
+
+    public void getServerKey(ValueEventListener listener){
+        appServerDb.addListenerForSingleValueEvent(listener);
     }
 
     /* ---------------------------------- Authentication ----------------------------------------*/
@@ -64,6 +70,10 @@ public class FirebaseManager {
 
     public FirebaseAuth getFirebaseAuth() {
         return mFirebaseAuth;
+    }
+
+    public void updateFirebaseToken(String token){
+        userProfileDb.child(Consts.FCM_TOKEN).setValue(token);
     }
 
     public void updateUserAuthState(UserAuthState state) {
@@ -167,8 +177,7 @@ public class FirebaseManager {
     public void addNewUserToDataBase() {
         User user = new User(
                 getMyUid(),
-                getMyPhone(),
-                new Profile()
+                getMyPhone()
         );
         mUserDb.setValue(user);
     }

@@ -17,7 +17,7 @@ import androidx.viewpager2.widget.ViewPager2;
 
 import com.bumptech.glide.Glide;
 import com.essam.chatapp.R;
-import com.essam.chatapp.firebase.FirebaseManager;
+import com.essam.chatapp.firebase.data.FirebaseManager;
 import com.essam.chatapp.ui.contacts.activity.ContactsActivity;
 import com.essam.chatapp.ui.home.adapter.ViewPagerAdapter;
 import com.essam.chatapp.ui.LoginPhoneNumberActivity;

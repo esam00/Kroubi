@@ -46,6 +46,7 @@ public class CompleteProfileActivity extends AppCompatActivity implements Profil
         setContentView(R.layout.activity_complete_profile);
 
         mPresenter = new ProfilePresenter(this, SharedPrefrence.getInstance(this));
+        myProfile = new Profile();
         initViews();
 
         // get current user profile info and subscribe for upcoming changes

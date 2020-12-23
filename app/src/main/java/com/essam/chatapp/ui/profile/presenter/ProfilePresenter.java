@@ -4,9 +4,9 @@ import android.net.Uri;
 
 import androidx.annotation.NonNull;
 
-import com.essam.chatapp.firebase.FirebaseManager;
-import com.essam.chatapp.firebase.FirebaseStorageManager;
-import com.essam.chatapp.firebase.StorageCallbacks;
+import com.essam.chatapp.firebase.data.FirebaseManager;
+import com.essam.chatapp.firebase.data.FirebaseStorageManager;
+import com.essam.chatapp.firebase.data.StorageCallbacks;
 import com.essam.chatapp.models.Profile;
 import com.essam.chatapp.utils.Consts;
 import com.essam.chatapp.utils.SharedPrefrence;

@@ -1,9 +1,12 @@
-package com.essam.chatapp.firebase;
+package com.essam.chatapp.firebase.data;
 
 import android.net.Uri;
 
 import androidx.annotation.NonNull;
 
+import com.essam.chatapp.firebase.fcm.FcmUtils;
+import com.essam.chatapp.firebase.fcm.FirebaseCloudMessage;
+import com.essam.chatapp.models.Data;
 import com.essam.chatapp.models.HomeChat;
 import com.essam.chatapp.models.Message;
 import com.essam.chatapp.models.Profile;
@@ -61,7 +64,7 @@ public class ChatManager {
         otherSideChat = new HomeChat(chatID, myProfile);
     }
 
-    private void updateLastMessage(Message message){
+    private void updateLastMessage(Message message) {
         // update home chat in mySide
         mySideChat.setLastMessage(message);
         mySideDb.setValue(mySideChat);
@@ -151,7 +154,17 @@ public class ChatManager {
 
             newMessageDb.setValue(message);
             updateLastMessage(message);
+
+            // finally push notification
+            pushMessageNotification(message);
+
         }
+    }
+
+    private void pushMessageNotification(Message message) {
+        Data data = new Data(message, myProfile);
+        FirebaseCloudMessage firebaseCloudMessage = new FirebaseCloudMessage(otherProfile.getToken(), data);
+        FcmUtils.pushNewMessageNotification(firebaseCloudMessage);
     }
 
     public void sendMediaMessage(Message message, Uri uri,

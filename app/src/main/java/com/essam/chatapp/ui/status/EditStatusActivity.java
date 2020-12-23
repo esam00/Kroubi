@@ -15,7 +15,7 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.essam.chatapp.R;
-import com.essam.chatapp.firebase.FirebaseManager;
+import com.essam.chatapp.firebase.data.FirebaseManager;
 import com.essam.chatapp.models.Status;
 import com.essam.chatapp.utils.Consts;
 import com.essam.chatapp.utils.ProjectUtils;

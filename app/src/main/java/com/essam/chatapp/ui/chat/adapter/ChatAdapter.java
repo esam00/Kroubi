@@ -23,7 +23,7 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.load.engine.DiskCacheStrategy;
 import com.essam.chatapp.R;
-import com.essam.chatapp.firebase.FirebaseManager;
+import com.essam.chatapp.firebase.data.FirebaseManager;
 import com.essam.chatapp.models.Content;
 import com.essam.chatapp.models.Message;
 import com.essam.chatapp.utils.DateTimeUtils;

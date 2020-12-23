@@ -5,13 +5,15 @@ import android.util.Log;
 
 import androidx.annotation.NonNull;
 
-import com.essam.chatapp.firebase.FirebaseManager;
+import com.essam.chatapp.firebase.data.FirebaseManager;
+import com.essam.chatapp.firebase.fcm.FcmUtils;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.FirebaseException;
 import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.PhoneAuthCredential;
+import com.google.firebase.auth.PhoneAuthOptions;
 import com.google.firebase.auth.PhoneAuthProvider;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
@@ -58,11 +60,13 @@ public class VerificationPresenter implements VerificationContract.Presenter {
             }
         };
 
-        PhoneAuthProvider.getInstance().verifyPhoneNumber(phoneNumber,
-                60,
-                TimeUnit.SECONDS,
-                (Activity) mView,
-                loginPhoneCallBack);
+        PhoneAuthOptions phoneAuthOptions = PhoneAuthOptions.newBuilder()
+                .setPhoneNumber(phoneNumber)       // Phone number to verify
+                .setTimeout(60L, TimeUnit.SECONDS) // Timeout and unit
+                .setActivity((Activity) mView)                 // Activity (for callback binding)
+                .setCallbacks(loginPhoneCallBack)
+                .build();
+        PhoneAuthProvider.verifyPhoneNumber(phoneAuthOptions);
     }
 
     @Override
@@ -99,6 +103,8 @@ public class VerificationPresenter implements VerificationContract.Presenter {
                     // If not found in database >> just push new user with basic info [Uid, phone]
                     addNewUserToDatabase();
                 }
+
+                FcmUtils.initFcm();
             }
 
             @Override

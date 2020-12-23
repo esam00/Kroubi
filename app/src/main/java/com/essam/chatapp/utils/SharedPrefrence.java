@@ -50,6 +50,7 @@ public class SharedPrefrence {
         setValue(Consts.PHONE, profile.getPhone());
         setValue(Consts.AVATAR, profile.getAvatar());
         setValue(Consts.STATUS, profile.getStatus());
+        setValue(Consts.FCM_TOKEN, profile.getToken());
     }
 
     public Profile getMyProfile(){
@@ -59,8 +60,8 @@ public class SharedPrefrence {
                 getValue(Consts.PHONE),
                 getValue(Consts.AVATAR),
                 getValue(Consts.STATUS),
-                true
-        );
+                true,
+                getValue(Consts.FCM_TOKEN));
     }
 
     public void setIntValue(String Tag, int value) {

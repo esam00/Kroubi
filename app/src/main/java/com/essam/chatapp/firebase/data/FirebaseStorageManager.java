@@ -1,4 +1,4 @@
-package com.essam.chatapp.firebase;
+package com.essam.chatapp.firebase.data;
 
 import android.net.Uri;
 

@@ -5,6 +5,8 @@ public class Consts {
     //firebase
     public static final String USER = "user";
     public static final String CHAT = "chat";
+    public static final String SERVER ="server" ;
+
     public static final String PROFILE = "profile";
     public static final String PROFILE_IMAGES = "profile_images";
     public static final String CHAT_IMAGES = "chat_images";
@@ -45,4 +47,7 @@ public class Consts {
     public static final String LAST_MESSAGE = "lastMessage" ;
     public static final String OTHER_TYPING = "otherTyping" ;
     public static final String LOADING = "loading";
+    public static final String FCM_TOKEN = "token" ;
+    public static final String BASE_URL = "https://fcm.googleapis.com/fcm/";
+    public static final String SERVER_KEY ="serverKey" ;
 }

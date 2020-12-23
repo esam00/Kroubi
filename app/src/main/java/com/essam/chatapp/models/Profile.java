@@ -10,18 +10,21 @@ public class Profile implements Parcelable {
     private String avatar;
     private String status;
     private boolean isOnline;
+    private String token;
+
 
     public Profile() {
         // Default constructor required for calls to DataSnapshot.getValue(Profile.class)
     }
 
-    public Profile(String id, String userName, String phone, String avatar, String status, boolean isOnline) {
+    public Profile(String id, String userName, String phone, String avatar, String status, boolean isOnline, String token) {
         this.id = id;
         this.userName = userName;
         this.phone = phone;
         this.avatar = avatar;
         this.status = status;
         this.isOnline = isOnline;
+        this.token = token;
     }
 
     public Profile(String userName) {
@@ -35,6 +38,8 @@ public class Profile implements Parcelable {
         avatar = in.readString();
         status = in.readString();
         isOnline = in.readByte() != 0;
+        token = in.readString();
+
     }
 
     public static final Creator<Profile> CREATOR = new Creator<Profile>() {
@@ -97,6 +102,14 @@ public class Profile implements Parcelable {
         this.userName = userName;
     }
 
+    public String getToken() {
+        return token;
+    }
+
+    public void setToken(String token) {
+        this.token = token;
+    }
+
     @Override
     public int describeContents() {
         return 0;
@@ -110,5 +123,6 @@ public class Profile implements Parcelable {
         dest.writeString(avatar);
         dest.writeString(status);
         dest.writeByte((byte) (isOnline ? 1 : 0));
+        dest.writeString(token);
     }
 }

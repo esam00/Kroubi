@@ -88,13 +88,18 @@
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value=".ui.settings.SettingsActivity" />
         </activity>
-
         <activity android:name=".ui.status.EditStatusActivity"
             android:label="@string/status"
             android:parentActivityName=".ui.profile.activity.MyProfileActivity">
             <meta-data android:name="android.support.PARENT_ACTIVITY"
                 android:value=".ui.profile.activity.MyProfileActivity"/>
         </activity>
+        <service
+            android:name=".firebase.fcm.MyFirebaseMessagingService">
+            <intent-filter>
+                <action android:name="com.google.firebase.MESSAGING_EVENT"/>
+            </intent-filter>
+        </service>
 
         <provider
             android:name="androidx.core.content.FileProvider"

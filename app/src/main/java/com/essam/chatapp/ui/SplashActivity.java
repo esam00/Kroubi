@@ -6,7 +6,7 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
 
-import com.essam.chatapp.firebase.FirebaseManager;
+import com.essam.chatapp.firebase.data.FirebaseManager;
 import com.essam.chatapp.ui.home.activity.HomeActivity;
 import com.essam.chatapp.ui.on_boarding.OnBoardingActivity;
 import com.essam.chatapp.ui.profile.activity.CompleteProfileActivity;

@@ -1,6 +1,6 @@
 package com.essam.chatapp.ui.status;
 
-import com.essam.chatapp.firebase.FirebaseManager;
+import com.essam.chatapp.firebase.data.FirebaseManager;
 
 public class EditStatusPresenter implements EditStatusContract.Presenter {
 

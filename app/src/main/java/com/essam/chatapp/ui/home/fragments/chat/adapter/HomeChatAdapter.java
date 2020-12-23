@@ -14,7 +14,7 @@ import androidx.recyclerview.widget.SortedListAdapterCallback;
 
 import com.bumptech.glide.Glide;
 import com.essam.chatapp.R;
-import com.essam.chatapp.firebase.FirebaseManager;
+import com.essam.chatapp.firebase.data.FirebaseManager;
 import com.essam.chatapp.models.HomeChat;
 import com.essam.chatapp.models.Profile;
 import com.essam.chatapp.ui.contacts.utils.ContactsHelper;
