@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="utf-8"?>
+<MotionScene 
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:motion="http://schemas.android.com/apk/res-auto">
+
+    <Transition
+        motion:constraintSetEnd="@+id/end"
+        motion:constraintSetStart="@id/start"
+        motion:duration="1000">
+       <KeyFrameSet>
+           <KeyAttribute
+               motion:motionTarget="@+id/profile_iv"
+               motion:framePosition="100"
+               android:alpha="0" />
+
+           <KeyAttribute
+               motion:motionTarget="@+id/image_back"
+               motion:framePosition="100"
+               android:alpha="1" />
+       </KeyFrameSet>
+        <OnSwipe motion:touchAnchorId="@+id/linearLayout2" />
+    </Transition>
+
+    <ConstraintSet android:id="@+id/start"/>
+
+    <ConstraintSet android:id="@+id/end">
+        <Constraint
+            android:layout_height="70dp"
+            motion:layout_constraintStart_toStartOf="parent"
+            motion:layout_constraintTop_toTopOf="parent"
+            motion:layout_constraintEnd_toEndOf="parent"
+            android:layout_width="match_parent"
+            android:id="@+id/profile_iv" />
+        <Constraint
+            android:layout_height="wrap_content"
+            android:layout_width="match_parent"
+            motion:layout_constraintTop_toBottomOf="@+id/profile_iv"
+            android:id="@+id/linearLayout2" />
+        <Constraint
+            android:id="@+id/name_tv"
+            motion:layout_constraintEnd_toEndOf="parent"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            motion:layout_constraintBottom_toBottomOf="@+id/profile_iv"
+            motion:layout_constraintStart_toEndOf="@+id/image_back"/>
+        <Constraint
+            android:layout_height="wrap_content"
+            motion:layout_constraintBottom_toBottomOf="@+id/name_tv"
+            android:layout_width="wrap_content"
+            android:id="@+id/image_back"
+            motion:layout_constraintTop_toTopOf="@+id/profile_iv" />
+    </ConstraintSet>
+</MotionScene>

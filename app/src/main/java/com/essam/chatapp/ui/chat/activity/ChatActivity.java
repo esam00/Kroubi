@@ -325,7 +325,7 @@ public class ChatActivity extends AppCompatActivity implements View.OnClickListe
 
     private void openProfile() {
         Intent intent = new Intent(this, UserProfileActivity.class);
-        intent.putExtra(Consts.USER, mOtherUserProfile);
+        intent.putExtra(Consts.PROFILE, mOtherUserProfile);
         startActivity(intent);
     }
 

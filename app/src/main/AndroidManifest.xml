@@ -79,7 +79,7 @@
         </activity>
         <activity
             android:name=".ui.profile.activity.UserProfileActivity"
-            android:theme="@style/AppTheme.NoActionBar" />
+            android:theme="@style/AppTheme.NoActionBar.FullScreen"/>
         <activity
             android:name=".ui.profile.activity.MyProfileActivity"
             android:label="@string/profile"
