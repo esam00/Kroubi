@@ -1,11 +1,12 @@
 package com.essam.chatapp.firebase.fcm;
 
+import android.app.NotificationChannel;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
-import android.graphics.BitmapFactory;
 import android.media.RingtoneManager;
+import android.os.Build;
 
 import androidx.annotation.NonNull;
 import androidx.core.app.NotificationCompat;
@@ -32,13 +33,20 @@ public class MyFirebaseMessagingService extends FirebaseMessagingService {
         Gson gson = new GsonBuilder().create();
         Message message = gson.fromJson(data.get(Consts.MESSAGE), Message.class);
         Profile profile = gson.fromJson(data.get(Consts.PROFILE), Profile.class);
+        String chatId = gson.fromJson(data.get(Consts.CHAT_ID), String.class);
 
-        if (message !=null && profile != null){
-            sendNewMessageNotification(message, profile);
+        if (message != null && profile != null && chatId != null) {
+            // User currently opening the same chat room no need to push notification!
+            String activeChatId = FcmUtils.getActiveChatId();
+            if (activeChatId != null && activeChatId.equals(chatId)){
+                return;
+            }
+
+            createNewMessageNotification(message, profile);
         }
     }
 
-    private void sendNewMessageNotification(Message message, Profile profile) {
+    private void createNewMessageNotification(Message message, Profile profile) {
         // Instantiate builder
         NotificationCompat.Builder builder = new NotificationCompat.Builder(this, Consts.DEFAULT_NOTIFICATION_CHANNEL_ID);
 
@@ -58,16 +66,24 @@ public class MyFirebaseMessagingService extends FirebaseMessagingService {
 
         //add properties to the builder
         builder.setSmallIcon(R.drawable.ic_logo)
-                .setLargeIcon(BitmapFactory.decodeResource(getResources(), R.drawable.ic_logo))
+//                .setLargeIcon(BitmapFactory.decodeResource(getResources(), R.drawable.user_placeholder))
                 .setSound(RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION))
                 .setContentTitle(profile.getUserName())
                 .setContentText(message.getMessage())
+                .setStyle(new NotificationCompat.BigTextStyle().bigText(message.getMessage()))
                 .setColor(getResources().getColor(R.color.colorAccent))
+                .setPriority(NotificationCompat.PRIORITY_HIGH)
                 .setAutoCancel(true)
                 .setContentIntent(notifyPendingIntent);
 
         NotificationManager notificationManager =
                 (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
+
+        // Create Notification Channel if version is android 8 or higher
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            notificationManager.createNotificationChannel(
+                    new NotificationChannel(Consts.DEFAULT_NOTIFICATION_CHANNEL_ID, "New message", NotificationManager.IMPORTANCE_HIGH));
+        }
         notificationManager.notify(Consts.NEW_MESSAGE_NOTIFICATION_ID, builder.build());
     }
 

@@ -49,11 +49,16 @@ public class ChatManager {
         InitChatRoomInfo(chatID);
     }
 
+    public void clearActiveChatId(){
+        mManager.setActiveChatId(null);
+    }
+
     /* -------------------------------Initialization[private helpers]----------------------------*/
 
     private void InitChatRoomInfo(String chatID) {
         //initialize reference to top level chat reference in database >> app/chat/chatID
         mChatDb = mManager.getReferenceToSpecificAppChat(chatID);
+        mManager.setActiveChatId(chatID);
 
         //initialize reference to chat node at my side in database >> app/user/myUid/chat/chatID
         mySideDb = mManager.getReferenceToSpecificUserChat(chatID);
@@ -162,7 +167,7 @@ public class ChatManager {
     }
 
     private void pushMessageNotification(Message message) {
-        Data data = new Data(message, myProfile);
+        Data data = new Data(message, myProfile, chatID);
         FirebaseCloudMessage firebaseCloudMessage = new FirebaseCloudMessage(otherProfile.getToken(), data);
         FcmUtils.pushNewMessageNotification(firebaseCloudMessage);
     }

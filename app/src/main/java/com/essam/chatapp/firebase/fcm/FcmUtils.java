@@ -71,4 +71,8 @@ public class FcmUtils {
         });
 
     }
+
+    public static String getActiveChatId(){
+        return FirebaseManager.getInstance().getActiveChatId();
+    }
 }

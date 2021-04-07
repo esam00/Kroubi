@@ -216,6 +216,7 @@ public class ChatPresenter implements ChatContract.Presenter, StorageCallbacks.C
     private void unSubScribeAllListeners() {
         toggleIsTypingState(false);
         mChatManager.removeLastUnseenCountListener();
+        mChatManager.clearActiveChatId();
 
         // remove firebase eventListener .. no need for them since activity is shutting down
         if (mNewMessageEventListener != null)

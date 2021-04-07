@@ -33,6 +33,16 @@ public class FirebaseManager {
     private DatabaseReference userChatDb;       //App/user/uid/chat/
     private DatabaseReference userProfileDb;    //App/user/uid/profile/
 
+    private String activeChatId;
+
+    public String getActiveChatId() {
+        return activeChatId;
+    }
+
+    public void setActiveChatId(String activeChatId) {
+        this.activeChatId = activeChatId;
+    }
+
     private FirebaseManager() {
         initFirebase();
     }
