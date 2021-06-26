@@ -6,6 +6,7 @@ import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.core.app.ActivityOptionsCompat;
 
 import android.content.Intent;
+import android.net.Uri;
 import android.os.Bundle;
 import android.view.MenuItem;
 import android.view.View;
@@ -81,9 +82,17 @@ public class SettingsActivity extends AppCompatActivity implements View.OnClickL
             case R.id.chats:
             case R.id.notifications:
             case R.id.storage:
-            case R.id.help:
                 Toast.makeText(this, " Just a design!", Toast.LENGTH_SHORT).show();
+                break;
+            case R.id.help:
+                openPayPal();
         }
+    }
+
+    private void openPayPal(){
+        Intent intent = new Intent(Intent.ACTION_VIEW);
+        intent.setData(Uri.parse("https://paypal.me/esammosbah?locale.x=en_US"));
+        startActivity(intent);
     }
 
     @Override

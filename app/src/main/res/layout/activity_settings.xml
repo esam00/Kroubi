@@ -317,7 +317,7 @@
                     android:id="@+id/help_iv"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:src="@drawable/ic_help"
+                    android:src="@drawable/ic_coffee"
                     app:layout_constraintBottom_toBottomOf="parent"
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toTopOf="parent" />
@@ -337,7 +337,7 @@
                         android:id="@+id/help_tv"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:text="@string/help"
+                        android:text="Donate"
                         android:textAppearance="@style/TextAppearance.AppCompat.Medium"
                         android:textColor="@color/colorPrimaryText" />
 
@@ -346,7 +346,7 @@
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:maxLines="1"
-                        android:text="@string/faq_contact_us_privacy_policy"
+                        android:text="Buy me a cup of coffee"
                         android:textAppearance="@style/TextAppearance.AppCompat.Small"
                         android:textColor="@color/colorSecondaryText" />
 

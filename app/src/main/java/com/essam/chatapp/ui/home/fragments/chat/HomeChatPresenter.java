@@ -94,5 +94,4 @@ public class HomeChatPresenter implements HomeChatContract.Presenter{
             mFirebaseManager.removeHomeChatListener(mHomeChatsEventListener);
         }
     }
-
 }
