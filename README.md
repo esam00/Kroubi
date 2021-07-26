@@ -7,13 +7,10 @@ Kroubi is a realtime chat app integrated with firebase and inspired its ui from 
 <img src="screenshots/intro.png" width=300>
 </p>
 
-## screenShots 
-<p align="center">
+## ScreenShots 
 <img src="screenshots/contacts.png" width=300> <img src="screenshots/chat.png" width=300>
-</p>
-<p align="center">
+
 <img src="screenshots/profile.png" width=300> <img src="screenshots/other.png" width=300>
-</p>
 
 ## Features
 * Login with phone number using Firebase Auth.
