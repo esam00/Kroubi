@@ -4,10 +4,10 @@ android {
     compileSdkVersion 31
     buildToolsVersion "28.0.3"
     defaultConfig {
-        applicationId "com.essam.chatapp"
+        applicationId "com.essam.kroubi"
         minSdkVersion 21
         targetSdkVersion 31
-        versionCode 3
+        versionCode 4
         versionName "beta-1.0.0"
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
     }

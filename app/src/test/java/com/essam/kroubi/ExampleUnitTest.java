@@ -1,4 +1,4 @@
-package com.essam.chatapp;
+package com.essam.kroubi;
 
 import org.junit.Test;
 

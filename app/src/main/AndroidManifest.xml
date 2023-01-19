@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="com.essam.chatapp">
+    package="com.essam.kroubi">
 
     <uses-permission android:name="android.permission.CALL_PHONE" />
     <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
@@ -22,7 +22,7 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
         <activity
-            android:name=".ui.SplashActivity"
+            android:name="com.essam.kroubi.ui.SplashActivity"
             android:theme="@style/SplashTheme"
             android:exported="true">
             <intent-filter>
@@ -33,69 +33,69 @@
             </intent-filter>
         </activity>
         <activity
-            android:name=".ui.on_boarding.OnBoardingActivity"
+            android:name="com.essam.kroubi.ui.on_boarding.OnBoardingActivity"
             android:screenOrientation="portrait"
             android:theme="@style/IntroTheme" />
         <activity
-            android:name=".ui.LoginPhoneNumberActivity"
+            android:name="com.essam.kroubi.ui.LoginPhoneNumberActivity"
             android:screenOrientation="portrait"
             android:theme="@style/LoginTheme"
             android:windowSoftInputMode="adjustPan|stateAlwaysVisible" />
         <activity
-            android:name=".ui.verification.VerificationActivity"
+            android:name="com.essam.kroubi.ui.verification.VerificationActivity"
             android:theme="@style/LoginTheme"
             android:windowSoftInputMode="adjustPan" />
         <activity
-            android:name=".ui.profile.activity.CompleteProfileActivity"
+            android:name="com.essam.kroubi.ui.profile.activity.CompleteProfileActivity"
             android:theme="@style/AppTheme.NoActionBar" />
         <activity
-            android:name=".ui.home.activity.HomeActivity"
+            android:name="com.essam.kroubi.ui.home.activity.HomeActivity"
             android:label="@string/home_activity_title"
             android:theme="@style/AppTheme.NoActionBar" />
         <activity
-            android:name=".ui.chat.activity.ChatActivity"
-            android:parentActivityName=".ui.home.activity.HomeActivity"
+            android:name="com.essam.kroubi.ui.chat.activity.ChatActivity"
+            android:parentActivityName="com.essam.kroubi.ui.home.activity.HomeActivity"
             android:theme="@style/AppTheme.NoActionBar">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
-                android:value=".ui.home.activity.HomeActivity" />
+                android:value="com.essam.kroubi.ui.home.activity.HomeActivity" />
         </activity>
         <activity
-            android:name=".ui.contacts.activity.ContactsActivity"
+            android:name="com.essam.kroubi.ui.contacts.activity.ContactsActivity"
             android:label="@string/select_contact"
-            android:parentActivityName=".ui.home.activity.HomeActivity" />
+            android:parentActivityName="com.essam.kroubi.ui.home.activity.HomeActivity" />
         <activity
-            android:name=".ui.photoEditor.PhotoEditorActivity"
+            android:name="com.essam.kroubi.ui.photoEditor.PhotoEditorActivity"
             android:label="@string/title_activity_image_presenter"
             android:theme="@style/ImagePresenterTheme"
             android:windowSoftInputMode="stateHidden|adjustResize" />
         <activity
-            android:name=".ui.settings.SettingsActivity"
+            android:name="com.essam.kroubi.ui.settings.SettingsActivity"
             android:label="@string/settings"
-            android:parentActivityName=".ui.home.activity.HomeActivity">
+            android:parentActivityName="com.essam.kroubi.ui.home.activity.HomeActivity">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
-                android:value=".ui.home.activity.HomeActivity" />
+                android:value="com.essam.kroubi.ui.home.activity.HomeActivity" />
         </activity>
         <activity
-            android:name=".ui.profile.activity.UserProfileActivity"
+            android:name="com.essam.kroubi.ui.profile.activity.UserProfileActivity"
             android:theme="@style/AppTheme.NoActionBar.FullScreen"/>
         <activity
-            android:name=".ui.profile.activity.MyProfileActivity"
+            android:name="com.essam.kroubi.ui.profile.activity.MyProfileActivity"
             android:label="@string/profile"
-            android:parentActivityName=".ui.settings.SettingsActivity">
+            android:parentActivityName="com.essam.kroubi.ui.settings.SettingsActivity">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
-                android:value=".ui.settings.SettingsActivity" />
+                android:value="com.essam.kroubi.ui.settings.SettingsActivity" />
         </activity>
-        <activity android:name=".ui.status.EditStatusActivity"
+        <activity android:name="com.essam.kroubi.ui.status.EditStatusActivity"
             android:label="@string/status"
-            android:parentActivityName=".ui.profile.activity.MyProfileActivity">
+            android:parentActivityName="com.essam.kroubi.ui.profile.activity.MyProfileActivity">
             <meta-data android:name="android.support.PARENT_ACTIVITY"
-                android:value=".ui.profile.activity.MyProfileActivity"/>
+                android:value="com.essam.kroubi.ui.profile.activity.MyProfileActivity"/>
         </activity>
         <service
-            android:name=".firebase.fcm.MyFirebaseMessagingService"
+            android:name="com.essam.kroubi.firebase.fcm.MyFirebaseMessagingService"
             android:exported="true">
             <intent-filter>
                 <action android:name="com.google.firebase.MESSAGING_EVENT"/>
@@ -104,7 +104,7 @@
 
         <provider
             android:name="androidx.core.content.FileProvider"
-            android:authorities="com.essam.chatapp.fileprovider"
+            android:authorities="com.essam.kroubi.fileprovider"
             android:exported="false"
             android:grantUriPermissions="true">
             <meta-data

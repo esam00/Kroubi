@@ -8,18 +8,26 @@
   "client": [
     {
       "client_info": {
-        "mobilesdk_app_id": "1:818002168553:android:d9914124b2d5242029fe78",
+        "mobilesdk_app_id": "1:818002168553:android:482772a25c7d1e9f29fe78",
         "android_client_info": {
-          "package_name": "com.essam.chatapp"
+          "package_name": "com.essam.kroubi"
         }
       },
       "oauth_client": [
         {
-          "client_id": "818002168553-cer8cpmo9i37ml2g9skhal67f9pf280v.apps.googleusercontent.com",
+          "client_id": "818002168553-m4p2tjq2t60d67hdhp8s2kmgqk7gfv6o.apps.googleusercontent.com",
           "client_type": 1,
           "android_info": {
-            "package_name": "com.essam.chatapp",
+            "package_name": "com.essam.kroubi",
             "certificate_hash": "7aa6972f7c653468c072054505af20e9c8f0a55d"
+          }
+        },
+        {
+          "client_id": "818002168553-pn2fu006g137su4sm5h1mam1ab5mrcve.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.essam.kroubi",
+            "certificate_hash": "adcabf92748d6ce07f5cb0d841cda924760765a4"
           }
         },
         {
